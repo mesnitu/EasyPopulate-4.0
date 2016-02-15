@@ -1666,33 +1666,24 @@ if ( strtolower(substr($file['name'],0,14)) == "pricebreaks-ep") {
 		/**
 		 * @EP4Bookx
 		 * Reports missing fields with the book edit link
-		 * @todo  make this reports configurable
-		 * @todo  remove colors, leave classes
-		 * @idea  Download link to save for later the books with empty fields 
 		 */
 		if (!empty($bookx_reports)) {
-		$display_output .= '<div class="bookx-reports">'.EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER; 
-		$display_output .= '<p>Review some empty or defaults fields used in the import</p>';			
-		
-		//pr($bookx_reports);
-		$keys = array_keys($bookx_reports);
-		//pr($keys);
-		
-		$display_output .= '<ul>';
-		for($i = 0; $i < count($bookx_reports); $i++) {
+		$display_output .= '<table class="bookx-reports"><caption>'.EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER.'</caption><tr class="bookx-reports-top"><th >Type</th><th>'.EASYPOPULATE_4_BOOKX_TABLE_BOOK.'</th></tr>'; 
+        
+        foreach ($bookx_reports as $key => $value) {
+            $display_output .= '<tr><th class="bookx-reports-th-left" rowspan ="'.(count($value) + 1).'">' . strtoupper($key) . '</th>';
+            $display_output .= '<th class="bookx-reports-th-caption">'. EASYPOPULATE_4_BOOKX_TABLE_CAPTION . '</th></tr>';
+            
+            $lastKey = count($value)-1;
+           
+            for ($i=0; $i < (count($value)) ; $i++) { 
 
-		    $display_output .= '<li class="bookx-report-type">' . strtoupper($keys[$i]) . '</li><ul class="ul">';
-		    
-		    foreach($bookx_reports[$keys[$i]] as $key => $value) {
-		    	$class = ($key%2 == true) ? 'odd' : 'even';
-		        $display_output .= "<li class=".$class.">". $value . "</li>";
-		    }
-		    $display_output .= '</ul>';
-
-		}
-		
-		$display_output .='</ul></div>';
-		
+                 $class = ($i & 1) ? 'odd' : 'even';
+                 ($i == $lastKey ? $class .=' last' :'');
+                 $display_output .= '<tr ><td class="' . $class .'">'. $value[$i] . '</td></tr>';	       
+            }
+        }
+		$display_output .='</table>';	
 		}
 		//ends ep4Bookx
 		
