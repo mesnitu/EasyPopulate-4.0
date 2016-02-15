@@ -9,7 +9,7 @@ To import Bookx fields by CSV - tested with **Zencart 1.5.4** and **EP4 v4.0.30*
 
 ### Note : Still under heavy tests 
 >This are some initial files, that already import BookX fields, but isn't yet suitable in a production enviroment. A lot of testings and ideas going on.
-It still **only supports the default language**
+~~It still **only supports the default language**~~
 I've tested this with 2129 books. Probably you'll have to adjust the EP4 split records, depending on the server's config and max_execution time. 
 
 ### Quick review : 
@@ -44,8 +44,8 @@ For now, this are the supported fields (just the names, no description yet)
   
 ### Use it (still in idea stage)
 
-For now , in EP4 configuration page, you may assign a default genre. 
-In EP4 language file, you'll find more configurations for other default values, or the reports you want to generate. 
+~~For now , in EP4 configuration page, you may assign a default genre. ~~
+In EP4 language file, you'll find the configurations for default values, or the reports you want to generate. 
 ie:
 ```php 
 $report_bookx_subtitle = false;  // no report on missing subtitle
@@ -97,7 +97,7 @@ So you would do v_status 10, to remove books.
 If you've never worked with this csv importers , be aware that "Author A" it's different than "Autor A ", or even more spaces of garbage, that sometimes are present in excel, calc, csv files.
 
  ## Todo  
- - [ ]  export /import with support for languages.
+ - [X]  export /import with support for languages.
  - [X]  export /import assigned multiple authors.
  - [X]  export /import assigned multiple genres.
  - [ ]  Create a separated file to deal only with bookx fields.
