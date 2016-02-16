@@ -1323,7 +1323,7 @@ function ep_4_query($query) {
 }
 
 function install_easypopulate_4() {
-	//   @ALTERED  Enable Bookx data (group ID 100) , default Genre group ID 111 
+	//   @ALTERED  Enable Bookx data (group ID 230) 
   global $db, $zco_notifier;
 	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
 	if ( (substr($project,0,5) == "1.3.8") || (substr($project,0,5) == "1.3.9") ) {
