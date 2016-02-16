@@ -383,78 +383,7 @@ function ep_4_set_filelayout($ep_dltype, &$filelayout_sql, $sql_filter, $langcod
 			$filelayout[] = 'v_music_genre_name';
 		}
 		
-		//@ALTERED Bookx Info - 23-04-2015             		
-if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
-	   
-        // BOOKX_EXTRA DESCRIPTION
-       // if (isset($enable_bookx_subtitle ) ) {
-        foreach ($langcode as $key => $lang) { // create variables for each language id
-            $l_id = $lang['id'];
-         $filelayout[] = 'v_bookx_subtitle_'.$l_id; 
-            }  
-        //}
-       //if ($enable_bookx_genre_name == true ) { // This is not working....
-       foreach ($langcode as $key => $lang) { // create variables for each language id
-            $l_id = $lang['id']; 
-         $filelayout[] = 'v_bookx_genre_name_'.$l_id;
-            }  
-       //} 
-       //if ($enable_bookx_publisher_name == true) {
-		$filelayout[] = 'v_bookx_publisher_name';
-        //}
-        //if ($enable_bookx_series_name == true) {
-        foreach ($langcode as $key => $lang) { 
-            $l_id = $lang['id'];
-            $filelayout[] = 'v_bookx_series_name_'.$l_id; // Series name, as Lang ID
-                }  
-        //} 
-        //if ($enable_bookx_imprint_name == true) {            
-		$filelayout[] = 'v_bookx_imprint_name';
-        //}
-        
-        //if ($enable_bookx_binding == true) { 
-        foreach ($langcode as $key => $lang) { 
-            $l_id = $lang['id'];
-            $filelayout[] = 'v_bookx_binding_'.$l_id; //   Lang ID
-                }
-        //}
-        // if ($enable_bookx_printing == true) { 
-        foreach ($langcode as $key => $lang) { 
-            $l_id = $lang['id'];
-            $filelayout[] = 'v_bookx_printing_'.$l_id; //   Lang ID
-                }
-         //}
-        //if ($enable_bookx_condition == true) { 
-        foreach ($langcode as $key => $lang) { 
-            $l_id = $lang['id'];
-            $filelayout[] = 'v_bookx_condition_'.$l_id; //  Lang ID
-                } 
-        //}
-        //if($enable_bookx_isbn == true) {     
-		$filelayout[] = 'v_bookx_isbn';
-        //}
-       //if($enable_bookx_size == true) { 
-		$filelayout[] = 'v_bookx_size';
-       //}
-       //if($enable_bookx_volume == true) {
-		$filelayout[] = 'v_bookx_volume';
-       //}
-        //if($enable_bookx_pages == true) {
-		$filelayout[] = 'v_bookx_pages';
-        //}
-        //if($enable_bookx_publishing_date == true) {
-		$filelayout[] = 'v_bookx_publishing_date'; 
-        //}
-        //if($enable_bookx_author_name == true) {        
-		$filelayout[] = 'v_bookx_author_name';
-        //}
-        //if ($enable_bookx_author_type == true) {
-            foreach ($langcode as $key => $lang) { 
-            $l_id = $lang['id'];
-		$filelayout[] = 'v_bookx_author_type_'.$l_id;
-            }	
-        //}		
-}
+
 		
 		$filelayout_sql = 'SELECT
 			p.products_id					as v_products_id,
@@ -1421,8 +1350,7 @@ function install_easypopulate_4() {
 			('Convert Curly Quotes, etc.',         'EASYPOPULATE_4_CONFIG_CURLY_QUOTES', '0', 'Convert Curly Quotes, Em-Dash, En-Dash and Ellipsis characters in fields displayed to customer (default 0).<br><br>0=No Change<br>1=Replace with Basic Characters<br>2=Replace with HTML equivalents', ".$group_id.", '170', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '180', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '190', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
-			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('Enable Products Bookx ',         'EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Bookx Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '17', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),       ('Enable Products Bookx ',         'EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Bookx Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
 			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '210', NULL, now(), NULL, NULL),
 			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 		");
@@ -1457,7 +1385,7 @@ function install_easypopulate_4() {
 			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '180', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '190', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
 			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '200', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('Enable Products Bookx',         'EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Books Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('Enable Products Bookx',         'EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Books Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
 			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '210', NULL, now(), NULL, NULL),
 			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 		");
@@ -1530,4 +1458,13 @@ function register_globals_vars_check_4 () {
 	print "_REQUEST: "; print_r($_REQUEST); echo '<br /><br />';
 	global $HTTP_POST_FILES;
 	print "HTTP_POST_FILES: "; print_r($HTTP_POST_FILES); echo '<br />';
+}
+
+function pr ($var,$title = null) {
+    echo '<pre style="background:#ccc;">';
+    if ($title):
+    echo '<b>' . $title. ':</b> ';
+    endif;
+    print_r($var);
+    echo '</pre>';
 }
