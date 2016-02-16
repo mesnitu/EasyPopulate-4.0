@@ -369,7 +369,11 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
       $row['v_specials_expires_date'] = '';
     }
   } // END: Specials
-
+//:::::@ALTERED for Bookx              
+        //if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA) {    
+        include 'easypopulate_4_export_bookx.php';
+        //}				   
+        //:::::::::::::::::::::::::::::::::::::::::
   $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
 
   // Multi-Lingual Categories, Categories Meta, Categories Descriptions
@@ -737,11 +741,7 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     }
   } // if (v_artists_name && v_products_type)
 
-	//:::::@ALTERED for Bookx              
-        //if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA) {    
-        include 'easypopulate_4_export_bookx.php';
-        //}				   
-        //:::::::::::::::::::::::::::::::::::::::::
+	
 		
   // MANUFACTURERS EXPORT - THIS NEEDS MULTI-LINGUAL SUPPORT LIKE EVERYTHING ELSE!
   // if the filelayout says we need a manfacturers name, get it for download file
