@@ -716,6 +716,103 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
             echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
             echo "</table>\n";
           }
+
+          foreach ((EP4_SHOW_ALL_FILETYPES != 'false' ? $filenames_merged : $filetypes) as $key => $val) {
+            (EP4_SHOW_ALL_FILETYPES != 'false' ? $val = $filetypes[$key] : '');
+            if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
+              $val = array();
+              for ($i = 0; $i < sizeof($files); $i++) {
+                $val[$i] = $i;
+              }
+            }
+
+            $file_count = 0;
+            //Display the information needed to start use of a filetype.
+            $plural_state = "<strong>" . (sizeof($val) > 1 ? EP_DESC_PLURAL : EP_DESC_SING) . "</strong>";
+            if (EP4_SHOW_ALL_FILETYPES != 'Hidden') {
+              echo "<tr><td colspan=\"8\">" . sprintf($filenames_merged[$key], "<strong>" . $key . "</strong>", $plural_state) . "</td></tr>";
+              echo "<tr><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_FILENAME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SIZE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DATE_TIME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_TYPE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SPLIT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_IMPORT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DELETE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DOWNLOAD . "</th>\n";
+            }
+
+            for ($i = 0; $i < sizeof($val); $i++) {
+              if (EP4_SHOW_ALL_FILETYPES != 'Hidden' || (EP4_SHOW_ALL_FILETYPES == 'Hidden' && ($files[$i] != ".") && ($files[$i] != "..") && preg_match("/\.(sql|gz|csv|txt|log)$/i", $files[$i]) )) {
+                $file_count++;
+                echo '<tr><td>' . $files[$val[$i]] . '</td>
+					<td align="right">' . filesize($upload_dir . $files[$val[$i]]) . '</td>
+					<td align="center">' . date("Y-m-d H:i:s", filemtime($upload_dir . $files[$val[$i]])) . '</td>';
+                $ext = strtolower(end(explode('.', $files[$val[$i]])));
+                // file type
+                switch ($ext) {
+                  case 'sql':
+                    echo '<td align=center>SQL</td>';
+                    break;
+                  case 'gz':
+                    echo '<td align=center>GZip</td>';
+                    break;
+                  case 'csv':
+                    echo '<td align=center>CSV</td>';
+                    break;
+                  case 'txt':
+                    echo '<td align=center>TXT</td>';
+                    break;
+                  case 'log':
+                    echo '<td align=center>LOG</td>';
+                    break;
+                  default:
+                }
+                // file management
+                if ($ext == 'csv') {
+                  // $_SERVER["PHP_SELF"] vs $_SERVER['SCRIPT_NAME']
+//                  echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?split=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT . "</a></td>\n";
+                  echo "<td align=center>" . zen_draw_form('split_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('split', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('split_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>\n"; //. "<a href=\"" . $_SERVER['SCRIPT_NAME'] . "?split=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT . "</a></td>\n";
+                  if (strtolower(substr($files[$val[$i]], 0, 12)) == "sba-stock-ep") {
+//                    echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a><br /><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "&amp;sync=1\"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC; </a></td>\n";
+                    echo "<td align=center>" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form><br />" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_hidden_field('sync', '1', /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>\n"; //"<a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a><br /><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "&amp;sync=1\"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC; //</a></td>\n";
+                  } else {
+//                    echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a></td>\n";
+                    echo "<td align=center>" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>\n"; // <a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a></td>\n";
+                  }
+//        echo zen_draw_form('custom', 'easypopulate_4.php', '', 'post', 'id="custom"');
+
+                  echo "<td align=center>" . zen_draw_form('delete_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('delete', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('delete_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>";
+/*                  echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?delete=" . urlencode($files[$val[$i]]) . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE . "</a></td>";*/
+                  echo "<td align=center><a href=\"" . ($request_type == 'SSL' ? (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ HTTPS_CATALOG_SERVER . DIR_WS_HTTPS_CATALOG : /*Admin Side */ HTTPS_SERVER . DIR_WS_HTTPS_ADMIN) : (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ HTTP_CATALOG_SERVER . DIR_WS_CATALOG : /*Admin Side */ HTTP_SERVER . DIR_WS_ADMIN)) . $tempdir . $files[$val[$i]] . "\" target=_blank>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DOWNLOAD . "</a></td></tr>\n";
+                } else {
+                  echo "<td>&nbsp;</td>\n";
+                  echo "<td>&nbsp;</td>\n";
+//                  echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?delete=" . urlencode($files[$val[$i]]) . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE . "</a></td>";
+                  echo "<td align=center>" . zen_draw_form('delete_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('delete', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('delete_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>";
+                  echo "<td align=center><a href=\"" . ($request_type == 'SSL' ? (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ HTTPS_CATALOG_SERVER . DIR_WS_HTTPS_CATALOG : /*Admin Side */ HTTPS_SERVER . DIR_WS_HTTPS_ADMIN) : (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ HTTP_CATALOG_SERVER . DIR_WS_CATALOG : /*Admin Side */ HTTP_SERVER . DIR_WS_ADMIN)) . $tempdir . $files[$val[$i]] . "\" target=_blank>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DOWNLOAD . "</a></td></tr>\n";
+                }
+              }
+            } // End loop within a filetype
+            if ($file_count == 0 && EP4_SHOW_ALL_FILETYPES != 'Hidden') {
+              echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
+            } // if (sizeof($files)>0)
+            if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
+              break;
+            }
+          } // End foreach filetype 
+          if (EP4_SHOW_ALL_FILETYPES != 'Hidden') {
+            echo "</table>\n";
+            if (sizeof($filetypes) == 0 && EP4_SHOW_ALL_FILETYPES == 'false') {
+              echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
+              echo "<tr><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_FILENAME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SIZE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DATE_TIME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_TYPE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SPLIT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_IMPORT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DELETE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DOWNLOAD . "</th>\n";
+              echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
+              echo "</table>\n";
+            }
+          }
+        } else { // can't open directory
+          echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_ERROR_FOLDER_OPEN . "</font> " . $tempdir . "</td></tr>\n";
+          $error = true;
+        } // opendir()
+        if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
+          echo "</table>\n";
+          if (sizeof($filetypes) == 0) {
+            echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
+            echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
+            echo "</table>\n";
+          }
         }
 
 

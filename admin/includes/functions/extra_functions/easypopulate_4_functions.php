@@ -1316,6 +1316,25 @@ function ep_4_remove_product_bookx($product_model) {
 	return;
 }
 
+function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
+//  $datarow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
+  $dataRow = '';
+
+  $problem_chars = array("\r", "\n", "\t"); // carriage return, newline, tab
+  foreach ($filelayout as $key => $value) {
+//		$thetext = $active_row[$key];
+    // remove carriage returns, newlines, and tabs - needs review
+    $thetext = str_replace($problem_chars, ' ', $active_row[$key]);
+    // encapsulate data in quotes, and escape embedded quotes in data
+    $dataRow .= '"' . str_replace('"', '""', $thetext) . '"' . $csv_delimiter;
+  }
+  // Remove trailing tab, then append the end-of-line
+  $dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
+
+  return $dataRow;
+}
+
+
 // DEPRECATED: no calls to this function!
 // reset products master categories ID - I do not believe this works correctly - chadd
 /*
