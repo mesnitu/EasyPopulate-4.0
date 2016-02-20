@@ -154,6 +154,80 @@ if (!defined('IS_ADMIN_FLAG')) {
 			}
 			$filelayout[] = 'v_music_genre_name';
 		}
+        
+//@ALTERED Bookx Info - 23-04-2015             		
+if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
+	   pr(EASYPOPULATE_4_CONFIG_BOOKX_DATA);
+        // BOOKX_EXTRA DESCRIPTION
+       // if (isset($enable_bookx_subtitle ) ) {
+        foreach ($langcode as $key => $lang) { // create variables for each language id
+            $l_id = $lang['id'];
+         $filelayout[] = 'v_bookx_subtitle_'.$l_id; 
+            }  
+        //}
+       //if ($enable_bookx_genre_name == true ) { // This is not working....
+       foreach ($langcode as $key => $lang) { // create variables for each language id
+            $l_id = $lang['id']; 
+         $filelayout[] = 'v_bookx_genre_name_'.$l_id;
+            }  
+       //} 
+       //if ($enable_bookx_publisher_name == true) {
+		$filelayout[] = 'v_bookx_publisher_name';
+        //}
+        //if ($enable_bookx_series_name == true) {
+        foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+            $filelayout[] = 'v_bookx_series_name_'.$l_id; // Series name, as Lang ID
+                }  
+        //} 
+        //if ($enable_bookx_imprint_name == true) {            
+		$filelayout[] = 'v_bookx_imprint_name';
+        //}
+        
+        //if ($enable_bookx_binding == true) { 
+        foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+            $filelayout[] = 'v_bookx_binding_'.$l_id; //   Lang ID
+                }
+        //}
+        // if ($enable_bookx_printing == true) { 
+        foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+            $filelayout[] = 'v_bookx_printing_'.$l_id; //   Lang ID
+                }
+         //}
+        //if ($enable_bookx_condition == true) { 
+        foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+            $filelayout[] = 'v_bookx_condition_'.$l_id; //  Lang ID
+                } 
+        //}
+        //if($enable_bookx_isbn == true) {     
+		$filelayout[] = 'v_bookx_isbn';
+        //}
+       //if($enable_bookx_size == true) { 
+		$filelayout[] = 'v_bookx_size';
+       //}
+       //if($enable_bookx_volume == true) {
+		$filelayout[] = 'v_bookx_volume';
+       //}
+        //if($enable_bookx_pages == true) {
+		$filelayout[] = 'v_bookx_pages';
+        //}
+        //if($enable_bookx_publishing_date == true) {
+		$filelayout[] = 'v_bookx_publishing_date'; 
+        //}
+        //if($enable_bookx_author_name == true) {        
+		$filelayout[] = 'v_bookx_author_name';
+        //}
+        //if ($enable_bookx_author_type == true) {
+            foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+		$filelayout[] = 'v_bookx_author_type_'.$l_id;
+            }	
+        //}		
+}
+        
 		$filelayout_sql = 'SELECT DISTINCT 
 
 			p.products_id					as v_products_id,
