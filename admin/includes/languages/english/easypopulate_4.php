@@ -10,6 +10,7 @@ define('EASYPOPULATE_4_DISPLAY_UPLOADED_FILE_SPEC','<p class=smallText>File uplo
 define('EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC','<p class=smallText><b>Filename: %s</b><br />'); // open paragraph
 
 // upload results display - output via $display_output
+define('EASYPOPULATE_4_DISPLAY_RESULT_DELETED', '<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s</font> - GENRE: %s');
 define('EASYPOPULATE_4_DISPLAY_RESULT_DELETED','<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_DELETE_NOT_FOUND','<br /><font color="darkviolet"><b>NOT FOUND! - Model:</b> %s - cant delete...</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_CATEGORY_NOT_FOUND', '<br /><font color="red"><b>SKIPPED! - Model:</b> %s - No category provided for this%s product</font>');
@@ -245,6 +246,7 @@ $bookx_default_printing = '';
 $bookx_default_binding = '';
 $bookx_default_genre_name = ''; 
 $bookx_default_publisher_name = '';
+$bookx_default_series_name = '';
 $bookx_default_imprint_name = '';
 $bookx_default_condition = '';
 define('EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE','File Import Completed.');

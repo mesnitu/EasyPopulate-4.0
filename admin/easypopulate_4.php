@@ -50,16 +50,6 @@ $ep_metatags = (int) EASYPOPULATE_4_CONFIG_META_DATA; // 0-Disable, 1-Enable
 $ep_music = (int) EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enable
 $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
-//@EP4Bookx 
-$ep_bookx         = (int)EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
-$ep_bookx_fallback_genre_name = EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME; 
-
-if ($ep_bookx = 1) {
-	$sql = "SELECT type_id FROM ".TABLE_PRODUCT_TYPES." WHERE type_handler= 'product_bookx'";
-	$result = $db->Execute($sql);
-	$bookx_product_type = $result->fields['type_id'];
-}
-//
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
 if ((isset($error) && !$error) || !isset($error)) {
@@ -182,21 +172,6 @@ $artists_name_max_len = zen_field_length(TABLE_RECORD_ARTISTS, 'artists_name');
 $record_company_name_max_len = zen_field_length(TABLE_RECORD_COMPANY, 'record_company_name');
 $music_genre_name_max_len = zen_field_length(TABLE_MUSIC_GENRE, 'music_genre_name');
 
-/**
-* @EP4Bookx
-*/
-$bookx_author_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name');
-$bookx_author_types_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION, 'type_description');
-$bookx_genre_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION, 'genre_description');
-$bookx_series_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_SERIES_DESCRIPTION, 'series_name');
-$bookx_publisher_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PUBLISHERS, 'publisher_name');
-$bookx_binding_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_BINDING_DESCRIPTION, 'binding_description');
-$bookx_printing_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION, 'printing_description');
-$bookx_condition_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION, 'condition_description');
-$bookx_imprint_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'imprint_name');
-$bookx_subtitle_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION, 'products_subtitle');
-//:::::::::::::::
-
 $project = PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
 
 if ($ep_uses_mysqli) {
@@ -222,20 +197,8 @@ if (($collation == 'utf8') && ((substr($project, 0, 5) == "1.3.8") || (substr($p
   $record_company_name_max_len = $record_company_name_max_len / 3;
   $music_genre_name_max_len = $music_genre_name_max_len / 3;
   
-  /**
-     * @EP4Bookx
-     */
-    $bookx_author_name_max_len = $bookx_author_name_max_len/3;
-    $bookx_author_types_name_max_len = $bookx_author_types_name_max_len/3;
-    $bookx_genre_name_max_len  = $bookx_genre_name_max_len/3;
-    $bookx_series_name_max_len = $bookx_series_name_max_len/3;
-    $bookx_publisher_name_max_len = $bookx_publisher_name_max_len/3;
-    $bookx_binding_name_max_len = $bookx_binding_name_max_len/3;
-    $bookx_printing_name_max_len = $bookx_printing_name_max_len/3;
-    $bookx_condition_name_max_len = $bookx_condition_name_max_len/3;
-    $bookx_imprint_name_max_len = $bookx_imprint_name_max_len/3;
-    $bookx_subtitle_max_len = $bookx_subtitle_max_len/3;
-  
+  $zco_notifier->notify('EP4_COLLATION_UTF8_ZC13X');
+
 }
 
 // test for Ajeh
@@ -325,7 +288,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
     <title><?php echo TITLE; ?></title>
     <link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
-	<link rel="stylesheet" type="text/css" href="includes/ep4bookx.css">
+    <?php $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK'); ?>
     <script language="javascript" type="text/javascript" src="includes/menu.js"></script>
     <script language="javascript" type="text/javascript" src="includes/general.js"></script>
     <!-- <script language="javascript" src="includes/ep4ajax.js"></script> -->
@@ -387,8 +350,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo 'Convert Char 0x92: ' . $ep_char92_text . '<br />';
            echo EASYPOPULATE_4_DISPLAY_ENABLE_META . $ep_metatags . '<br />';
            echo EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC . $ep_music . '<br />';
-		   //::::: @ALTERED for Bookx ::::::::::::::::
-		   echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX.$ep_bookx.'<br/>';
+
            echo '<br /><b><u>' . EASYPOPULATE_4_DISPLAY_CUSTOM_PRODUCT_FIELDS . '</u></b><br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SHORT_DESC . (($ep_supported_mods['psd']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UNIT_MEAS . (($ep_supported_mods['uom']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
@@ -402,6 +364,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SBA . (($ep_4_SBAEnabled != false) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_CEON . (($ep4CEONURIDoesExist == true) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_DPM . (($ep_supported_mods['dual']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+
+           $zco_notifier->notify('EP4_DISPLAY_STATUS');
 
            echo "<br /><b><u>" . EASYPOPULATE_4_DISPLAY_USER_DEF_FIELDS . "</u></b><br />";
            $i = 0;
@@ -423,19 +387,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo 'manufacturers_name:' . $manufacturers_name_max_len . '<br />';
            echo 'products_model:' . $products_model_max_len . '<br />';
            echo 'products_name:' . $products_name_max_len . '<br />';
-		   
-		   /**
-		 * @EP4Bookx
-		 */
-		echo 'author_name:'.$bookx_author_name_max_len.'<br/>';
-		echo 'genre_description:'.$bookx_genre_name_max_len.'<br/>';		
-		echo 'series_name:'.$bookx_series_name_max_len.'<br/>';
-		echo 'publisher_name:'.$bookx_publisher_name_max_len.'<br/>';
-		echo 'binding_description:'.$bookx_binding_name_max_len.'<br/>';
-		echo 'printing_description:'.$bookx_printing_name_max_len.'<br/>';
-		echo 'condition_description:'.$bookx_condition_name_max_len.'<br/>';
-		echo 'imprint_name:'.$bookx_imprint_name_max_len.'<br/>';
 
+           $zco_notifier->notify('EP4_MAX_LEN');
            /*  // some error checking
              echo '<br /><br />Problem Data: '. mysql_num_rows($ajeh_result);
              echo '<br />Memory Usage: '.memory_get_usage();
@@ -711,103 +664,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
         } // opendir()
         if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
           echo "</table>\n";
-          if (sizeof($filetypes) == 0) {
-            echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
-            echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
-            echo "</table>\n";
-          }
 
-          foreach ((EP4_SHOW_ALL_FILETYPES != 'false' ? $filenames_merged : $filetypes) as $key => $val) {
-            (EP4_SHOW_ALL_FILETYPES != 'false' ? $val = $filetypes[$key] : '');
-            if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
-              $val = array();
-              for ($i = 0; $i < sizeof($files); $i++) {
-                $val[$i] = $i;
-              }
-            }
-
-            $file_count = 0;
-            //Display the information needed to start use of a filetype.
-            $plural_state = "<strong>" . (sizeof($val) > 1 ? EP_DESC_PLURAL : EP_DESC_SING) . "</strong>";
-            if (EP4_SHOW_ALL_FILETYPES != 'Hidden') {
-              echo "<tr><td colspan=\"8\">" . sprintf($filenames_merged[$key], "<strong>" . $key . "</strong>", $plural_state) . "</td></tr>";
-              echo "<tr><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_FILENAME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SIZE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DATE_TIME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_TYPE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SPLIT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_IMPORT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DELETE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DOWNLOAD . "</th>\n";
-            }
-
-            for ($i = 0; $i < sizeof($val); $i++) {
-              if (EP4_SHOW_ALL_FILETYPES != 'Hidden' || (EP4_SHOW_ALL_FILETYPES == 'Hidden' && ($files[$i] != ".") && ($files[$i] != "..") && preg_match("/\.(sql|gz|csv|txt|log)$/i", $files[$i]) )) {
-                $file_count++;
-                echo '<tr><td>' . $files[$val[$i]] . '</td>
-					<td align="right">' . filesize($upload_dir . $files[$val[$i]]) . '</td>
-					<td align="center">' . date("Y-m-d H:i:s", filemtime($upload_dir . $files[$val[$i]])) . '</td>';
-                $ext = strtolower(end(explode('.', $files[$val[$i]])));
-                // file type
-                switch ($ext) {
-                  case 'sql':
-                    echo '<td align=center>SQL</td>';
-                    break;
-                  case 'gz':
-                    echo '<td align=center>GZip</td>';
-                    break;
-                  case 'csv':
-                    echo '<td align=center>CSV</td>';
-                    break;
-                  case 'txt':
-                    echo '<td align=center>TXT</td>';
-                    break;
-                  case 'log':
-                    echo '<td align=center>LOG</td>';
-                    break;
-                  default:
-                }
-                // file management
-                if ($ext == 'csv') {
-                  // $_SERVER["PHP_SELF"] vs $_SERVER['SCRIPT_NAME']
-//                  echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?split=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT . "</a></td>\n";
-                  echo "<td align=center>" . zen_draw_form('split_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('split', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('split_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>\n"; //. "<a href=\"" . $_SERVER['SCRIPT_NAME'] . "?split=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_SPLIT . "</a></td>\n";
-                  if (strtolower(substr($files[$val[$i]], 0, 12)) == "sba-stock-ep") {
-//                    echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a><br /><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "&amp;sync=1\"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC; </a></td>\n";
-                    echo "<td align=center>" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form><br />" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_hidden_field('sync', '1', /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>\n"; //"<a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a><br /><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "&amp;sync=1\"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT_SYNC; //</a></td>\n";
-                  } else {
-//                    echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a></td>\n";
-                    echo "<td align=center>" . zen_draw_form('import_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('import', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('import_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>\n"; // <a href=\"" . $_SERVER['SCRIPT_NAME'] . "?import=" . $files[$val[$i]] . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_IMPORT . "</a></td>\n";
-                  }
-//        echo zen_draw_form('custom', 'easypopulate_4.php', '', 'post', 'id="custom"');
-
-                  echo "<td align=center>" . zen_draw_form('delete_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('delete', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('delete_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>";
-/*                  echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?delete=" . urlencode($files[$val[$i]]) . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE . "</a></td>";*/
-                  echo "<td align=center><a href=\"" . ($request_type == 'SSL' ? (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ HTTPS_CATALOG_SERVER . DIR_WS_HTTPS_CATALOG : /*Admin Side */ HTTPS_SERVER . DIR_WS_HTTPS_ADMIN) : (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ HTTP_CATALOG_SERVER . DIR_WS_CATALOG : /*Admin Side */ HTTP_SERVER . DIR_WS_ADMIN)) . $tempdir . $files[$val[$i]] . "\" target=_blank>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DOWNLOAD . "</a></td></tr>\n";
-                } else {
-                  echo "<td>&nbsp;</td>\n";
-                  echo "<td>&nbsp;</td>\n";
-//                  echo "<td align=center><a href=\"" . $_SERVER['SCRIPT_NAME'] . "?delete=" . urlencode($files[$val[$i]]) . "\">" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE . "</a></td>";
-                  echo "<td align=center>" . zen_draw_form('delete_form', basename($_SERVER['SCRIPT_NAME']), /*$parameters = */'', 'post', /*$params =*/ '', $request_type == 'SSL') . zen_draw_hidden_field('delete', urlencode($files[$val[$i]]), /*$parameters = */'') . zen_draw_input_field('delete_button', EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DELETE, /*$parameters = */'', /*$required = */false, /*$type = */'submit') . "</form></td>";
-                  echo "<td align=center><a href=\"" . ($request_type == 'SSL' ? (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ HTTPS_CATALOG_SERVER . DIR_WS_HTTPS_CATALOG : /*Admin Side */ HTTPS_SERVER . DIR_WS_HTTPS_ADMIN) : (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ HTTP_CATALOG_SERVER . DIR_WS_CATALOG : /*Admin Side */ HTTP_SERVER . DIR_WS_ADMIN)) . $tempdir . $files[$val[$i]] . "\" target=_blank>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_DOWNLOAD . "</a></td></tr>\n";
-                }
-              }
-            } // End loop within a filetype
-            if ($file_count == 0 && EP4_SHOW_ALL_FILETYPES != 'Hidden') {
-              echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
-            } // if (sizeof($files)>0)
-            if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
-              break;
-            }
-          } // End foreach filetype 
-          if (EP4_SHOW_ALL_FILETYPES != 'Hidden') {
-            echo "</table>\n";
-            if (sizeof($filetypes) == 0 && EP4_SHOW_ALL_FILETYPES == 'false') {
-              echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
-              echo "<tr><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_FILENAME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SIZE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DATE_TIME . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_TYPE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_SPLIT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_IMPORT . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DELETE . "</th><th>" . EASYPOPULATE_4_DISPLAY_EXPORT_TABLE_TITLE_DOWNLOAD . "</th>\n";
-              echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
-              echo "</table>\n";
-            }
-          }
-        } else { // can't open directory
-          echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_ERROR_FOLDER_OPEN . "</font> " . $tempdir . "</td></tr>\n";
-          $error = true;
-        } // opendir()
-        if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
-          echo "</table>\n";
           if (sizeof($filetypes) == 0) {
             echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
             echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
