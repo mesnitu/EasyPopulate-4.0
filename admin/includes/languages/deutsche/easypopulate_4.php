@@ -247,3 +247,4 @@ $bookx_default_genre_name = '';
 $bookx_default_publisher_name = '';
 $bookx_default_imprint_name = '';
 $bookx_default_condition = '';
+define('EASYPOPULATE_4_DISPLAY_IMPORT_COMPLETE','Dateiimport ohne Probleme abgeschlossen.');

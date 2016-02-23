@@ -50,16 +50,6 @@ $ep_metatags = (int) EASYPOPULATE_4_CONFIG_META_DATA; // 0-Disable, 1-Enable
 $ep_music = (int) EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enable
 $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
-//@EP4Bookx 
-$ep_bookx         = (int)EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
-$ep_bookx_fallback_genre_name = EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME; 
-
-if ($ep_bookx = 1) {
-	$sql = "SELECT type_id FROM ".TABLE_PRODUCT_TYPES." WHERE type_handler= 'product_bookx'";
-	$result = $db->Execute($sql);
-	$bookx_product_type = $result->fields['type_id'];
-}
-//
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
 if ((isset($error) && !$error) || !isset($error)) {
@@ -182,21 +172,6 @@ $artists_name_max_len = zen_field_length(TABLE_RECORD_ARTISTS, 'artists_name');
 $record_company_name_max_len = zen_field_length(TABLE_RECORD_COMPANY, 'record_company_name');
 $music_genre_name_max_len = zen_field_length(TABLE_MUSIC_GENRE, 'music_genre_name');
 
-/**
-* @EP4Bookx
-*/
-$bookx_author_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name');
-$bookx_author_types_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION, 'type_description');
-$bookx_genre_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION, 'genre_description');
-$bookx_series_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_SERIES_DESCRIPTION, 'series_name');
-$bookx_publisher_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PUBLISHERS, 'publisher_name');
-$bookx_binding_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_BINDING_DESCRIPTION, 'binding_description');
-$bookx_printing_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION, 'printing_description');
-$bookx_condition_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION, 'condition_description');
-$bookx_imprint_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'imprint_name');
-$bookx_subtitle_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION, 'products_subtitle');
-//:::::::::::::::
-
 $project = PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
 
 if ($ep_uses_mysqli) {
@@ -222,20 +197,8 @@ if (($collation == 'utf8') && ((substr($project, 0, 5) == "1.3.8") || (substr($p
   $record_company_name_max_len = $record_company_name_max_len / 3;
   $music_genre_name_max_len = $music_genre_name_max_len / 3;
   
-  /**
-     * @EP4Bookx
-     */
-    $bookx_author_name_max_len = $bookx_author_name_max_len/3;
-    $bookx_author_types_name_max_len = $bookx_author_types_name_max_len/3;
-    $bookx_genre_name_max_len  = $bookx_genre_name_max_len/3;
-    $bookx_series_name_max_len = $bookx_series_name_max_len/3;
-    $bookx_publisher_name_max_len = $bookx_publisher_name_max_len/3;
-    $bookx_binding_name_max_len = $bookx_binding_name_max_len/3;
-    $bookx_printing_name_max_len = $bookx_printing_name_max_len/3;
-    $bookx_condition_name_max_len = $bookx_condition_name_max_len/3;
-    $bookx_imprint_name_max_len = $bookx_imprint_name_max_len/3;
-    $bookx_subtitle_max_len = $bookx_subtitle_max_len/3;
-  
+  $zco_notifier->notify('EP4_COLLATION_UTF8_ZC13X');
+
 }
 
 // test for Ajeh
@@ -325,7 +288,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
     <title><?php echo TITLE; ?></title>
     <link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
-	<link rel="stylesheet" type="text/css" href="includes/ep4bookx.css">
+    <?php $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK'); ?>
     <script language="javascript" type="text/javascript" src="includes/menu.js"></script>
     <script language="javascript" type="text/javascript" src="includes/general.js"></script>
     <!-- <script language="javascript" src="includes/ep4ajax.js"></script> -->
@@ -387,8 +350,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo 'Convert Char 0x92: ' . $ep_char92_text . '<br />';
            echo EASYPOPULATE_4_DISPLAY_ENABLE_META . $ep_metatags . '<br />';
            echo EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC . $ep_music . '<br />';
-		   //::::: @ALTERED for Bookx ::::::::::::::::
-		   echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX.$ep_bookx.'<br/>';
+
            echo '<br /><b><u>' . EASYPOPULATE_4_DISPLAY_CUSTOM_PRODUCT_FIELDS . '</u></b><br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SHORT_DESC . (($ep_supported_mods['psd']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UNIT_MEAS . (($ep_supported_mods['uom']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
@@ -402,6 +364,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SBA . (($ep_4_SBAEnabled != false) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_CEON . (($ep4CEONURIDoesExist == true) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_DPM . (($ep_supported_mods['dual']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+
+           $zco_notifier->notify('EP4_DISPLAY_STATUS');
 
            echo "<br /><b><u>" . EASYPOPULATE_4_DISPLAY_USER_DEF_FIELDS . "</u></b><br />";
            $i = 0;
@@ -423,19 +387,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo 'manufacturers_name:' . $manufacturers_name_max_len . '<br />';
            echo 'products_model:' . $products_model_max_len . '<br />';
            echo 'products_name:' . $products_name_max_len . '<br />';
-		   
-		   /**
-		 * @EP4Bookx
-		 */
-		echo 'author_name:'.$bookx_author_name_max_len.'<br/>';
-		echo 'genre_description:'.$bookx_genre_name_max_len.'<br/>';		
-		echo 'series_name:'.$bookx_series_name_max_len.'<br/>';
-		echo 'publisher_name:'.$bookx_publisher_name_max_len.'<br/>';
-		echo 'binding_description:'.$bookx_binding_name_max_len.'<br/>';
-		echo 'printing_description:'.$bookx_printing_name_max_len.'<br/>';
-		echo 'condition_description:'.$bookx_condition_name_max_len.'<br/>';
-		echo 'imprint_name:'.$bookx_imprint_name_max_len.'<br/>';
 
+           $zco_notifier->notify('EP4_MAX_LEN');
            /*  // some error checking
              echo '<br /><br />Problem Data: '. mysql_num_rows($ajeh_result);
              echo '<br />Memory Usage: '.memory_get_usage();
@@ -711,6 +664,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
         } // opendir()
         if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
           echo "</table>\n";
+
           if (sizeof($filetypes) == 0) {
             echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
             echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";

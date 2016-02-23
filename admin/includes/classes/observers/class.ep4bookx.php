@@ -1,0 +1,393 @@
+<?php
+
+/**
+ * Description of class.ep4bookx
+ *
+ * @author mc12345678
+ */
+class ep4bookx extends base {
+
+//  private $_product = array();
+
+  function __construct() { // ep4bookx if this class has difficulty loading
+//    global $zco_notifier;
+    $notifyme = array();
+
+    $notifyme[] = 'EP4_START';
+    $notifyme[] = 'EP4_COLLATION_UTF8_ZC13X';
+    $notifyme[] = 'EP4_EASYPOPULATE_4_LINK';
+    $notifyme[] = 'EP4_DISPLAY_STATUS';
+    $notifyme[] = 'EP4_MAX_LEN';
+    $notifyme[] = 'EP4_FILENAMES';
+    $notifyme[] = 'EP4_LINK_SELECTION_END';
+    $notifyme[] = 'EP4_EXPORT_FILE_ARRAY_START';
+    $notifyme[] = 'EP4_EXPORT_CASE_EXPORT_FILE_END';
+    $notifyme[] = 'EP4_EXPORT_WHILE_START';
+    $notifyme[] = 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK';
+    $notifyme[] = 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP';
+    $notifyme[] = 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END';
+    $notifyme[] = 'EP4_EXPORT_SPECIALS_AFTER';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT';
+    $notifyme[] = 'EP4_EXTRA_FUNCTIONS_INSTALL_END';
+    $notifyme[] = 'EP4_EXPORT_FULL_OR_CAT_FULL_AFTER';
+    $notifyme[] = 'EP4_IMPORT_START';
+
+    $this->attach($this, $notifyme); 
+
+  }
+
+/* Function run/called by notifier: EP4_START*/
+  function updateEP4Start(&$callingClass, $notifier, $paramsArray){
+    global $curver, $ep_bookx, $ep_bookx_fallback_genre_name, $bookx_product_type;
+    global $bookx_author_name_max_len, $bookx_author_types_name_max_len, 
+      $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len, 
+      $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len, 
+      $bookx_imprint_name_max_len, $bookx_subtitle_max_len;
+
+    $curver .= "<br />";
+    $curver .= "w/ BookX v1.0";
+/**
+ *  @EP4Bookx 
+ *  Get the user config
+ */
+    $ep_bookx         = (int)EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
+    $ep_bookx_fallback_genre_name = EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME; 
+
+    if ($ep_bookx = 1) {
+      $result = $db->Execute('SELECT type_id FROM ' . TABLE_PRODUCT_TYPES . ' WHERE type_handler = \'product_bookx\'');
+      $bookx_product_type = $result->fields['type_id'];
+    }
+    
+    $bookx_author_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name');
+    $bookx_author_types_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION, 'type_description');
+    $bookx_genre_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION, 'genre_description');
+    $bookx_series_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_SERIES_DESCRIPTION, 'series_name');
+    $bookx_publisher_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PUBLISHERS, 'publisher_name');
+    $bookx_binding_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_BINDING_DESCRIPTION, 'binding_description');
+    $bookx_printing_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION, 'printing_description');
+    $bookx_condition_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION, 'condition_description');
+    $bookx_imprint_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'imprint_name');
+    $bookx_subtitle_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION, 'products_subtitle');
+  }
+
+  // $zco_notifier->notify('EP4_COLLATION_UTF8_ZC13X');
+  function updateEP4CollationUTF8ZC13x(&$callingClass, $notifier, $paramsArray) {
+    global $bookx_author_name_max_len, $bookx_author_types_name_max_len, 
+      $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len, 
+      $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len, 
+      $bookx_imprint_name_max_len, $bookx_subtitle_max_len;
+    
+    $bookx_author_name_max_len = $bookx_author_name_max_len/3;
+    $bookx_author_types_name_max_len = $bookx_author_types_name_max_len/3;
+    $bookx_genre_name_max_len  = $bookx_genre_name_max_len/3;
+    $bookx_series_name_max_len = $bookx_series_name_max_len/3;
+    $bookx_publisher_name_max_len = $bookx_publisher_name_max_len/3;
+    $bookx_binding_name_max_len = $bookx_binding_name_max_len/3;
+    $bookx_printing_name_max_len = $bookx_printing_name_max_len/3;
+    $bookx_condition_name_max_len = $bookx_condition_name_max_len/3;
+    $bookx_imprint_name_max_len = $bookx_imprint_name_max_len/3;
+    $bookx_subtitle_max_len = $bookx_subtitle_max_len/3;
+  }
+
+  // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
+  function updateEP4Easypopulate4Link(&$callingClass, $notifier, $paramsArray) {
+    ?>
+    <link rel="stylesheet" type="text/css" href="includes/ep4bookx.css">
+    <?php
+  }
+
+
+  // $zco_notifier->notify('EP4_DISPLAY_STATUS');
+  function updateEP4DisplayStatus(&$callingClass, $notifier, $paramsArray) {
+    global $ep_bookx, $ep_bookx_default_genre_name;
+    
+    echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX . $ep_bookx . '<br/>';
+    echo EASY_POPULATE_4_BOOKX_DISPLAY_DEFAULT_GENRE_NAME . $ep_bookx_default_genre_name . '<br />';
+  }
+
+  // $zco_notifier->notify('EP4_MAX_LEN');
+  function updateEP4MaxLen(&$callingClass, $notifier, $paramsArray) {
+    global $bookx_author_name_max_len, 
+      $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len, 
+      $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len, 
+      $bookx_imprint_name_max_len, $bookx_subtitle_max_len;
+
+    echo 'author_name:'.$bookx_author_name_max_len.'<br/>';
+    echo 'genre_description:'.$bookx_genre_name_max_len.'<br/>';		
+    echo 'series_name:'.$bookx_series_name_max_len.'<br/>';
+    echo 'publisher_name:'.$bookx_publisher_name_max_len.'<br/>';
+    echo 'binding_description:'.$bookx_binding_name_max_len.'<br/>';
+    echo 'printing_description:'.$bookx_printing_name_max_len.'<br/>';
+    echo 'condition_description:'.$bookx_condition_name_max_len.'<br/>';
+    echo 'imprint_name:'.$bookx_imprint_name_max_len.'<br/>';
+    
+  }
+
+  // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START');
+  function updateEP4ExtraFunctionsSetFilelayoutFullStart(&$callingClass, $notifier, $paramsArray) {
+  }
+
+    //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
+  function updateEP4ExtraFunctionsSetFilelayoutFullFilelayout(&$callingClass, $notifier, $paramsArray) {
+    global $filelayout, $langcode;
+
+  }
+
+  // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
+  function updateEP4ExtraFunctionsSetFilelayoutFullSQLSelect(&$callingClass, $notifier, $paramsArray) {
+  }
+
+  // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
+  function updateEP4ExtraFunctionsSetFilelayoutFullSQLTable(&$callingClass, $notifier, $paramsArray) {
+  }
+  
+  // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT');
+  function updateEP4ExtraFunctionsSetFilelayoutCategoryFilelayout(&$callingClass, $notifier, $paramsArray) {
+  }
+
+  //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
+  function updateEP4ExtraFunctionsSetFilelayoutCategorySQLSelect(&$callingClass, $notifier, $paramsArray) {
+    global $langcode, $filelayout;
+    
+  }
+
+  //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT');
+  function updateEP4ExtraFunctionsSetFilelayoutCategorymetaFilelayout(&$callingClass, $notifier, $paramsArray) {
+  }
+
+    // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT');
+  function updateEP4ExtraFunctionsSetFilelayoutCaseDefault(&$callingClass, $notifier, $paramsArray) {
+    global $db, $ep_dltype, $filelayout, $filelayout_sql, $langcode;
+    switch($ep_dltype) {
+    
+  case 'TEST_1':
+    break;
+    
+  case 'TEST_2': 
+     break;
+
+  case 'TEST_3':
+    break;
+    }
+  }
+
+  //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_INSTALL_END');
+  function updateEP4ExtraFunctionsInstallEnd(&$callingClass, $notifier, $paramsArray) {
+    global $db, $project;
+    $group_id = $paramsArray['group_id'];
+  
+    if ( (substr($project,0,5) == "1.3.8") || (substr($project,0,5) == "1.3.9") ) {
+      $db->Execute("INSERT INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
+        ('Enable Products Bookx','EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Books Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
+      ");
+    } elseif (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.0') {
+      $db->Execute("INSERT INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
+        ('Enable Products Bookx','EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Books Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
+      ");
+    } else { // unsupported version 
+      // i should do something here!
+    }
+  }
+
+    // $zco_notifier->notify('EP4_LINK_SELECTION_END');
+  function updateEP4LinkSelectionEnd(&$callingClass, $notifier, $paramsArray) {
+    
+  }
+  
+  // $zco_notifier->notify('EP4_FILENAMES');
+  function updateEP4Filenames(&$callingClass, $notifier, $paramsArray) {
+    global $filenames;
+    
+    $filenames = array_merge($filenames,
+/*      array('bookx-ep' => BOOKX_EP_DESC,
+      'bookx-auth-ep' => BOOKX_AUTH_EP_DESC)*/
+    );
+
+  }
+
+  
+  // 'EP4_EXPORT_FILE_ARRAY_START'
+  function updateEP4ExportFileArrayStart(&$callingClass, $notifier, $paramsArray) { // mc12345678 doesn't work on ZC 1.5.1 and below
+    global $ep_dltype, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row;
+  }
+
+  // 'EP4_EXPORT_CASE_EXPORT_FILE_END'
+  function updateEP4ExportCaseExportFileEnd(&$callingClass, $notifier, $paramsArray) {
+    global $ep_dltype, $EXPORT_FILE;
+  
+    if ($ep_dltype == 'DEMO-1') {
+      $EXPORT_FILE = 'DEMO-1-EP';
+    } elseif ($ep_dltype == 'DEMO-2') { 
+      $EXPORT_FILE = 'DEMO-2-EP';
+    } elseif ($ep_dltype == 'DEMO-3') { 
+      $EXPORT_FILE = 'DEMO-3-EP';
+    }
+  }
+
+// EP4_EXPORT_WHILE_START
+  function updateEP4ExportWhileStart(&$callingClass, $notifier, $paramsArray) {
+
+
+  }
+
+  //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
+  function updateEP4ExportLoopFullOrSBAStock(&$callingClass, $notifier, $paramsArray) {
+  
+  }
+
+  //  $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
+  function updateEP4ExportLoopFullOrSBAStockLoop(&$callingClass, $notifier, $paramsArray) {
+  
+  }
+
+//    $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END');
+  function updateEP4ExportLoopFullOrSBAStockEnd(&$callingClass, $notifier, $paramsArray) {
+  }
+
+
+//  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
+  function updateEP4ExportSpecialsAfter(&$callingClass, $notifier, $paramsArray) {
+    include 'easypopulate_4_export_bookx.php';
+  }
+
+//  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
+  function updateEP4ExportFullOrCatFullAfter(&$callingClass, $notifier, $paramsArray) {
+  }
+
+  //     $notifyme[] = 'EP4_IMPORT_START';
+  function updateEP4ImportStart(&$callingClass, $notifier, $paramsArray) {
+    global $bookx_reports;
+    
+    $bookx_reports = array();
+  }
+
+  function update(&$callingClass, $notifier, $paramsArray) {
+
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START') {
+      $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
+    }
+
+    // $zco_notifier->notify('EP4_COLLATION_UTF8_ZC13X');
+    if ($notifier == 'EP4_COLLATION_UTF8_ZC13X') {
+      $this->updateEP4CollationUTF8ZC13x($callingClass, $notifier, $paramsArray);
+    }
+
+    // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
+    if ($notifier == 'EP4_EASYPOPULATE_4_LINK') {
+      $this->updateEP4Easypopulate4Link($callingClass, $notifier, $paramsArray);
+    }
+
+    // $zco_notifier->notify('EP4_DISPLAY_STATUS');
+    if ($notifier == 'EP4_DISPLAY_STATUS') {
+      $this->updateEP4DisplayStatus($callingClass, $notifier, $paramsArray);
+    }
+
+    // $zco_notifier->notify('EP4_MAX_LEN');
+    if ($notifier == 'EP4_MAX_LEN') {
+      $this->updateEP4MaxLen($callingClass, $notifier, $paramsArray);
+    }
+
+    //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT') {
+      $this->updateEP4ExtraFunctionsSetFilelayoutFullFilelayout($callingClass, $notifier, $paramsArray);
+    }
+  
+  // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT') {
+      $this->updateEP4ExtraFunctionsSetFilelayoutFullSQLSelect($callingClass, $notifier, $paramsArray);
+    }
+
+  // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE') {
+      $this->updateEP4ExtraFunctionsSetFilelayoutFullSQLTable($callingClass, $notifier, $paramsArray);
+    }
+  
+  // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT');
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT') {
+      $this->updateEP4ExtraFunctionsSetFilelayoutCategoryFilelayout($callingClass, $notifier, $paramsArray);
+    }
+
+  //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT') {
+      $this->updateEP4ExtraFunctionsSetFilelayoutCategorySQLSelect($callingClass, $notifier, $paramsArray);
+    }
+
+  //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT');
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT') {
+      $this->updateEP4ExtraFunctionsSetFilelayoutCategorymetaFilelayout($callingClass, $notifier, $paramsArray);
+    }
+
+    // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT');
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT') {
+      $this->updateEP4ExtraFunctionsSetFilelayoutCaseDefault($callingClass, $notifier, $paramsArray);
+    }
+
+  //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_INSTALL_END');
+    if ($notifier == 'EP4_EXTRA_FUNCTIONS_INSTALL_END') {
+      $this->updateEP4ExtraFunctionsInstallEnd($callingClass, $notifier, $paramsArray);
+    }
+
+    // $zco_notifier->notify('EP4_LINK_SELECTION_END');
+    if ($notifier == 'EP4_LINK_SELECTION_END') {
+      $this->updateEP4LinkSelectionEnd($callingClass, $notifier, $paramsArray);
+    }
+  
+  // $zco_notifier->notify('EP4_FILENAMES');
+    if ($notifier == 'EP4_FILENAMES') {
+      $this->updateEP4Filenames($callingClass, $notifier, $paramsArray);
+    }
+
+  
+  // 'EP4_EXPORT_FILE_ARRAY_START'
+    if ($notifier == 'EP4_EXPORT_FILE_ARRAY_START') {
+      $this->updateEP4ExportFileArrayStart($callingClass, $notifier, $paramsArray); // mc12345678 doesn't work on ZC 1.5.1 and below
+    }
+
+  // 'EP4_EXPORT_CASE_EXPORT_FILE_END'
+    if ($notifier == 'EP4_EXPORT_CASE_EXPORT_FILE_END') {
+      $this->updateEP4ExportCaseExportFileEnd($callingClass, $notifier, $paramsArray);
+    }
+
+// EP4_EXPORT_WHILE_START
+    if ($notifier == 'EP4_EXPORT_WHILE_START') {
+      $this->updateEP4ExportWhileStart($callingClass, $notifier, $paramsArray);
+    }
+
+  //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
+    if ($notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK') {
+      $this->updateEP4ExportLoopFullOrSBAStock($callingClass, $notifier, $paramsArray);
+    }
+
+  //  $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
+    if ($notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP') {
+      $this->updateEP4ExportLoopFullOrSBAStockLoop($callingClass, $notifier, $paramsArray);
+    }
+
+//    $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END');
+    if ($notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END') {
+      $this->updateEP4ExportLoopFullOrSBAStockEnd($callingClass, $notifier, $paramsArray);
+    }
+
+
+//  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
+    if ($notifier == 'EP4_EXPORT_SPECIALS_AFTER') {
+      $this->updateEP4ExportSpecialsAfter($callingClass, $notifier, $paramsArray);
+    }
+
+//  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
+    if ($notifier == 'EP4_EXPORT_FULL_OR_CAT_FULL_AFTER') {
+      $this->updateEP4ExportFullOrCatFullAfter($callingClass, $notifier, $paramsArray);
+    }
+    
+    if ($notifier == 'EP4_IMPORT_START') {
+      $this->updateEP4ImportStart($callingClass, $notifier, $paramsArray);
+    }
+  } // EOF Update()
+}
