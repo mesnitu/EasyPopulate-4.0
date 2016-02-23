@@ -1281,7 +1281,7 @@ function ep_4_bookx_delete_bookx_specific_product_entries($product_id = null, $d
   	}
   }
 
-function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
+/*function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
 //  $datarow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
   $dataRow = '';
 
@@ -1297,7 +1297,7 @@ function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
   $dataRow = rtrim($dataRow, $csv_delimiter) . "\n";
 
   return $dataRow;
-}
+}*/
 
 
 // DEPRECATED: no calls to this function!
@@ -1440,7 +1440,6 @@ function install_easypopulate_4() {
 			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '180', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '190', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
 			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '200', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
-			('Enable Products Bookx',         'EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Books Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
 			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '210', NULL, now(), NULL, NULL),
 			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 		");
