@@ -13,17 +13,7 @@ if (!defined(EP4_REPLACE_BLANK_IMAGE)) {
 if (!is_null($_POST['import']) && isset($_POST['import'])) {
   $time_start = microtime(true); // benchmarking
   $display_output .= EASYPOPULATE_4_DISPLAY_HEADING;
-  
-  /**
-	 * @EP4Bookx - 1 of 4
-	 * [It aggregates missing fields in a report linked to the imported book. Uses Bookx languages files as key so it can be tranlated ex: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
-	 * @see   [adminFolder/includes/languades/YOUR_lang/extra_definitions/product_bookx.php]
-	 * @var array
-	 */
-	$bookx_reports = array();
-	//ends ep4bookx
-	//
-	
+
   $file = array('name' => $_POST['import']);
   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
 
@@ -1498,19 +1488,13 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $v_products_id = $max_product_id;
             }
             if ($v_artists_name <> '') {
-					$v_products_type = 2; // 2 = music
-				} 
-                /**
-                 * @EP4Bookx 3 of 4
-                 */
-				elseif (isset($v_bookx_genre_name) || isset($v_bookx_isbn) ) {
-					$v_products_type = $bookx_product_type; 
-				}
-				//ends ep4bookx
-				else {
-					$v_products_type = 1; // 1 = standard product
-				}	
-			
+              $v_products_type = 2; // 2 = music Product - Music
+            } else {
+              $v_products_type = 1; // 1 = standard product
+            }
+
+            $zco_notifier->notify('EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE');
+
 // mc12345678, new item need to address products_id assignment as it is provided
             $query = "INSERT INTO " . TABLE_PRODUCTS . " SET
 							products_model					= :products_model:,

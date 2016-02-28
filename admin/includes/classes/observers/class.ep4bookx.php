@@ -38,6 +38,7 @@ class ep4bookx extends base {
     $notifyme[] = 'EP4_EXTRA_FUNCTIONS_INSTALL_END';
     $notifyme[] = 'EP4_EXPORT_FULL_OR_CAT_FULL_AFTER';
     $notifyme[] = 'EP4_IMPORT_START';
+    $notifyme[] = 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE';
 
     $this->attach($this, $notifyme); 
 
@@ -266,8 +267,32 @@ class ep4bookx extends base {
   //     $notifyme[] = 'EP4_IMPORT_START';
   function updateEP4ImportStart(&$callingClass, $notifier, $paramsArray) {
     global $bookx_reports;
-    
+    /**
+     * @EP4Bookx - 1 of 4
+     * [It aggregates missing fields in a report linked to the imported book. Uses Bookx languages files as key so it can be tranlated ex: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
+     * @see   [adminFolder/includes/languades/YOUR_lang/extra_definitions/product_bookx.php]
+     * @var array
+     */
     $bookx_reports = array();
+    //ends ep4bookx
+    //
+  }
+
+  // EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE
+  function updateEP4ImportFileNewProductProductType(&$callingClass, $notifier, $paramsArray) {
+    global $v_products_type, $v_artists_name, $bookx_product_type, $v_bookx_genre_name, $v_bookx_isbn;
+
+    // Assign product_type to bookx product type (overriding any previous product type assignment)
+    //  if the either of the applicable bookx product type fields are populated.  Otherwise,
+    //  will use the default which is a product type of 1 (generic product), this means that
+    //  for all new product, at least one of these fields must be included as a part of this
+    //  addin in order for the product type to be properly entered.
+
+    if (isset($v_bookx_genre_name) || isset($v_bookx_isbn) )
+    {
+      $v_products_type = $bookx_product_type;
+    }
+
   }
 
   function update(&$callingClass, $notifier, $paramsArray) {
@@ -390,6 +415,10 @@ class ep4bookx extends base {
     
     if ($notifier == 'EP4_IMPORT_START') {
       $this->updateEP4ImportStart($callingClass, $notifier, $paramsArray);
+    }
+
+    if ($notifier == 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE') {
+      $this->updateEP4ImportFileNewProductProductType($callingClass, $notifier, $paramsArray);
     }
   } // EOF Update()
 }
