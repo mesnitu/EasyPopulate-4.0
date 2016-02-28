@@ -789,22 +789,24 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             ep_4_remove_product($items[$filelayout[$chosen_key]]);
             continue 2; // short circuit - loop to next record
           }
-			
+          
+          $zco_notifier->notify('EP4_IMPORT_FILE_EARLY_ROW_PROCESSING');
+          			
 			/**
 			 * @EP4Bookx 2 of 5
 			 * 
 			 * Remove Bookx Produtct
 			 * @todo  Display some books fields aside with the model (ex: title or ISBN)
 			 */
-			if ($items[$filelayout['v_status']] == 10) {
-				$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);
+/*			if ($items[$filelayout['v_status']] == 10) {
+				$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);*/
 				/**
 				 * Using Bookx function to remove books. 
 				 * @todo Remove from bookx_extra_description
 				 */
-				ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
+/*				ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
 				continue 2; // short circuit - loop to next record
-			}
+			}*/ // Test if works by being in above notifier.
 			//ends ep4bookx
 			
           // Create variables and assign default values for each language products name, description, url and optional short description

@@ -38,6 +38,7 @@ class ep4bookx extends base {
     $notifyme[] = 'EP4_EXTRA_FUNCTIONS_INSTALL_END';
     $notifyme[] = 'EP4_EXPORT_FULL_OR_CAT_FULL_AFTER';
     $notifyme[] = 'EP4_IMPORT_START';
+    $notifyme[] = 'EP4_IMPORT_FILE_EARLY_ROW_PROCESSING';
     $notifyme[] = 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE';
 
     $this->attach($this, $notifyme); 
@@ -278,6 +279,23 @@ class ep4bookx extends base {
     //
   }
 
+  // EP4_IMPORT_FILE_EARLY_ROW_PROCESSING
+  function updateEP4ImportFileEarlyRowProcessing(&$callingClass, $notifier, $paramsArray) {
+    global $items, $filelayout, $display_output;
+
+    if ($items[$filelayout['v_status']] == 10) {
+      $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);
+      /**
+       * Using Bookx function to remove books.
+       * @todo Remove from bookx_extra_description
+       */
+      ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
+      continue 2; // short circuit - loop to next record
+    }
+    //ends ep4bookx
+
+  }
+
   // EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE
   function updateEP4ImportFileNewProductProductType(&$callingClass, $notifier, $paramsArray) {
     global $v_products_type, $v_artists_name, $bookx_product_type, $v_bookx_genre_name, $v_bookx_isbn;
@@ -415,6 +433,10 @@ class ep4bookx extends base {
     
     if ($notifier == 'EP4_IMPORT_START') {
       $this->updateEP4ImportStart($callingClass, $notifier, $paramsArray);
+    }
+
+    if ($notifier == 'EP4_IMPORT_FILE_EARLY_ROW_PROCESSING'){
+      $this->updateEP4ImportFileEarlyRowProcessing($callingClass, $notifier, $paramsArray);
     }
 
     if ($notifier == 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE') {
