@@ -40,6 +40,7 @@ class ep4bookx extends base {
     $notifyme[] = 'EP4_IMPORT_START';
     $notifyme[] = 'EP4_IMPORT_FILE_EARLY_ROW_PROCESSING';
     $notifyme[] = 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE';
+    $notifyme[] = 'EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT';
 
     $this->attach($this, $notifyme); 
 
@@ -315,6 +316,34 @@ class ep4bookx extends base {
 
   }
 
+  // EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT
+  function updateEP4ImportFilePreDisplayOutput(&$callingClass, $notifier, $paramsArray) {
+    $bookx_reports, $display_output;
+    /**
+     * @EP4Bookx
+     * Reports missing fields with the book edit link
+     */
+    if (!empty($bookx_reports)) {
+      $display_output .= '<table class="bookx-reports"><caption>'.EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER.'</caption><tr class="bookx-reports-top"><th >Type</th><th>'.EASYPOPULATE_4_BOOKX_TABLE_BOOK.'</th></tr>';
+
+      foreach ($bookx_reports as $key => $value) {
+        $display_output .= '<tr><th class="bookx-reports-th-left" rowspan ="'.(count($value) + 1).'">' . strtoupper($key) . '</th>';
+        $display_output .= '<th class="bookx-reports-th-caption">'. EASYPOPULATE_4_BOOKX_TABLE_CAPTION . '</th></tr>';
+
+        $lastKey = count($value)-1;
+
+        for ($i=0; $i < (count($value)) ; $i++) {
+
+          $class = ($i & 1) ? 'odd' : 'even';
+          ($i == $lastKey ? $class .=' last' :'');
+          $display_output .= '<tr ><td class="' . $class .'">'. $value[$i] . '</td></tr>';
+        }
+      }
+      $display_output .='</table>';
+    }
+    //ends ep4Bookx
+  }
+
   function update(&$callingClass, $notifier, $paramsArray) {
 
     if ($notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START') {
@@ -444,5 +473,10 @@ class ep4bookx extends base {
     if ($notifier == 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE') {
       $this->updateEP4ImportFileNewProductProductType($callingClass, $notifier, $paramsArray);
     }
-  } // EOF Update()
+
+    if ($notifier == 'EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT') {
+      $this->updateEP4ImportFilePreDisplayOutput($callingClass, $notifier, $paramsArray);
+    }
+
+    } // EOF Update()
 }

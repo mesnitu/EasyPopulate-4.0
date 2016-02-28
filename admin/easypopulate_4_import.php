@@ -2238,30 +2238,8 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
 		
       } // end of Mail While Loop
     } // conditional IF statement
-	
-	/**
-		 * @EP4Bookx
-		 * Reports missing fields with the book edit link
-		 */
-		if (!empty($bookx_reports)) {
-		$display_output .= '<table class="bookx-reports"><caption>'.EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER.'</caption><tr class="bookx-reports-top"><th >Type</th><th>'.EASYPOPULATE_4_BOOKX_TABLE_BOOK.'</th></tr>'; 
-        
-        foreach ($bookx_reports as $key => $value) {
-            $display_output .= '<tr><th class="bookx-reports-th-left" rowspan ="'.(count($value) + 1).'">' . strtoupper($key) . '</th>';
-            $display_output .= '<th class="bookx-reports-th-caption">'. EASYPOPULATE_4_BOOKX_TABLE_CAPTION . '</th></tr>';
-            
-            $lastKey = count($value)-1;
-           
-            for ($i=0; $i < (count($value)) ; $i++) { 
 
-                 $class = ($i & 1) ? 'odd' : 'even';
-                 ($i == $lastKey ? $class .=' last' :'');
-                 $display_output .= '<tr ><td class="' . $class .'">'. $value[$i] . '</td></tr>';	       
-            }
-        }
-		$display_output .='</table>';	
-		}
-		//ends ep4Bookx
+    $zco_notifier->notify('EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT');
 
 //    $display_output .= '<h3>Finished Processing Import File</h3>';
     $display_output .= EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_TITLE;
