@@ -57,12 +57,14 @@ class ep4bookx extends base {
  *  @EP4Bookx 
  *  Get the user config
  */
+
     $ep_bookx         = (int)EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
     $ep_bookx_fallback_genre_name = EASYPOPULATE_4_CONFIG_BOOKX_DEFAULT_GENRE_NAME; 
 
     if ($ep_bookx = 1) {
       $result = $db->Execute('SELECT type_id FROM ' . TABLE_PRODUCT_TYPES . ' WHERE type_handler = \'product_bookx\'');
       $bookx_product_type = $result->fields['type_id'];
+      require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
     }
     
     $bookx_author_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name');
