@@ -189,11 +189,13 @@ class ep4bookx extends base {
   
     if ( (substr($project,0,5) == "1.3.8") || (substr($project,0,5) == "1.3.9") ) {
       $db->Execute("INSERT INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
-        ('Enable Products Bookx','EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Books Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
+        ('Enable Products Bookx','EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Bookx Data Columns
+        (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
       ");
     } elseif (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.0') {
       $db->Execute("INSERT INTO ".TABLE_CONFIGURATION." (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
-        ('Enable Products Bookx','EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Books Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
+        ('Enable Products Bookx','EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Bookx Data Columns
+        (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
       ");
     } else { // unsupported version 
       // i should do something here!
