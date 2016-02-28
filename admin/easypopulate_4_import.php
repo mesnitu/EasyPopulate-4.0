@@ -1941,7 +1941,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
     $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_ADD_OR_CHANGE_DATA');
     if (isset($v_products_name) || isset($v_products_description) || ($ep_supported_mods['psd'] == true && isset($v_products_short_desc) ) || isset($v_products_url) || $add_products_description_data) { // 
       // Effectively need a way to step through all language options, this section to be "accepted" if there is something to be updated.  Prefer the ability to verify update need without having to loop on anything, but just by "presence" of information.
-      foreach ($languages as $lang) {
+      foreach ($langcode as $lang) {
         // foreach ($v_products_name as $key => $name) {  // Decouple the dependency on the products_name being imported to update the products_name, description, short description and/or URL. //mc12345678 2015-Dec-12
         $lang_id = $lang['id'];
               $sql = "SELECT * FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE
@@ -1993,7 +1993,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $sql = "UPDATE " . TABLE_PRODUCTS_DESCRIPTION . " SET ";
           $update_count = false;
           if (isset($filelayout['v_products_name_' . $lang_id])) {
-            $sql .= " products_name      = :products_name:";
+            $sql .= " products_name      = :v_products_name:";
             $update_count = true;
           }
           if (isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new)) {
