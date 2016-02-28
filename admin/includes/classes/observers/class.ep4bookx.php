@@ -258,7 +258,7 @@ class ep4bookx extends base {
 
 //  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
   function updateEP4ExportSpecialsAfter(&$callingClass, $notifier, $paramsArray) {
-    include 'easypopulate_4_export_bookx.php';
+    include DIR_FS_ADMIN . 'easypopulate_4_export_bookx.php';
   }
 
 //  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
