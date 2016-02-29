@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.5.4
  * @version  0.9.0 - Still in development, make your changes in a local environment
@@ -7,8 +6,9 @@
  * @see Readme-EP4Bookx
  *
  * @author mesnitu
- * 
  */
+
+
 if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
 }
@@ -53,7 +53,6 @@ function ep_4_remove_product_bookx($product_model) {
     }
     return;
 }
-
 
 function pr ($var,$title = null) {
     echo '<pre style="background:#ccc;">';
