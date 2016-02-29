@@ -769,7 +769,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
           // since we have a row, the item already exists.
           // let's check and delete it if requested   
-          // v_status == 9 is a delete request  
+          // v_status == 9 is a delete request
+          $continueNextRow = false;
           if ($items[$filelayout['v_status']] == 9) {
             $chosen_key = '';
             switch (EP4_DB_FILTER_KEY) {
@@ -787,11 +788,15 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
 
             $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETED, $items[$filelayout[$chosen_key]]);
             ep_4_remove_product($items[$filelayout[$chosen_key]]);
-            continue 2; // short circuit - loop to next record
+
+            $continueNextRow = true;
           }
           
           $zco_notifier->notify('EP4_IMPORT_FILE_EARLY_ROW_PROCESSING');
-          			
+
+          if ($continueNextRow == true) {
+            continue 2; // short circuit - loop to next record
+          }
 			/**
 			 * @EP4Bookx 2 of 5
 			 * 
