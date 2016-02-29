@@ -2229,13 +2229,6 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
           }
         } // end of row insertion code
 		
-		/**
-		 * @EP4Bookx 4 of 5
-		 * At last but not least , include the bookx import file. Try to stay clean 
-		 */
-		include 'easypopulate_4_import_bookx.php';
-		//end ep4bookx
-		
       } // end of Mail While Loop
     } // conditional IF statement
 

@@ -39,6 +39,7 @@ class ep4bookx extends base {
     $notifyme[] = 'EP4_EXPORT_FULL_OR_CAT_FULL_AFTER';
     $notifyme[] = 'EP4_IMPORT_START';
     $notifyme[] = 'EP4_IMPORT_FILE_EARLY_ROW_PROCESSING';
+    $notifyme[] = 'EP4_IMPORT_AFTER_CATEGORY';
     $notifyme[] = 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE';
     $notifyme[] = 'EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT';
 
@@ -297,6 +298,16 @@ class ep4bookx extends base {
     }
     //ends ep4bookx
 
+  }
+
+  // EP4_IMPORT_AFTER_CATEGORY
+  function updateEP4ImportAfterCategory(&$callingClass, $notifier, $paramsArray){
+    /**
+     * @EP4Bookx 4 of 5
+     * At last but not least , include the bookx import file. Try to stay clean
+     */
+    include DIR_FS_ADMIN . 'easypopulate_4_import_bookx.php';
+    //end ep4bookx
   }
 
   // EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE
