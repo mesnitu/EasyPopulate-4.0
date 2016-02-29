@@ -4,20 +4,6 @@
   if (!defined('IS_ADMIN_FLAG')) {
     die('Illegal Access');
   } 
-/**
- * @EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.5.4
- * @version  0.9.0 - Still in development, make your changes in a local environment
- * @see Bookx module for ZenCart
- * @see Readme-EP4Bookx
- *
- * @author mesnitu
- * @todo  export with support for languages
- */
- function download_remote_file($file_url, $save_to)
-	{
-		$content = file_get_contents($file_url);
-		file_put_contents($save_to, $content);
-	}	
 
 function ep_4_curly_quotes($curly_text) {
 	$ep_curly_quotes = (int)EASYPOPULATE_4_CONFIG_CURLY_QUOTES;
@@ -81,6 +67,16 @@ function ep_4_SBA1Exists () {
 	// The current thought is to have one of these Exists files for each version of SBA to consider; however, they also all could fall under one SBA_Exists check provided some return is made and a comparison done on the other end about what was returned.  
 	//Check to see if any version of Stock with attributes is installed (If so, and properly programmed, there should be a define for the table associated with the stock.  There may be more than one, and if so, they should all be verified for the particular SBA.
 	if (defined('TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK')) {
+		$tablePresent = ep_4_query('SELECT * 
+					FROM information_schema.tables
+					WHERE table_schema = ' . DB_DATABASE . '
+					AND table_name = ' . TABLE_PRODUCTS_WITH_ATTRIBUTES_STOCK . '
+					LIMIT 1;');
+		// Check if database table is present in the database before attempting to access it.  If not present, then no need to
+		//  continue processing.
+		if (($ep_uses_mysqli ? mysqli_num_rows($tablePresent) : mysql_num_rows($tablePresent)) == 0) {
+			return false;
+		}
 		//Now that have identified that the table (applicable to mc12345678's store, has been identified as in existence, now need to look at the setup of the table (Number of columns and if each column identified below is in the table, or conversely if the table's column matches the list below.
 		//Columns in table: stock_id, products_id, stock_attributes, quantity, and sort.
 //		echo 'In<br />';
@@ -1223,63 +1219,6 @@ function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
   return $dataRow;
 }
 
-/**
- * @EP4BookX
- * [Deletes all bookx produts with a status = 10, using a bookx function]
- * @see   [product_bookx_functions.php]
- * @param  [model] $product_model 
- * @return [model]                [description]
- *
- * @todo  Remove bookx from bookx_extra_description
- */
-function ep_4_remove_product_bookx($product_model) {
- 	global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
-	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-	$ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-	$sql = "SELECT products_id FROM ".TABLE_PRODUCTS." WHERE products_model = '".zen_db_input($product_model)."'";
-	$products = $db->Execute($sql);
-	//$bookx_id = $products->fields['products_id'];
-	// Bye bye
-	bookx_delete_product($products->fields['products_id']);
-
-	if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
-		$ep_stack_sql_error = true;
-		if ($ep_debug_logging == true) {
-			$string = "MySQL error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno()).": ".($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error())."\nWhen executing:\n$sql\n";
-			write_debug_log($string);
-		}
-	} elseif ($ep_debug_logging_all == true) {
-		$string = "MySQL PASSED\nWhen executing:\n$sql\n";
-		write_debug_log($string);
-	}
-	while (!$products->EOF) {
-		zen_remove_product($products->fields['products_id']);
-		$products->MoveNext();
-	}
-	return;
-}
-
-/**
- * [ep_4_bookx_delete_bookx_specific_product_entries description]
- * @param  [type]  $product_id    [description]
- * @param  boolean $delete_linked [description]
- * @return [type]                 [description]
- */
- // Probably to delete - not in use 
-function ep_4_bookx_delete_bookx_specific_product_entries($product_id = null, $delete_linked = true) {
-  	global $db;
-   
-  	if (null != $product_id) {
-  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_EXTRA . '
-                      WHERE products_id = "' . (int)$product_id . '"');
-
-  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_GENRES_TO_PRODUCTS . '
-                      WHERE products_id = "' . (int)$product_id . '"');
-
-  		$db->Execute('DELETE FROM ' . TABLE_PRODUCT_BOOKX_AUTHORS_TO_PRODUCTS . '
-                      WHERE products_id = "' . (int)$product_id . '"');
-  	}
-  }
 
 /*function ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter = "^") {
 //  $datarow = ep_4_rmv_chars($filelayout, $active_row, $csv_delimiter);
@@ -1405,7 +1344,7 @@ function install_easypopulate_4() {
 			('Convert Curly Quotes, etc.',         'EASYPOPULATE_4_CONFIG_CURLY_QUOTES', '0', 'Convert Curly Quotes, Em-Dash, En-Dash and Ellipsis characters in fields displayed to customer (default 0).<br><br>0=No Change<br>1=Replace with Basic Characters<br>2=Replace with HTML equivalents', ".$group_id.", '170', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Convert Character 0x92',             'EASYPOPULATE_4_CONFIG_CHAR_92', '1', 'Convert Character 0x92 characters in Product Names &amp; Descriptions (default 1).<br><br>0=No Change<br>1=Replace with Standard Single Quote<br>2=Replace with HMTL equivalant', ".$group_id.", '180', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\", \"2\"),'),
 			('Enable Products Meta Data',          'EASYPOPULATE_4_CONFIG_META_DATA', '1', 'Enable Products Meta Data Columns (default 1).<br><br>0=Disable<br>1=Enable', ".$group_id.", '190', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'), 
-			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '100', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),       ('Enable Products Bookx ',         'EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Bookx Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
+			('Enable Products Music Data',         'EASYPOPULATE_4_CONFIG_MUSIC_DATA', '0', 'Enable Products Music Data Columns (default 0).<br><br>0=Disable<br>1=Enable', ".$group_id.", '200', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),'),
 			('User Defined Products Fields',       'EASYPOPULATE_4_CONFIG_CUSTOM_FIELDS', '', 'User Defined Products Table Fields (comma delimited, no spaces)', ".$group_id.", '210', NULL, now(), NULL, NULL),
 			('Export URI with Prod and or Cat',       'EASYPOPULATE_4_CONFIG_EXPORT_URI', '0', 'Export the current products or categories URI when exporting data? (Yes - 1 or no - 0)', ".$group_id.", '220', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 		");
@@ -1512,23 +1451,4 @@ function register_globals_vars_check_4 () {
 	print "_REQUEST: "; print_r($_REQUEST); echo '<br /><br />';
 	global $HTTP_POST_FILES;
 	print "HTTP_POST_FILES: "; print_r($HTTP_POST_FILES); echo '<br />';
-}
-
-function pr ($var,$title = null) {
-    echo '<pre style="background:#ccc;">';
-    if ($title):
-    echo '<b>' . $title. ':</b> ';
-    endif;
-    print_r($var);
-    echo '</pre>';
-}
-
-function array_merge_recursive2($paArray1, $paArray2)
-{
-    if (!is_array($paArray1) or !is_array($paArray2)) { return $paArray2; }
-    foreach ($paArray2 AS $sKey2 => $sValue2)
-    {
-        $paArray1[$sKey2] = array_merge_recursive2(@$paArray1[$sKey2], $sValue2);
-    }
-    return $paArray1;
 }

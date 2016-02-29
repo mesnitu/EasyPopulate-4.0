@@ -13,17 +13,7 @@ if (!defined(EP4_REPLACE_BLANK_IMAGE)) {
 if (!is_null($_POST['import']) && isset($_POST['import'])) {
   $time_start = microtime(true); // benchmarking
   $display_output .= EASYPOPULATE_4_DISPLAY_HEADING;
-  
-  /**
-	 * @EP4Bookx - 1 of 4
-	 * [It aggregates missing fields in a report linked to the imported book. Uses Bookx languages files as key so it can be tranlated ex: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
-	 * @see   [adminFolder/includes/languades/YOUR_lang/extra_definitions/product_bookx.php]
-	 * @var array
-	 */
-	$bookx_reports = array();
-	//ends ep4bookx
-	//
-	
+
   $file = array('name' => $_POST['import']);
   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
 
@@ -799,22 +789,24 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             ep_4_remove_product($items[$filelayout[$chosen_key]]);
             continue 2; // short circuit - loop to next record
           }
-			
+          
+          $zco_notifier->notify('EP4_IMPORT_FILE_EARLY_ROW_PROCESSING');
+          			
 			/**
 			 * @EP4Bookx 2 of 5
 			 * 
 			 * Remove Bookx Produtct
 			 * @todo  Display some books fields aside with the model (ex: title or ISBN)
 			 */
-			if ($items[$filelayout['v_status']] == 10) {
-				$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);
+/*			if ($items[$filelayout['v_status']] == 10) {
+				$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);*/
 				/**
 				 * Using Bookx function to remove books. 
 				 * @todo Remove from bookx_extra_description
 				 */
-				ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
+/*				ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
 				continue 2; // short circuit - loop to next record
-			}
+			}*/ // Test if works by being in above notifier.
 			//ends ep4bookx
 			
           // Create variables and assign default values for each language products name, description, url and optional short description
@@ -1498,19 +1490,13 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $v_products_id = $max_product_id;
             }
             if ($v_artists_name <> '') {
-					$v_products_type = 2; // 2 = music
-				} 
-                /**
-                 * @EP4Bookx 3 of 4
-                 */
-				elseif (isset($v_bookx_genre_name) || isset($v_bookx_isbn) ) {
-					$v_products_type = $bookx_product_type; 
-				}
-				//ends ep4bookx
-				else {
-					$v_products_type = 1; // 1 = standard product
-				}	
-			
+              $v_products_type = 2; // 2 = music Product - Music
+            } else {
+              $v_products_type = 1; // 1 = standard product
+            }
+
+            $zco_notifier->notify('EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE');
+
 // mc12345678, new item need to address products_id assignment as it is provided
             $query = "INSERT INTO " . TABLE_PRODUCTS . " SET
 							products_model					= :products_model:,
@@ -1941,7 +1927,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
     $zco_notifier->notify('EP4_IMPORT_FILE_PRODUCTS_DESCRIPTION_ADD_OR_CHANGE_DATA');
     if (isset($v_products_name) || isset($v_products_description) || ($ep_supported_mods['psd'] == true && isset($v_products_short_desc) ) || isset($v_products_url) || $add_products_description_data) { // 
       // Effectively need a way to step through all language options, this section to be "accepted" if there is something to be updated.  Prefer the ability to verify update need without having to loop on anything, but just by "presence" of information.
-      foreach ($languages as $lang) {
+      foreach ($langcode as $lang) {
         // foreach ($v_products_name as $key => $name) {  // Decouple the dependency on the products_name being imported to update the products_name, description, short description and/or URL. //mc12345678 2015-Dec-12
         $lang_id = $lang['id'];
               $sql = "SELECT * FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE
@@ -1993,7 +1979,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
           $sql = "UPDATE " . TABLE_PRODUCTS_DESCRIPTION . " SET ";
           $update_count = false;
           if (isset($filelayout['v_products_name_' . $lang_id])) {
-            $sql .= " products_name      = :products_name:";
+            $sql .= " products_name      = :v_products_name:";
             $update_count = true;
           }
           if (isset($filelayout['v_products_description_' . $lang_id]) || ( isset($filelayout['v_products_description_' . $lang_id]) && $product_is_new)) {
@@ -2252,30 +2238,8 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
 		
       } // end of Mail While Loop
     } // conditional IF statement
-	
-	/**
-		 * @EP4Bookx
-		 * Reports missing fields with the book edit link
-		 */
-		if (!empty($bookx_reports)) {
-		$display_output .= '<table class="bookx-reports"><caption>'.EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER.'</caption><tr class="bookx-reports-top"><th >Type</th><th>'.EASYPOPULATE_4_BOOKX_TABLE_BOOK.'</th></tr>'; 
-        
-        foreach ($bookx_reports as $key => $value) {
-            $display_output .= '<tr><th class="bookx-reports-th-left" rowspan ="'.(count($value) + 1).'">' . strtoupper($key) . '</th>';
-            $display_output .= '<th class="bookx-reports-th-caption">'. EASYPOPULATE_4_BOOKX_TABLE_CAPTION . '</th></tr>';
-            
-            $lastKey = count($value)-1;
-           
-            for ($i=0; $i < (count($value)) ; $i++) { 
 
-                 $class = ($i & 1) ? 'odd' : 'even';
-                 ($i == $lastKey ? $class .=' last' :'');
-                 $display_output .= '<tr ><td class="' . $class .'">'. $value[$i] . '</td></tr>';	       
-            }
-        }
-		$display_output .='</table>';	
-		}
-		//ends ep4Bookx
+    $zco_notifier->notify('EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT');
 
 //    $display_output .= '<h3>Finished Processing Import File</h3>';
     $display_output .= EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_TITLE;
