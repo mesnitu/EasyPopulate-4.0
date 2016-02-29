@@ -8,8 +8,37 @@
  * @author mesnitu
  * @todo  export with support for languages
  */
+	// names and descriptions require that we loop thru all installed languages
 
-if ($row['v_products_type'] == $bookx_product_type) { // check bookx product type
+    foreach ($langcode as $key2 => $lang2) {
+      $lid2 = $lang2['id'];
+
+      $sql2 = 'SELECT * FROM ' . TABLE_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
+      $sql2 = $db->bindVars($sql2, ':products_id:', $row['v_products_id'], 'integer');
+      $sql2 = $db->bindVars($sql2, ':language_id:', $lid2, 'integer');
+      $result2 = ep_4_query($sql2);
+      $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+      $row['v_products_name_' . $lid2] = $row2['products_name'];
+      $row['v_products_description_' . $lid2] = $row2['products_description'];
+      if ($ep_supported_mods['psd'] == true) { // products short descriptions mod
+        $row['v_products_short_desc_' . $lid2] = $row2['products_short_desc'];
+      }
+      $row['v_products_url_' . $lid2] = $row2['products_url'];
+      // metaData start
+      // for each language, get the description and set the vals
+      $sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
+      $sqlMeta = $db->bindVars($sqlMeta, ':products_id:', $row['v_products_id'], 'integer');
+      $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid2, 'integer');
+      $resultMeta = ep_4_query($sqlMeta);
+      $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
+      $row['v_metatags_title_' . $lid2] = $rowMeta['metatags_title'];
+      $row['v_metatags_keywords_' . $lid2] = $rowMeta['metatags_keywords'];
+      $row['v_metatags_description_' . $lid2] = $rowMeta['metatags_description'];
+      // metaData end
+     // $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
+    } // foreach
+    
+//if ($row['v_products_type'] == $bookx_product_type) { // check bookx product type... No need ot check, it is bookx prodcut type
 
     if (isset($filelayout['v_bookx_isbn'])) {
 
@@ -59,6 +88,7 @@ if ($row['v_products_type'] == $bookx_product_type) { // check bookx product typ
         $sql = "SELECT * FROM ".TABLE_PRODUCT_BOOKX_PUBLISHERS." WHERE bookx_publisher_id = :bookx_publisher_id: LIMIT 1 ";
         $sql = $db->bindVars($sql, ':bookx_publisher_id:', $row_bookx_extra['bookx_publisher_id'], 'integer');
         $result_publisher = ep_4_query($sql);
+        pr($sql);
         $row_publisher_name = ($ep_uses_mysqli ? mysqli_fetch_array($result_publisher) : mysql_fetch_array($result_publisher));
         $row['v_bookx_publisher_name'] = $row_publisher_name['publisher_name'];
     } else {
@@ -284,4 +314,4 @@ if ($row['v_products_type'] == $bookx_product_type) { // check bookx product typ
         }
     }
 
-} //ends product bookx export
+// } //ends product bookx export

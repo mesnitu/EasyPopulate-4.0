@@ -101,7 +101,7 @@ $zco_notifier->notify('EP4_EXPORT_FILE_ARRAY_START');
 
 $filelayout = array_flip($filelayout);
 // END: File Download Layouts
-
+pr($filelayout);
 // Create export file name
 switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
   case 'full':
@@ -158,6 +158,13 @@ switch ($ep_dltype) { // chadd - changed to use $EXPORT_FILE
   case 'orders_4':
     $EXPORT_FILE = 'orders_4-EP';
     break;
+   case 'bookx':
+    $EXPORT_FILE = 'BookX-EP';
+    $loader = true;
+  
+   
+   
+    break;
   default:
     $zco_notifier->notify('EP4_EXPORT_CASE_EXPORT_FILE_END');
     break;
@@ -193,7 +200,10 @@ $active_row = array(); // empty array
 $last_products_id = "";
 $print1 = 0;
 $result = ep_4_query($filelayout_sql);
-
+pr($filelayout_sql);
+pr($result);
+$rp = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+pr($rp);
 $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 
 while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
@@ -370,8 +380,15 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
     }
   } // END: Specials
 
+  
   $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
-
+     //@ALTERED for Bookx              
+ $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_BOOKX_FILELAYOUT');
+  if ($ep_dltype == 'bookx') {
+        pr($_POST, "POST on export");
+        pr($_GET, "GET on export");  
+       include 'easypopulate_4_export_bookx.php';
+  }
   // Multi-Lingual Categories, Categories Meta, Categories Descriptions
   if ($ep_dltype == 'categorymeta') {
     // names and descriptions require that we loop thru all languages that are turned on in the store
@@ -782,7 +799,14 @@ while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array
 
   fwrite($fp, $dataRow); // write 1 line of csv data (this can be slow...)
   $ep_export_count++;
+  
+
+  
+  
   } // if $ep_dltype == 'attrib_basic'
+  
+
+  
 } // while ($row) 
 //Start SBA1 addresses writing to the file
 

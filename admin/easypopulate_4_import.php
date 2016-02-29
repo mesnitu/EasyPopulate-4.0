@@ -13,7 +13,14 @@ if (!defined(EP4_REPLACE_BLANK_IMAGE)) {
 if (!is_null($_POST['import']) && isset($_POST['import'])) {
   $time_start = microtime(true); // benchmarking
   $display_output .= EASYPOPULATE_4_DISPLAY_HEADING;
+  
+ // @EP4Bookx - 1 of 4
+ // [It aggregates missing fields in a report linked to the imported book. Uses Bookx languages files as key so it can be tranlated ex: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
+	 
+	$bookx_reports = array();
+	//ends ep4bookx
 
+	
   $file = array('name' => $_POST['import']);
   $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_LOCAL_FILE_SPEC, $file['name']);
 
@@ -789,24 +796,22 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             ep_4_remove_product($items[$filelayout[$chosen_key]]);
             continue 2; // short circuit - loop to next record
           }
-          
-          $zco_notifier->notify('EP4_IMPORT_FILE_EARLY_ROW_PROCESSING');
-          			
+			
 			/**
 			 * @EP4Bookx 2 of 5
 			 * 
 			 * Remove Bookx Produtct
 			 * @todo  Display some books fields aside with the model (ex: title or ISBN)
 			 */
-/*			if ($items[$filelayout['v_status']] == 10) {
-				$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);*/
+			if ($items[$filelayout['v_status']] == 10) {
+				$display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']],$items[$filelayout['v_bookx_isbn']]);
 				/**
 				 * Using Bookx function to remove books. 
 				 * @todo Remove from bookx_extra_description
 				 */
-/*				ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
+				ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
 				continue 2; // short circuit - loop to next record
-			}*/ // Test if works by being in above notifier.
+			}
 			//ends ep4bookx
 			
           // Create variables and assign default values for each language products name, description, url and optional short description
@@ -1490,13 +1495,19 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
               $v_products_id = $max_product_id;
             }
             if ($v_artists_name <> '') {
-              $v_products_type = 2; // 2 = music Product - Music
-            } else {
-              $v_products_type = 1; // 1 = standard product
-            }
-
-            $zco_notifier->notify('EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE');
-
+					$v_products_type = 2; // 2 = music
+				} 
+                /**
+                 * @EP4Bookx 3 of 4
+                 */
+				elseif (isset($v_bookx_genre_name) || isset($v_bookx_isbn) ) {
+					$v_products_type = $bookx_product_type; 
+				}
+				//ends ep4bookx
+				else {
+					$v_products_type = 1; // 1 = standard product
+				}	
+			
 // mc12345678, new item need to address products_id assignment as it is provided
             $query = "INSERT INTO " . TABLE_PRODUCTS . " SET
 							products_model					= :products_model:,
@@ -2229,10 +2240,49 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
           }
         } // end of row insertion code
 		
+		
+		
       } // end of Mail While Loop
     } // conditional IF statement
+	
+    
+    ///TESTING BOOKX 
+      if (strtolower(substr($file['name'], 0, 11)) == "bookx-ep") {
+     //$zco_notifier->notify('EP4_IMPORT_GENERAL_FILE_ALL');
+	   echo $file['name'];
+    //   // Main IMPORT loop For Product Related Data. v_products_id is the main key
+    //   while ($items = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) { 
+    //      /**
+	// 	 * @EP4Bookx 4 of 5
+	// 	 * At last but not least , include the bookx import file. Try to stay clean 
+	// 	 */
+	// 	include 'easypopulate_4_import_bookx.php';
+	// 	//end ep4bookx 
+    //   }
+     }
+	/**
+		 * @EP4Bookx
+		 * Reports missing fields with the book edit link
+		 */
+		if (!empty($bookx_reports)) {
+		$display_output .= '<table class="bookx-reports"><caption>'.EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER.'</caption><tr class="bookx-reports-top"><th >Type</th><th>'.EASYPOPULATE_4_BOOKX_TABLE_BOOK.'</th></tr>'; 
+        
+        foreach ($bookx_reports as $key => $value) {
+            $display_output .= '<tr><th class="bookx-reports-th-left" rowspan ="'.(count($value) + 1).'">' . strtoupper($key) . '</th>';
+            $display_output .= '<th class="bookx-reports-th-caption">'. EASYPOPULATE_4_BOOKX_TABLE_CAPTION . '</th></tr>';
+            
+            $lastKey = count($value)-1;
+           
+            for ($i=0; $i < (count($value)) ; $i++) { 
 
-    $zco_notifier->notify('EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT');
+                 $class = ($i & 1) ? 'odd' : 'even';
+                 ($i == $lastKey ? $class .=' last' :'');
+                 $display_output .= '<tr ><td class="' . $class .'">'. $value[$i] . '</td></tr>';	       
+            }
+        }
+		$display_output .='</table>';	
+		}
+		//ends ep4Bookx
 
 //    $display_output .= '<h3>Finished Processing Import File</h3>';
     $display_output .= EASYPOPULATE_4_DISPLAY_IMPORT_RESULTS_TITLE;

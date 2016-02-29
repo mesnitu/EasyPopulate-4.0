@@ -50,6 +50,22 @@ $ep_metatags = (int) EASYPOPULATE_4_CONFIG_META_DATA; // 0-Disable, 1-Enable
 $ep_music = (int) EASYPOPULATE_4_CONFIG_MUSIC_DATA; // 0-Disable, 1-Enable
 $ep_uses_mysqli = (PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3' ? true : false);
 
+//@EP4Bookx 
+$ep_bookx         = (int)EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
+
+if ($ep_bookx = 1) {
+	$sql = "SELECT type_id FROM ".TABLE_PRODUCT_TYPES." WHERE type_handler= 'product_bookx'";
+	$result = $db->Execute($sql);
+	$bookx_product_type = $result->fields['type_id'];
+    pr($ep_dltype, "DLTYPE on ep4");
+    pr($_POST, "on ep4");
+    pr($_GET, "GET on ep4");
+     pr($_SESSION, "GLOBAL on ep4");
+
+    $bookx_make_file = array();
+    pr($bookx_make_file);
+}
+//
 @set_time_limit($ep_execution);  // executin limit in seconds. 300 = 5 minutes before timeout, 0 means no timelimit
 
 if ((isset($error) && !$error) || !isset($error)) {
@@ -172,6 +188,21 @@ $artists_name_max_len = zen_field_length(TABLE_RECORD_ARTISTS, 'artists_name');
 $record_company_name_max_len = zen_field_length(TABLE_RECORD_COMPANY, 'record_company_name');
 $music_genre_name_max_len = zen_field_length(TABLE_MUSIC_GENRE, 'music_genre_name');
 
+/**
+* @EP4Bookx
+*/
+$bookx_author_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name');
+$bookx_author_types_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION, 'type_description');
+$bookx_genre_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION, 'genre_description');
+$bookx_series_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_SERIES_DESCRIPTION, 'series_name');
+$bookx_publisher_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PUBLISHERS, 'publisher_name');
+$bookx_binding_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_BINDING_DESCRIPTION, 'binding_description');
+$bookx_printing_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION, 'printing_description');
+$bookx_condition_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION, 'condition_description');
+$bookx_imprint_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'imprint_name');
+$bookx_subtitle_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION, 'products_subtitle');
+//:::::::::::::::
+
 $project = PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
 
 if ($ep_uses_mysqli) {
@@ -197,8 +228,20 @@ if (($collation == 'utf8') && ((substr($project, 0, 5) == "1.3.8") || (substr($p
   $record_company_name_max_len = $record_company_name_max_len / 3;
   $music_genre_name_max_len = $music_genre_name_max_len / 3;
   
-  $zco_notifier->notify('EP4_COLLATION_UTF8_ZC13X');
-
+  /**
+     * @EP4Bookx
+     */
+    $bookx_author_name_max_len = $bookx_author_name_max_len/3;
+    $bookx_author_types_name_max_len = $bookx_author_types_name_max_len/3;
+    $bookx_genre_name_max_len  = $bookx_genre_name_max_len/3;
+    $bookx_series_name_max_len = $bookx_series_name_max_len/3;
+    $bookx_publisher_name_max_len = $bookx_publisher_name_max_len/3;
+    $bookx_binding_name_max_len = $bookx_binding_name_max_len/3;
+    $bookx_printing_name_max_len = $bookx_printing_name_max_len/3;
+    $bookx_condition_name_max_len = $bookx_condition_name_max_len/3;
+    $bookx_imprint_name_max_len = $bookx_imprint_name_max_len/3;
+    $bookx_subtitle_max_len = $bookx_subtitle_max_len/3;
+  
 }
 
 // test for Ajeh
@@ -288,10 +331,14 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
     <title><?php echo TITLE; ?></title>
     <link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
-    <?php $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK'); ?>
+    <?php  if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) { // Only loads if BookX is enable ?>
+	<link rel="stylesheet" type="text/css" href="includes/ep4bookx.css">
+    <?php } ?>
+
     <script language="javascript" type="text/javascript" src="includes/menu.js"></script>
     <script language="javascript" type="text/javascript" src="includes/general.js"></script>
     <!-- <script language="javascript" src="includes/ep4ajax.js"></script> -->
+    
     <script type="text/javascript">
 <!--
 	 function init()
@@ -305,6 +352,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 	 }
 // -->
     </script>
+
     <style type="text/css">
       #epfiles tbody tr:hover { background:#CCCCCC; }
     </style>
@@ -313,11 +361,12 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
        <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
 
     <!-- body -->
+      
     <div style="padding:5px">
          <?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?>
       <div class="pageHeading"><?php echo "Easy Populate $curver"; ?></div>
 
-      <div style="text-align:right; float:right; width:25%"><a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=remove') ?>"><?php echo EASYPOPULATE_4_REMOVE_SETTINGS; ?></a>
+      <div class="ep4-right" style="text-align:right; float:right; width:25%"><a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'epinstaller=remove') ?>"><?php echo EASYPOPULATE_4_REMOVE_SETTINGS; ?></a>
            <?php
            echo '<br /><b><u>' . EASYPOPULATE_4_CONFIG_SETTINGS . '</u></b><br />';
            echo EASYPOPULATE_4_CONFIG_UPLOAD . '<b>' . (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ 'catalog/' : /* Admin side */ 'admin/') . $tempdir . '</b><br />';
@@ -350,7 +399,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo 'Convert Char 0x92: ' . $ep_char92_text . '<br />';
            echo EASYPOPULATE_4_DISPLAY_ENABLE_META . $ep_metatags . '<br />';
            echo EASYPOPULATE_4_DISPLAY_ENABLE_MUSIC . $ep_music . '<br />';
-
+		   //::::: @ALTERED for Bookx ::::::::::::::::
+		   echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX.$ep_bookx.'<br/>';
            echo '<br /><b><u>' . EASYPOPULATE_4_DISPLAY_CUSTOM_PRODUCT_FIELDS . '</u></b><br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SHORT_DESC . (($ep_supported_mods['psd']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_UNIT_MEAS . (($ep_supported_mods['uom']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
@@ -364,8 +414,6 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_SBA . (($ep_4_SBAEnabled != false) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_CEON . (($ep4CEONURIDoesExist == true) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
            echo EASYPOPULATE_4_DISPLAY_STATUS_PRODUCT_DPM . (($ep_supported_mods['dual']) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
-
-           $zco_notifier->notify('EP4_DISPLAY_STATUS');
 
            echo "<br /><b><u>" . EASYPOPULATE_4_DISPLAY_USER_DEF_FIELDS . "</u></b><br />";
            $i = 0;
@@ -387,8 +435,18 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
            echo 'manufacturers_name:' . $manufacturers_name_max_len . '<br />';
            echo 'products_model:' . $products_model_max_len . '<br />';
            echo 'products_name:' . $products_name_max_len . '<br />';
+		   
+		   
+		 //@EP4Bookx -- @todo - Does a user really needs this ? 
+		echo 'author_name:'.$bookx_author_name_max_len.'<br/>';
+		echo 'genre_description:'.$bookx_genre_name_max_len.'<br/>';		
+		echo 'series_name:'.$bookx_series_name_max_len.'<br/>';
+		echo 'publisher_name:'.$bookx_publisher_name_max_len.'<br/>';
+		echo 'binding_description:'.$bookx_binding_name_max_len.'<br/>';
+		echo 'printing_description:'.$bookx_printing_name_max_len.'<br/>';
+		echo 'condition_description:'.$bookx_condition_name_max_len.'<br/>';
+		echo 'imprint_name:'.$bookx_imprint_name_max_len.'<br/>';
 
-           $zco_notifier->notify('EP4_MAX_LEN');
            /*  // some error checking
              echo '<br /><br />Problem Data: '. mysql_num_rows($ajeh_result);
              echo '<br />Memory Usage: '.memory_get_usage();
@@ -402,9 +460,9 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 
       <?php echo zen_draw_separator('pixel_trans.gif', '1', '10'); ?>
 
-      <div style="text-align:left">
+      <div class="ep4-left" style="text-align:left">
 
-        <?php echo zen_draw_form('ep4 upload', FILENAME_EASYPOPULATE_4, '', 'post', 'enctype="multipart/form-data"'); ?>
+        <form ENCTYPE="multipart/form-data" ACTION="easypopulate_4.php" METHOD="POST">
           <div align = "left"><br />
             <b><?php echo EASYPOPULATE_4_DISPLAY_TITLE_UPLOAD; ?></b><br />
             <?php echo sprintf(EASYPOPULATE_4_DISPLAY_MAX_UP_SIZE, $upload_max_filesize, round($upload_max_filesize / 1024 / 1024)) . '<br />'; ?>
@@ -417,10 +475,10 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 
         <?php
 // echo zen_draw_form('custom', 'easypopulate_4.php', 'id="custom"', 'get'); 
-        echo zen_draw_form('custom', FILENAME_EASYPOPULATE_4, '', 'post', 'id="custom"');
+        echo zen_draw_form('custom', 'easypopulate_4.php', '', 'post', 'id="custom"');
         ?>
 
-        <div align = "left">
+        <div  align = "left">
              <?php
              $manufacturers_array = array();
              $manufacturers_array[] = array("id" => '', 'text' => EASYPOPULATE_4_DISPLAY_MANUFACTURERS);
@@ -453,12 +511,13 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
           <br /><br />
         </div></form>
   <?php
-	echo zen_draw_form('custom2', FILENAME_EASYPOPULATE_4, '', 'post', 'id="custom2"'); 
+	echo zen_draw_form('custom2', 'easypopulate_4.php', '', 'post', 'id="custom2"'); 
 	?>
 	
     <div align = "left">
 		<?php	
-		$order_export_type_array  = array(array( "id" => '0', 'text' => EASYPOPULATE_4_ORDERS_DROPDOWN_FIRST ),
+		$order_export_type_array  = array(
+            array( "id" => '0', 'text' => EASYPOPULATE_4_ORDERS_DROPDOWN_FIRST ),
 			array( "id" => '1', 'text' => EASYPOPULATE_4_ORDERS_FULL ),
 			array( "id" => '2', 'text' => EASYPOPULATE_4_ORDERS_NEWFULL ),
 			array( "id" => '3', 'text' => EASYPOPULATE_4_ORDERS_NO_ATTRIBS ),
@@ -467,44 +526,98 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 		echo EASYPOPULATE_4_ORDERS_DROPDOWN_TITLE;
 		
 		echo zen_draw_pull_down_menu('ep_order_export_type', $order_export_type_array) . ' ';
-    echo zen_cfg_pull_down_order_statuses(NULL, 'order_status');
+        echo zen_cfg_pull_down_order_statuses(NULL, 'order_status');
 		echo zen_draw_input_field('exportorder', EASYPOPULATE_4_ORDERS_DROPDOWN_EXPORT, ' style="padding: 0px"', false, 'submit');
 		?>				
     <br /><br />
     </div></form>
     
     
-        <b><?php echo EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION; ?></b><br />
+    <b><?php echo EASYPOPULATE_4_DISPLAY_PRODUCTS_PRICE_EXPORT_OPTION; ?></b><br />
         <!-- Download file links -->
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=full', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_COMPLETE_PRODUCTS; ?></a><br/>
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=priceqty', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_PRICE_QTY; ?></a><br />
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=pricebreaks', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_PRICE_BREAKS; ?></a><br />
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=featured', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_FEATURED; ?></a><br />
+    <a href="easypopulate_4.php?export=full"><?php echo EASYPOPULATE_4_DISPLAY_COMPLETE_PRODUCTS; ?></a><br/>
+   
+        <a href="easypopulate_4.php?export=priceqty"><?php echo EASYPOPULATE_4_DISPLAY_PRICE_QTY; ?></a><br />
+        <a href="easypopulate_4.php?export=pricebreaks"><?php echo EASYPOPULATE_4_DISPLAY_PRICE_BREAKS; ?></a><br />
+        <a href="easypopulate_4.php?export=featured"><?php echo EASYPOPULATE_4_DISPLAY_FEATURED; ?></a><br />
+        
+         <!-- @altered for bookx -->
+        <br /><b><?php echo EASYPOPULATE_4_DISPLAY_TITLE_BOOKX_FILES; ?></b><br />
+        
+        <a href="easypopulate_4.php?export=bookx"><?php echo EASYPOPULATE_4_DISPLAY_BOOKX_PRODUCTS; ?></a><br /> 
+        <a href="easypopulate_4.php?export=bookx">Export Authors</a><br /> 
+        <div class="ep4bookx-options-container">     
+        <a id="displayText" href="javascript:toggle();"><h3>Show Export Options</h3></a>
+        <div id="toggleText" style="display: none">
+        <?php
+         
+            //$_POST['customers_gender']
+            echo zen_draw_form('bookx_fields_enable', 'easypopulate_4.php', '', 'get', 'id="bookx_fields_enable"');
+            ?>
 
+            <table id="ep4bookx_options">
+            <tr>
+            <th>Fields</th>
+            <th class="ep4bookx-select">Enable</th>
+            <th class="ep4bookx-select">Disable</th>
+            </tr>
+            <tr>
+            <td>Export Special price</td>
+            <td><?php  //echo zen_draw_radio_field('bookx_export_specials', '1', true); 
+            echo zen_draw_hidden_field('bookx_export_specials', urlencode($bookx_make_file), /*$parameters = */'')
+            ?>
+
+            </td>
+            <td><?php echo zen_draw_radio_field('bookxexport_specials', '0',false); ?></td>
+            </tr>
+            <tr>
+            <td>Export Meta Tags</td>
+            <td><?php echo zen_draw_radio_field('bookx_export_metatags', '1', true,'Special Price'); ?></td>
+            <td><?php echo zen_draw_radio_field('bookx_export_metatags', '0',false, 'No Special Price'); ?></td>
+           
+            </tr>
+             <tr>
+            <td>&nbsp;</td>
+            <td colspan="2"><?php echo zen_draw_input_field('ep4bookx_export_options', 'Make File', ' style="padding: 0px"', false, 'submit'); ?></td>
+            
+           
+            </tr>
+            </table>
+            
+           
+          
+           
+        </div>
+        </div>
+     
+    
+    
+    
+        <!-- eof @altered for bookx -->
         <br /><b><?php echo EASYPOPULATE_4_DISPLAY_TITLE_CATEGORY; ?></b><br />
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=category', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORY; ?></a><br />
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=categorymeta', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORYMETA; ?></a><br/>
+        <a href="easypopulate_4.php?export=category"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORY; ?></a><br />
+    <a href="easypopulate_4.php?export=categorymeta"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_CATEGORYMETA; ?></a><br/>
 
         <br /><?php echo EASYPOPULATE_4_DISPLAY_TITLE_ATTRIBUTE; ?><br />
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=attrib_basic', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_BASIC; ?></a><br /> 
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=attrib_detailed', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_DETAILED; ?></a><br />
+        <a href="easypopulate_4.php?export=attrib_basic"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_BASIC; ?></a><br /> 
+        <a href="easypopulate_4.php?export=attrib_detailed"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_ATTRIBUTE_DETAILED; ?></a><br />
         <?php
         /* Begin SBA1 addition */
         if ($ep_4_SBAEnabled != false) {
           ?>
-          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=SBA_detailed', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_DETAILED_SBA; ?></a><br />
-          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=SBAStock', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_SBA_STOCK; ?></a><br />
+          <a href="easypopulate_4.php?export=SBA_detailed"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_DETAILED_SBA; ?></a><br />
+          <a href="easypopulate_4.php?export=SBAStock"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_SBA_STOCK; ?></a><br />
 
-          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=SBAStockProdFilter, $request_type'); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_SBA_STOCK_ASC; ?></a><br />
+          <a href="easypopulate_4.php?export=SBAStockProdFilter"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_SBA_STOCK_ASC; ?></a><br />
 
         <?php } /* End SBA1 Addition */ 
 		$zco_notifier->notify('EP4_LINK_SELECTION_END');
 		?>
 
         <br><?php echo EASYPOPULATE_4_DISPLAY_TITLE_EXPORT_ONLY; ?><br />
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=options', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_OPTION_NAMES; ?></a><br />
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=values', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_OPTION_VALUES; ?></a><br />
-        <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=optionvalues', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_OPTION_NAMES_TO_VALUES; ?></a><br />
+        <a href="easypopulate_4.php?export=options"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_OPTION_NAMES; ?></a><br />
+        <a href="easypopulate_4.php?export=values"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_OPTION_VALUES; ?></a><br />
+        <a href="easypopulate_4.php?export=optionvalues"><?php echo EASYPOPULATE_4_DISPLAY_EXPORT_OPTION_NAMES_TO_VALUES; ?></a><br />
 
         <?php
 // List uploaded files in multifile mode
@@ -537,7 +650,8 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
             "orders-full-ep"=>ORDERSEXPORT_LINK_SAVE1,
             "orders-fullb-ep"=>ORDERSEXPORT_LINK_SAVE1B,
             "orders-noattribs-ep"=>ORDERSEXPORT_LINK_SAVE2,
-            "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3
+            "orders-onlyAttribs-ep"=>ORDERSEXPORT_LINK_SAVE3,
+            "bookx-ep"=>BOOKX_EP_DESC
           );
 		  $zco_notifier->notify('EP4_FILENAMES');
 
@@ -664,7 +778,6 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
         } // opendir()
         if (EP4_SHOW_ALL_FILETYPES == 'Hidden') {
           echo "</table>\n";
-
           if (sizeof($filetypes) == 0) {
             echo "<table id=\"epfiles\"    width=\"80%\" border=1 cellspacing=\"2\" cellpadding=\"2\">\n";
             echo "<tr><td COLSPAN=8><font color='red'>" . EASYPOPULATE_4_DISPLAY_EXPORT_FILE_NONE_SUPPORTED . "</font></td></tr>\n";
@@ -699,6 +812,21 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
     </div>
     <br />
     <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
+    <?php // @altered for Bookx 
+    if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) { // Only loads if BookX is enable ?>
+    <script language="javascript" type="text/javascript" src="includes/ep4bookx.js"></script>
+    <?php } ?>
+    <!-- Sets nanobar when exporting / exporting bookx fields //-->   
+    <?php if( $loader == true )  { ?>
+<script>
+            var loader = new Nanobar();
+            loader.go(50)
+            loader.setState('danger')
+            loader.setHeight('10px')
+            loader.go(100)        
+        </script>
+ <?php   } ?>
+ <!-- ends nanobar when exporting / exporting bookx fields //-->
   </body>
 </html>
 <?php require(DIR_WS_INCLUDES . 'application_bottom.php'); ?>
