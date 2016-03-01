@@ -55,6 +55,8 @@ class ep4bookx extends base {
         $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
         $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len;
 
+            $curver .= '<br />'; // Intent of this is to show that the option is available not that it is "active", though if that is desired instead, then suggest adding an "active/inactive"
+            $curver .= 'w/ BookX v1.0';
         //  @EP4Bookx Get the user config 
         $ep_bookx = (int) EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
         //ups, Actually BookX doesn't yet have the products metatags on the fly. 
@@ -65,8 +67,6 @@ class ep4bookx extends base {
             $result = $db->Execute('SELECT type_id FROM ' . TABLE_PRODUCT_TYPES . ' WHERE type_handler = \'product_bookx\'');
             $bookx_product_type = $result->fields['type_id'];
             require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
-            $curver .= '<br />';
-            $curver .= 'w/ BookX v1.0';
 
             $bookx_author_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name');
             $bookx_author_types_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION, 'type_description');
@@ -125,9 +125,10 @@ class ep4bookx extends base {
 
     // $zco_notifier->notify('EP4_DISPLAY_STATUS');
     function updateEP4DisplayStatus(&$callingClass, $notifier, $paramsArray) {
-        global $ep_bookx;
+    global $ep_bookx, $ep_bookx_default_genre_name;
 
         echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX . $ep_bookx . '<br/>';
+    echo EASY_POPULATE_4_BOOKX_DISPLAY_DEFAULT_GENRE_NAME . $ep_bookx_default_genre_name . '<br />';
     }
 
     // $zco_notifier->notify('EP4_MAX_LEN');
@@ -156,7 +157,81 @@ class ep4bookx extends base {
 
     //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
     function updateEP4ExtraFunctionsSetFilelayoutFullFilelayout(&$callingClass, $notifier, $paramsArray) {
+    global $filelayout, $langcode;
+
+//@ALTERED Bookx Info - 23-04-2015
+    if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
+	   pr(EASYPOPULATE_4_CONFIG_BOOKX_DATA);
+        // BOOKX_EXTRA DESCRIPTION
+       // if (isset($enable_bookx_subtitle ) ) {
+        foreach ($langcode as $key => $lang) { // create variables for each language id
+          $l_id = $lang['id'];
+          $filelayout[] = 'v_bookx_subtitle_'.$l_id;
+        }
+        //}
+       //if ($enable_bookx_genre_name == true ) { // This is not working....
+       foreach ($langcode as $key => $lang) { // create variables for each language id
+         $l_id = $lang['id'];
+         $filelayout[] = 'v_bookx_genre_name_'.$l_id;
+       }
+       //} 
+       //if ($enable_bookx_publisher_name == true) {
+		$filelayout[] = 'v_bookx_publisher_name';
+        //}
+        //if ($enable_bookx_series_name == true) {
+        foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+            $filelayout[] = 'v_bookx_series_name_'.$l_id; // Series name, as Lang ID
+        }
+        //} 
+        //if ($enable_bookx_imprint_name == true) {            
+		$filelayout[] = 'v_bookx_imprint_name';
+        //}
         
+        //if ($enable_bookx_binding == true) { 
+        foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+            $filelayout[] = 'v_bookx_binding_'.$l_id; //   Lang ID
+        }
+        //}
+        // if ($enable_bookx_printing == true) { 
+        foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+            $filelayout[] = 'v_bookx_printing_'.$l_id; //   Lang ID
+        }
+         //}
+        //if ($enable_bookx_condition == true) { 
+        foreach ($langcode as $key => $lang) { 
+            $l_id = $lang['id'];
+            $filelayout[] = 'v_bookx_condition_'.$l_id; //  Lang ID
+        }
+        //}
+        //if($enable_bookx_isbn == true) {     
+		$filelayout[] = 'v_bookx_isbn';
+        //}
+       //if($enable_bookx_size == true) { 
+		$filelayout[] = 'v_bookx_size';
+       //}
+       //if($enable_bookx_volume == true) {
+		$filelayout[] = 'v_bookx_volume';
+       //}
+        //if($enable_bookx_pages == true) {
+		$filelayout[] = 'v_bookx_pages';
+        //}
+        //if($enable_bookx_publishing_date == true) {
+		$filelayout[] = 'v_bookx_publishing_date'; 
+        //}
+        //if($enable_bookx_author_name == true) {        
+		$filelayout[] = 'v_bookx_author_name';
+        //}
+        //if ($enable_bookx_author_type == true) {
+        foreach ($langcode as $key => $lang) {
+          $l_id = $lang['id'];
+		  $filelayout[] = 'v_bookx_author_type_'.$l_id;
+        }
+        //}		
+    }
+
     }
 
     // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
@@ -191,7 +266,7 @@ class ep4bookx extends base {
 
         switch ($ep_dltype) {
             case 'bookx':
-                $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START');
+                $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START'); // Because this grouping is now set aside, anything that is in this observer and others, really should be brought into this for the most part because anything modified there affects here as well...
 
                 // The file layout is dynamically made depending on the number of languages
                 $filelayout[] = 'v_products_model';
@@ -345,14 +420,15 @@ class ep4bookx extends base {
 
     // $zco_notifier->notify('EP4_LINK_SELECTION_END');
     function updateEP4LinkSelectionEnd(&$callingClass, $notifier, $paramsArray) {
-        global $ep_bookx;
+        global $ep_bookx, $request_type;
+        
         if ($ep_bookx == 1) {
             ?> 
             <!-- @altered for bookx -->
             <br />
             <b><?php echo EASYPOPULATE_4_DISPLAY_TITLE_BOOKX_FILES; ?></b>
             <br />
-            <a href="easypopulate_4.php?export=bookx"><?php echo EASYPOPULATE_4_DISPLAY_BOOKX_PRODUCTS; ?></a>
+            <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx', $request_type); ?>"><?php echo EASYPOPULATE_4_DISPLAY_BOOKX_PRODUCTS; ?></a>
             <br />
             <!-- <a href="easypopulate_4.php?export=bookx">Export Authors</a> -->
             <br />
@@ -390,7 +466,8 @@ class ep4bookx extends base {
 
     // EP4_EXPORT_WHILE_START
     function updateEP4ExportWhileStart(&$callingClass, $notifier, $paramsArray) {
-        
+        global $result;
+        pr($result);
     }
 
     //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
@@ -410,7 +487,8 @@ class ep4bookx extends base {
 
 //  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
     function updateEP4ExportSpecialsAfter(&$callingClass, $notifier, $paramsArray) {
-        global $ep_dltype, $db, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row, $langcode, $epdlanguage_id, $ep_bookx;
+        global $ep_dltype, $db, $filelayout_sql, $ep_uses_mysqli, $filelayout, 
+          $row, $langcode, $epdlanguage_id, $ep_bookx, $category_delimiter;
         if ($ep_dltype == 'bookx' && $ep_bookx == 1) {
             include DIR_FS_ADMIN . 'easypopulate_4_export_bookx.php';
         }
@@ -442,9 +520,28 @@ class ep4bookx extends base {
     
     // EP4_IMPORT_AFTER_CATEGORY
    function updateEP4ImportAfterCategory(&$callingClass, $notifier, $paramsArray){
+    global $v_products_id, $bookx_product_type, $enable_bookx_genre_name, $langcode,
+           $items, $filelayout, $db, $bookx_reports, $v_bookx_isbn, $v_bookx_genre_name,
+           $display_output, $ep_error_count,
+           $bookx_author_name_max_len, $bookx_author_types_name_max_len,
+           $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
+           $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
+           $bookx_imprint_name_max_len, $bookx_subtitle_max_len, $
+    $bookx_default_author_name, $bookx_default_author_type, $bookx_default_printing,
+    $bookx_default_binding, $bookx_default_genre_name, $bookx_default_publisher_name,
+    $bookx_default_series_name, $bookx_default_imprint_name, $bookx_default_condition,
+    $report_bookx_subtitle, $report_bookx_genre_name, $report_bookx_publisher_name,
+    $report_bookx_series_name, $report_bookx_imprint_name, $report_bookx_binding,
+    $report_bookx_printing, $report_bookx_condition, $report_bookx_isbn,
+    $report_bookx_size, $report_bookx_volume, $report_bookx_pages,
+    $report_bookx_publishing_date, $report_bookx_author_name, $report_bookx_author_type;
      //include the bookx import file.   
+    /**
+     * @EP4Bookx 4 of 5
+     * At last but not least , include the bookx import file. Try to stay clean
+     */
      include DIR_FS_ADMIN . 'easypopulate_4_import_bookx.php';
-   
+    //end ep4bookx
    }
  
     // EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE
@@ -604,6 +701,11 @@ class ep4bookx extends base {
             $this->updateEP4ExportSpecialsAfter($callingClass, $notifier, $paramsArray);
         }
 
+//  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
+    if ($notifier == 'EP4_EXPORT_FULL_OR_CAT_FULL_AFTER') {
+      $this->updateEP4ExportFullOrCatFullAfter($callingClass, $notifier, $paramsArray);
+    }
+    
         if ($notifier == 'EP4_IMPORT_START') {
             $this->updateEP4ImportStart($callingClass, $notifier, $paramsArray);
         }

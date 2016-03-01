@@ -771,6 +771,7 @@ pr($_POST);
                     // since we have a row, the item already exists.
                     // let's check and delete it if requested   
                     // v_status == 9 is a delete request  
+                    $continueNextRow = false;
                     if ($items[$filelayout['v_status']] == 9) {
                         $chosen_key = '';
                         switch (EP4_DB_FILTER_KEY) {
@@ -788,7 +789,7 @@ pr($_POST);
 
                         $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETED, $items[$filelayout[$chosen_key]]);
                         ep_4_remove_product($items[$filelayout[$chosen_key]]);
-                        continue 2; // short circuit - loop to next record
+
                         $continueNextRow = true;
                     }
 
@@ -2227,19 +2228,11 @@ pr($_POST);
                     $display_output .= EASYPOPULATE_4_DISPLAY_RESULT_NO_MODEL;
                     foreach ($items as $col => $summary) {
             if ($col == $filelayout[$chosen_key]){
-                            continue;
-                        }
-                        $display_output .= print_el_4($summary);
-                    }
-                } // end of row insertion code
-
-                /**
-                 * @EP4Bookx 4 of 5
-                 * At last but not least , include the bookx import file. Try to stay clean 
-                 */
-                $zco_notifier->notify('EP4_IMPORT_AFTER_CATEGORY');
-                 //include 'easypopulate_4_import_bookx.php';
-		//end ep4bookx
+              continue;
+            }
+            $display_output .= print_el_4($summary);
+          }
+        } // end of row insertion code
 		
             } // end of Mail While Loop
         } // conditional IF statement

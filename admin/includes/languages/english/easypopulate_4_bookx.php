@@ -9,6 +9,8 @@
  * @author mesnitu
  */
 
+define('EASYPOPULATE_4_DISPLAY_RESULT_DELETED', '<br /><font color="fuchsia"><b>DELETED! - Model:</b> %s</font> - GENRE: %s');
+
 define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Author Name:</b> %s - excede tamanho max: %s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_AUTHOR_TYPES_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Author Type Name:</b> %s - excede tamanho max: %s</font>');
 define('EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_PUBLISHER_NAME_LONG', '<br /><font color="red"><b>SKIPPED! - Book Publisher Name:</b> %s - excede tamanho max: %s</font>');

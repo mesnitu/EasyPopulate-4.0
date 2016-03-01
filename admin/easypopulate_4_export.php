@@ -194,7 +194,7 @@ $active_row = array(); // empty array
 $last_products_id = "";
 $print1 = 0;
 $result = ep_4_query($filelayout_sql);
-pr($result);
+
 $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 
 while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
