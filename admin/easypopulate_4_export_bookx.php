@@ -9,8 +9,6 @@
  * @todo  export with support for languages
  */
     // names and descriptions require that we loop thru all installed languages
-//pr($row, "ROW BOOKX EXPORT FILE");
-//pr($filelayout, "filelayout");
 
 foreach ($langcode as $key2 => $lang2) {
     $lid2 = $lang2['id'];
@@ -98,12 +96,11 @@ foreach ($langcode as $key2 => $lang2) {
   } //End if isset v_manufacturers_name
   
         if (($row['isbn'] != '0') && ($row['isbn'] != '') || ($row['size'] != '0') && ($row['size'] != '') || ($row['pages'] != '0') && ($row['pages'] != '') || ($row['publishing_date'] != '0') && ($row['publishing_date'] != '') || ($row['v_bookx_volume'] != '0') && ($row['v_bookx_volume'] != '0')) { // '0' is correct, but '' NULL is possible
-
-            $row['v_bookx_isbn'] = $row['isbn'];
-            $row['v_bookx_size'] = $row['size'];
-            $row['v_bookx_pages'] = $row['pages'];
-            $row['v_bookx_publishing_date'] = $row['publishing_date'];
-            $row['v_bookx_volume'] = $row['volume'];
+            $row['v_bookx_isbn'];
+            $row['v_bookx_size'];
+            $row['v_bookx_pages'];
+            $row['v_bookx_publishing_date'];
+            $row['v_bookx_volume'];
 
         } else {
             $row['v_bookx_isbn'] = '';
@@ -133,25 +130,14 @@ foreach ($langcode as $key2 => $lang2) {
 
     // Publisher Name
     if (isset($filelayout['v_bookx_publisher_name']) && ($row['v_bookx_publisher_name'] != '')) {
-
-        $sql = "SELECT * FROM ".TABLE_PRODUCT_BOOKX_PUBLISHERS." WHERE bookx_publisher_id = :bookx_publisher_id: LIMIT 1 ";
-        $sql = $db->bindVars($sql, ':bookx_publisher_id:', $row_bookx_extra['bookx_publisher_id'], 'integer');
-        $result_publisher = ep_4_query($sql);
-        $row_publisher_name = ($ep_uses_mysqli ? mysqli_fetch_array($result_publisher) : mysql_fetch_array($result_publisher));
-        $row['v_bookx_publisher_name'] = $row_publisher_name['publisher_name'];
+        $row['v_bookx_publisher_name'];
     } else {
         $row['v_bookx_publisher_name'] = '';
     }//ends Bookx Publisher
     
     // Imprints Name
     if (isset($filelayout['v_bookx_imprint_name']) && ($row['v_bookx_imprint_name'] != '')) {
-
-        $sql = "SELECT * FROM ".TABLE_PRODUCT_BOOKX_IMPRINTS." WHERE bookx_imprint_id = :bookx_imprint_id: LIMIT 1";
-        $sql = $db->bindVars($sql, ':bookx_imprint_id:', $row_bookx_extra['bookx_imprint_id'], 'integer');
-        $result_imprint_name = ep_4_query($sql);
-        $row_imprint_name = ($ep_uses_mysqli ? mysqli_fetch_array($result_imprint_name) : mysql_fetch_array($result_imprint_name));
-
-        $row['v_bookx_imprint_name'] = $row_imprint_name['imprint_name'];
+        $row['v_bookx_imprint_name'];
     } else {
         $row['v_bookx_imprint_name'] = '';
     } //ends Bookx imprint
@@ -264,7 +250,7 @@ foreach ($langcode as $key2 => $lang2) {
                     }
                 } //ends foreach lang
             } //ends foreach
-            //pr($genre_names_array);
+            
             foreach($genre_names_array as $lang => $value) {
                 $row['v_bookx_genre_name_'.$lang] = implode($category_delimiter, $value);
             }

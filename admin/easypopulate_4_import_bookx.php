@@ -27,7 +27,7 @@
  */
 // Edit link to books with missing fields
 $edit_link = "<a href=" . zen_href_link('product_bookx.php', 'cPath=' . zen_get_product_path($v_products_id) . '&product_type=' . $bookx_product_type . '&pID=' . $v_products_id . '&action=new_product') . ">" . EASYPOPULATE_4_BOOKX_EDIT_LINK . "</a>";
-pr($report_bookx_genre_name);
+
 //::: BOOKX GENRE
 if ($enable_bookx_genre_name == true) {
 
@@ -43,21 +43,21 @@ if ($enable_bookx_genre_name == true) {
         }
         $genres_names_array[$l_id] = mb_split('\x5e', $items[$filelayout['v_bookx_genre_name_' . $l_id]]); // names to array 
     }
-
+    
     foreach ($genres_names_array as $key => $genres_lang_array) {
         foreach ($genres_lang_array as $names) {
             ((mb_strlen($names) <= $bookx_genre_name_max_len) ? $flag[] = '1' : $flag[] = '0');
         }
     }
 
-    if ((!in_array('0', $flag) && ($items[$filelayout['v_bookx_genre_name_' . $epdlanguage_id]] != ''))) {
+    if ((!in_array('0', $flag) && ($items[$filelayout['v_bookx_genre_name_'.$epdlanguage_id]] != ''))) {
 
         for ($i = 0; $i < count($genres_names_array[$epdlanguage_id]); $i++) { // go for the default language  
             $sql = "SELECT bookx_genre_id AS genreID, genre_description, languages_id  FROM " . TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION . " WHERE genre_description = :genre_name: AND languages_id = :languages_id:";
             $sql = $db->bindVars($sql, ':genre_name:', $genres_names_array[$epdlanguage_id][$i], 'string');
             $sql = $db->bindVars($sql, ':languages_id:', $epdlanguage_id, 'integer');
             $result_genre = $db->Execute($sql);
-
+           
             $v_genre_id = $result_genre->fields['genreID'];
 
             if ($result_genre->RecordCount() == 0) {
@@ -129,7 +129,7 @@ if ($enable_bookx_genre_name == true) {
         $v_genre_id = 0;
     }
 } // ends genres
-pr($bookx_reports, "inside file");
+
 //::: Publisher Name
 if (isset($filelayout['v_bookx_publisher_name'])) {
 
@@ -243,7 +243,7 @@ if (isset($filelayout['v_bookx_series_name_' . $l_id])) {
         foreach ($langcode as $lang) {
             $l_id = $lang['id'];
             if (mb_strlen($items[$filelayout['v_bookx_series_name_' . $l_id]]) > $bookx_series_name_max_len) {
-                //pr($v_bookx_series_name, "EROR");
+                
                 $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_SERIES_NAME_LONG, $items[$filelayout['v_bookx_series_name_' . $l_id]], $bookx_series_name_max_len);
                 $ep_error_count++;
             }
@@ -540,6 +540,7 @@ if (isset($filelayout['v_bookx_author_name'])) {
                             $author_types_array[$l_id][] = $bookx_default_author_type; // add remaining type to array 
                         } // ends for   
                     } elseif ((count($author_types_array[$epdlanguage_id])) <> (count($author_types_array[$l_id]))) {
+                       
                         // If for some reason the lang records are not equal -> error                     
                         $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_UNBALANCED_AUTHOR_TYPES_ERROR_TYPES . $items[$filelayout['v_bookx_author_type_' . $l_id]], $v_products_name[$epdlanguage_id]);
                         $ep_error_count++;

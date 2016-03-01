@@ -198,7 +198,7 @@ $result = ep_4_query($filelayout_sql);
 $zco_notifier->notify('EP4_EXPORT_WHILE_START');
 
 while ($row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result))) {
-  pr($filelayout_sql);
+  
   if ($ep_dltype == 'attrib_basic') { // special case 'attrib_basic'
     if ($row['v_products_id'] == $active_products_id) {
       if ($row['v_options_id'] == $active_options_id) {

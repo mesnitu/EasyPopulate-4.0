@@ -93,8 +93,7 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
     } else if (!($handle = fopen($file_location, "r"))) {
         $display_output .= '<font color="red"><b>ERROR: Cannot open import file:' . $file_location . '</b></font><br/>';
     }
-pr($_GET);
-pr($_POST);
+    
     // Read Column Headers
     if ($raw_headers = fgetcsv($handle, 0, $csv_delimiter, $csv_enclosure)) {
         /* 		$header_search = array("ARTIST","TITLE","FORMAT","LABEL",
@@ -771,7 +770,6 @@ pr($_POST);
                     // since we have a row, the item already exists.
                     // let's check and delete it if requested   
                     // v_status == 9 is a delete request  
-                    $continueNextRow = false;
                     if ($items[$filelayout['v_status']] == 9) {
                         $chosen_key = '';
                         switch (EP4_DB_FILTER_KEY) {
@@ -789,7 +787,7 @@ pr($_POST);
 
                         $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_DELETED, $items[$filelayout[$chosen_key]]);
                         ep_4_remove_product($items[$filelayout[$chosen_key]]);
-
+                        continue 2; // short circuit - loop to next record
                         $continueNextRow = true;
                     }
 
@@ -2228,12 +2226,11 @@ pr($_POST);
                     $display_output .= EASYPOPULATE_4_DISPLAY_RESULT_NO_MODEL;
                     foreach ($items as $col => $summary) {
             if ($col == $filelayout[$chosen_key]){
-              continue;
-            }
-            $display_output .= print_el_4($summary);
-          }
-        } // end of row insertion code
-		
+                            continue;
+                        }
+                        $display_output .= print_el_4($summary);
+                    }
+                } // end of row insertion code              	
             } // end of Mail While Loop
         } // conditional IF statement
 

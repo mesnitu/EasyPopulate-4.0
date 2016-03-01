@@ -47,7 +47,6 @@ class ep4bookx extends base {
     }
 
     /* Function run/called by notifier: EP4_START */
-
     function updateEP4Start(&$callingClass, $notifier, $paramsArray) {
         global $db, $curver, $ep_bookx, $bookx_product_type, $check_bookx_export_metatags;
         global $bookx_author_name_max_len, $bookx_author_types_name_max_len,
@@ -118,17 +117,15 @@ class ep4bookx extends base {
               // Finish progress bar
               nanobar.go(100);
                         </script>
-                        <?php }
-            
+                        <?php }           
         }
     }
-
+    
     // $zco_notifier->notify('EP4_DISPLAY_STATUS');
     function updateEP4DisplayStatus(&$callingClass, $notifier, $paramsArray) {
-    global $ep_bookx, $ep_bookx_default_genre_name;
+        global $ep_bookx;
 
         echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX . $ep_bookx . '<br/>';
-    echo EASY_POPULATE_4_BOOKX_DISPLAY_DEFAULT_GENRE_NAME . $ep_bookx_default_genre_name . '<br />';
     }
 
     // $zco_notifier->notify('EP4_MAX_LEN');
@@ -136,8 +133,8 @@ class ep4bookx extends base {
         global $bookx_author_name_max_len,
         $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
         $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
-        $bookx_imprint_name_max_len, $bookx_subtitle_max_len, $ep_bookx;
-        ;
+        $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len, $ep_bookx;
+        
         if ($ep_bookx == 1) {
             echo 'author_name:' . $bookx_author_name_max_len . '<br/>';
             echo 'genre_description:' . $bookx_genre_name_max_len . '<br/>';
@@ -158,16 +155,16 @@ class ep4bookx extends base {
     //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
     function updateEP4ExtraFunctionsSetFilelayoutFullFilelayout(&$callingClass, $notifier, $paramsArray) {
     global $filelayout, $langcode;
-
+        
 //@ALTERED Bookx Info - 23-04-2015
     if ((int)EASYPOPULATE_4_CONFIG_BOOKX_DATA == true) {
-	   pr(EASYPOPULATE_4_CONFIG_BOOKX_DATA);
+	   //pr(EASYPOPULATE_4_CONFIG_BOOKX_DATA);
         // BOOKX_EXTRA DESCRIPTION
        // if (isset($enable_bookx_subtitle ) ) {
         foreach ($langcode as $key => $lang) { // create variables for each language id
           $l_id = $lang['id'];
           $filelayout[] = 'v_bookx_subtitle_'.$l_id;
-        }
+    }
         //}
        //if ($enable_bookx_genre_name == true ) { // This is not working....
        foreach ($langcode as $key => $lang) { // create variables for each language id
@@ -187,7 +184,7 @@ class ep4bookx extends base {
         //if ($enable_bookx_imprint_name == true) {            
 		$filelayout[] = 'v_bookx_imprint_name';
         //}
-        
+
         //if ($enable_bookx_binding == true) { 
         foreach ($langcode as $key => $lang) { 
             $l_id = $lang['id'];
@@ -467,7 +464,7 @@ class ep4bookx extends base {
     // EP4_EXPORT_WHILE_START
     function updateEP4ExportWhileStart(&$callingClass, $notifier, $paramsArray) {
         global $result;
-        pr($result);
+        //pr($result);
     }
 
     //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
@@ -497,12 +494,11 @@ class ep4bookx extends base {
     //     $notifyme[] = 'EP4_IMPORT_START';
     function updateEP4ImportStart(&$callingClass, $notifier, $paramsArray) {
         global $bookx_reports;
-
         /* [It aggregates missing fields in a report linked to the imported book. Uses Bookx languages files as key so it can be tranlated ie: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
          * @see   [adminFolder/includes/languades/YOUR_lang/extra_definitions/product_bookx.php]
          * @var array
          */
-        $bookx_reports = array();
+        $bookx_reports = array();       
     }
 
     // EP4_IMPORT_FILE_EARLY_ROW_PROCESSING
@@ -520,7 +516,7 @@ class ep4bookx extends base {
     
     // EP4_IMPORT_AFTER_CATEGORY
    function updateEP4ImportAfterCategory(&$callingClass, $notifier, $paramsArray){
-    global $v_products_id, $bookx_product_type, $enable_bookx_genre_name, $langcode,
+    global $v_products_id, $v_products_name, $bookx_product_type, $enable_bookx_genre_name, $langcode, $epdlanguage_id, $edit_link, 
            $items, $filelayout, $db, $bookx_reports, $v_bookx_isbn, $v_bookx_genre_name,
            $display_output, $ep_error_count,
            $bookx_author_name_max_len, $bookx_author_types_name_max_len,
@@ -535,7 +531,10 @@ class ep4bookx extends base {
     $report_bookx_printing, $report_bookx_condition, $report_bookx_isbn,
     $report_bookx_size, $report_bookx_volume, $report_bookx_pages,
     $report_bookx_publishing_date, $report_bookx_author_name, $report_bookx_author_type;
-     //include the bookx import file.   
+     //include the bookx import file.  
+    
+   require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
+        // pr("AM I LOOPING ? ");
     /**
      * @EP4Bookx 4 of 5
      * At last but not least , include the bookx import file. Try to stay clean
@@ -566,7 +565,7 @@ class ep4bookx extends base {
 
     // EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT
     function updateEP4ImportFilePreDisplayOutput(&$callingClass, $notifier, $paramsArray) {
-        global $bookx_reports, $display_output;
+        global $bookx_reports, $display_output, $edit_link;
         /**
          * @EP4Bookx
          * Reports missing fields with the book edit link
