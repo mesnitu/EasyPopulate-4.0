@@ -262,6 +262,8 @@ class ep4bookx extends base {
 
 //  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
   function updateEP4ExportSpecialsAfter(&$callingClass, $notifier, $paramsArray) {
+    global $row, $filelayout, $epdlanguage_id, $langcode;
+
     include DIR_FS_ADMIN . 'easypopulate_4_export_bookx.php';
   }
 
@@ -303,6 +305,22 @@ class ep4bookx extends base {
 
   // EP4_IMPORT_AFTER_CATEGORY
   function updateEP4ImportAfterCategory(&$callingClass, $notifier, $paramsArray){
+    global $v_products_id, $bookx_product_type, $enable_bookx_genre_name, $langcode,
+           $items, $filelayout, $db, $bookx_reports, $v_bookx_isbn, $v_bookx_genre_name,
+           $display_output, $ep_error_count,
+           $bookx_author_name_max_len, $bookx_author_types_name_max_len,
+           $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
+           $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
+           $bookx_imprint_name_max_len, $bookx_subtitle_max_len,
+    $bookx_default_author_name, $bookx_default_author_type, $bookx_default_printing,
+    $bookx_default_binding, $bookx_default_genre_name, $bookx_default_publisher_name,
+    $bookx_default_series_name, $bookx_default_imprint_name, $bookx_default_condition,
+    $report_bookx_subtitle, $report_bookx_genre_name, $report_bookx_publisher_name,
+    $report_bookx_series_name, $report_bookx_imprint_name, $report_bookx_binding,
+    $report_bookx_printing, $report_bookx_condition, $report_bookx_isbn,
+    $report_bookx_size, $report_bookx_volume, $report_bookx_pages,
+    $report_bookx_publishing_date, $report_bookx_author_name, $report_bookx_author_type;
+
     /**
      * @EP4Bookx 4 of 5
      * At last but not least , include the bookx import file. Try to stay clean
