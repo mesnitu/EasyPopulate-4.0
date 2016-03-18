@@ -2222,6 +2222,12 @@ $result_incategory = ($ep_uses_mysqli ? mysqli_fetch_array($result_incategory) :
             $display_output .= print_el_4($summary);
           }
         } // end of row insertion code
+		
+		//  Back to origin. The only way it seens to be fully working is here. 
+        //  it catches the product's id. In other places doesn't. only $row[0] is available.
+        // 	I gave it this name, possibly another more generic, or possibly i'm missing something.
+            $zco_notifier->notify('EP4_IMPORT_FILE_ENDS');
+		
       } // end of Mail While Loop
     } // conditional IF statement
   
