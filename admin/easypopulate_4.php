@@ -736,7 +736,11 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
       ?>
     </div>
     <br />
-    <?php require(DIR_WS_INCLUDES . 'footer.php'); ?>
+     <?php 
+    require(DIR_WS_INCLUDES . 'footer.php'); 
+	// loads js files in the footer
+    $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK_END');
+    ?>
   </body>
 </html>
 <?php require(DIR_WS_INCLUDES . 'application_bottom.php'); ?>
