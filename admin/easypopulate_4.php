@@ -328,7 +328,7 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
 	
     <script language="javascript" type="text/javascript" src="includes/menu.js"></script>
     <script language="javascript" type="text/javascript" src="includes/general.js"></script>
-    <?php $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK'); ?>
+    
     <!-- <script language="javascript" src="includes/ep4ajax.js"></script> -->
     <script type="text/javascript">
 <!--
