@@ -17,10 +17,6 @@
 //	die('Illegal Access');
 //} 
 
-if ((mb_substr($_POST['import'], 0, 5)) == 'BookX' || ($_GET['export'] == 'bookx'))  {
-	$autoLoadConfig[0][] = array('autoType' => 'require',
-			'loadFile' => DIR_WS_MODULES.'easypopulate_4_bookx_config.php');
-}
  $autoLoadConfig[0][] = array(
 	'autoType' => 'class',
 	'loadFile' => 'observers/class.ep4bookx.php',
