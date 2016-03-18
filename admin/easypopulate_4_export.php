@@ -1,5 +1,5 @@
 <?php
-// $Id: easypopulate_4_export.php, v4.0.32 12-28-2015 mc12345678 $
+// $Id: easypopulate_4_export.php, v4.0.33 02-29-2016 mc12345678 $
 
 if (!defined('IS_ADMIN_FLAG')) {
   die('Illegal Access');
@@ -407,8 +407,11 @@ $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
   // chadd - 12-13-2010 - logic change. $max_categories no longer required. better to loop back to root category and
   // concatenate the entire categories path into one string with $category_delimiter for separater.
   if (($ep_dltype == 'full') || ($ep_dltype == 'category')) { // chadd - 12-02-2010 fixed error: missing parenthesis
-    // NEW While-loop for unlimited category depth
-    $category_delimiter = "^"; //Need to move this to the admin panel
+
+    // NEW While-loop for unlimited category depth			
+//    $category_delimiter = "^"; //Need to move this to the admin panel // mc12345678 02-29-2016 moved to main file.
+//    $category_delimiter = "\x5e"; This is the UTF-8 implementation of "^".
+
     $thecategory_id = $row['v_categories_id']; // starting category_id
 
     if ($ep_dltype == 'full' && EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {

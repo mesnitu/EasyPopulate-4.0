@@ -1,10 +1,14 @@
 <?php
-// $Id: easypopulate_4.php, v4.0.32 12-30-2015 mc12345678 $
+// $Id: easypopulate_4.php, v4.0.33 02-29-2016 mc12345678 $
 
 // CSV VARIABLES - need to make this configurable in the ADMIN
 // $csv_delimiter = "\t"; // "\t" = tab AND "," = COMMA
 $csv_delimiter = ","; // "\t" = tab AND "," = COMMA
 $csv_enclosure = '"'; // chadd - i think you should always use the '"' for best compatibility
+//$category_delimiter = "^"; //Need to move this to the admin panel
+$category_delimiter = "\x5e"; //Need to move this to the admin panel
+// See https://en.wikipedia.org/wiki/UTF-8 for UTF-8 character encodings
+
 
 $excel_safe_output = true; // this forces enclosure in quotes
 
@@ -74,8 +78,17 @@ $ep_debug_logging_all = false; // do not comment out.. make false instead
 //$sql_fail_test == true; // used to cause an sql error on new product upload - tests error handling & logs
 /* Test area end */
 
+$curver = '4.0.33a';
+$message = '';
+if (IS_ADMIN_FLAG) {
+  $new_version_details = plugin_version_check_for_updates(2069, $curver);
+  if ($new_version_details !== FALSE) {
+    $message = '<span class="alert">' . ' - NOTE: A NEW VERSION OF THIS PLUGIN IS AVAILABLE. <a href="' . $new_version_details['link'] . '" target="_blank">[Details]</a>' . '</span>';
+  }
+}
+
 // Current EP Version - Modded by mc12345678 after Chadd had done so much
-$curver              = '4.0.32 - Beta 12-30-2015';
+$curver              = $curver . ' - Beta 02-29-2016' . $message;
 $display_output = ''; // results of import displayed after script run
 $ep_dltype = NULL;
 $ep_stack_sql_error = false; // function returns true on any 1 error, and notifies user of an error
@@ -101,6 +114,27 @@ if (substr($tempdir, 0, 1) == '/') {
 
 //$ep_debug_log_path = DIR_FS_CATALOG . $tempdir;
 $ep_debug_log_path = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ? /* Storeside */ DIR_FS_CATALOG : /* Admin side */ DIR_FS_ADMIN) . $tempdir;
+
+// Check the current path of the above directory, if the selection is the
+//  store directory, but the path leads into the admin directory, then 
+//  reset the selection to be the admin directory and modify the path so 
+//  that the admin directory is no longer typed into the path.  This same
+//  action occurs in the configuration window now, but this is in case
+//  operation of the program has allowed some other modification to occur
+//  and the database for EP4 has the admin path in it.
+if (EP4_ADMIN_TEMP_DIRECTORY !== 'true') {
+  if (strpos($ep_debug_log_path, DIR_FS_ADMIN) !== false) {
+    $temp_rem = substr($ep_debug_log_path, strlen(DIR_FS_ADMIN));
+    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'true\' where configuration_key = \'EP4_ADMIN_TEMP_DIRECTORY\'', false, false, 0, true);
+    
+    $db->Execute('UPDATE ' . TABLE_CONFIGURATION . ' SET configuration_value = \'' . $temp_rem . '\' WHERE configuration_key = \'EASYPOPULATE_4_CONFIG_TEMP_DIR\'', false, false, 0, true);
+
+    // need a message to  be displayed...
+
+    // Reload the page with the path now reset. No parameters are passed.
+    zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
+  }
+}
 
 if ($ep_debug_logging_all == true) {
   $fp = fopen($ep_debug_log_path . 'ep_debug_log.txt', 'w'); // new blank log file on each page impression for full testing log (too big otherwise!!)
@@ -289,7 +323,9 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
     <title><?php echo TITLE; ?></title>
     <link rel="stylesheet" type="text/css" href="includes/stylesheet.css">
     <link rel="stylesheet" type="text/css" href="includes/cssjsmenuhover.css" media="all" id="hoverJS">
-    
+
+    <?php $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK'); ?>
+	
     <script language="javascript" type="text/javascript" src="includes/menu.js"></script>
     <script language="javascript" type="text/javascript" src="includes/general.js"></script>
     <?php $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK'); ?>
