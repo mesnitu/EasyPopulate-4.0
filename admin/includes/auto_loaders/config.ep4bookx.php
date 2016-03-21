@@ -27,3 +27,9 @@
 	'className' => 'ep4bookx',
 	'objectName' => 'ep4bookx'
 	); 
+
+if (isset($GLOBALS['PHP_SELF']) == DIR_WS_ADMIN.'easypopulate_4.php' ) {
+
+	$autoLoadConfig[199][] = array('autoType' => 'init_script',
+			'loadFile' => 'init_ep4bookx.php');  
+	}

@@ -1,0 +1,698 @@
+/*! 
+ *  @package EP4Bookx - EP4 CSV fork to import Bookx fields - tested with Zencart 1.5.4
+ *  @version  0.9.9 - Still in development, make your changes in a local environment
+ *  @see BookX Module for ZenCart https://sourceforge.net/p/zencartbookx
+ *  @see Readme-EP4Bookx
+ *  @author mesnitu 
+ *  @see https://github.com/mesnitu/EasyPopulate-4.0-BookX
+ *  $Id: ep4bookx.css [UTF-8] - 16/mar/2016-19:48:01 mesnitu  $
+ */
+
+/*!
+Pure v0.6.0
+Copyright 2014 Yahoo! Inc. All rights reserved.
+Licensed under the BSD License.
+https://github.com/yahoo/pure/blob/master/LICENSE.md
+*/
+/*!
+normalize.css v^3.0 | MIT License | git.io/normalize
+Copyright (c) Nicolas Gallagher and Jonathan Neal
+*/
+/*! normalize.css v3.0.2 | MIT License | git.io/normalize */html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}article,aside,details,figcaption,figure,footer,header,hgroup,main,menu,nav,section,summary{display:block}audio,canvas,progress,video{display:inline-block;vertical-align:baseline}audio:not([controls]){display:none;height:0}[hidden],template{display:none}a{background-color:transparent}a:active,a:hover{outline:0}abbr[title]{border-bottom:1px dotted}b,strong{font-weight:700}dfn{font-style:italic}h1{font-size:2em;margin:.67em 0}mark{background:#ff0;color:#000}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sup{top:-.5em}sub{bottom:-.25em}img{border:0}svg:not(:root){overflow:hidden}figure{margin:1em 40px}hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}pre{overflow:auto}code,kbd,pre,samp{font-family:monospace,monospace;font-size:1em}button,input,optgroup,select,textarea{color:inherit;font:inherit;margin:0}button{overflow:visible}button,select{text-transform:none}button,html input[type=button],input[type=reset],input[type=submit]{-webkit-appearance:button;cursor:pointer}button[disabled],html input[disabled]{cursor:default}button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}input{line-height:normal}input[type=checkbox],input[type=radio]{box-sizing:border-box;padding:0}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{height:auto}input[type=search]{-webkit-appearance:textfield;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;box-sizing:content-box}input[type=search]::-webkit-search-cancel-button,input[type=search]::-webkit-search-decoration{-webkit-appearance:none}fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}legend{border:0;padding:0}textarea{overflow:auto}optgroup{font-weight:700}table{border-collapse:collapse;border-spacing:0}td,th{padding:0}.hidden,[hidden]{display:none!important}.pure-img{max-width:100%;height:auto;display:block}
+/*!
+Pure v0.6.0
+Copyright 2014 Yahoo! Inc. All rights reserved.
+Licensed under the BSD License.
+https://github.com/yahoo/pure/blob/master/LICENSE.md
+*/
+.pure-button {
+    /* Structure */
+    display: inline-block;
+    zoom: 1;
+    line-height: normal;
+    white-space: nowrap;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* Firefox: Get rid of the inner focus border */
+.pure-button::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+}
+
+/*csslint outline-none:false*/
+
+.pure-button {
+    font-family: inherit;
+    font-size: 100%;
+    padding: 0.5em 1em;
+    color: #444; /* rgba not supported (IE 8) */
+    color: rgba(0, 0, 0, 0.80); /* rgba supported */
+    border: 1px solid #999;  /*IE 6/7/8*/
+    border: none rgba(0, 0, 0, 0);  /*IE9 + everything else*/
+    background-color: #E6E6E6;
+    text-decoration: none;
+    border-radius: 2px;
+}
+
+.pure-button-hover,
+.pure-button:hover,
+.pure-button:focus {
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#1a000000',GradientType=0);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(transparent), color-stop(40%, rgba(0,0,0, 0.05)), to(rgba(0,0,0, 0.10)));
+    background-image: -webkit-linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+    background-image: -moz-linear-gradient(top, rgba(0,0,0, 0.05) 0%, rgba(0,0,0, 0.10));
+    background-image: -o-linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+    background-image: linear-gradient(transparent, rgba(0,0,0, 0.05) 40%, rgba(0,0,0, 0.10));
+}
+.pure-button:focus {
+    outline: 0;
+}
+.pure-button-active,
+.pure-button:active {
+    box-shadow: 0 0 0 1px rgba(0,0,0, 0.15) inset, 0 0 6px rgba(0,0,0, 0.20) inset;
+    border-color: #000\9;
+}
+
+.pure-button[disabled],
+.pure-button-disabled,
+.pure-button-disabled:hover,
+.pure-button-disabled:focus,
+.pure-button-disabled:active {
+    border: none;
+    background-image: none;
+    filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+    filter: alpha(opacity=40);
+    -khtml-opacity: 0.40;
+    -moz-opacity: 0.40;
+    opacity: 0.40;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.pure-button-hidden {
+    display: none;
+}
+
+/* Firefox: Get rid of the inner focus border */
+.pure-button::-moz-focus-inner{
+    padding: 0;
+    border: 0;
+}
+
+.pure-button-primary,
+.pure-button-selected,
+a.pure-button-primary,
+a.pure-button-selected {
+    background-color: rgb(0, 120, 231);
+    color: #fff;
+}
+
+/*!
+Pure v0.6.0
+Copyright 2014 Yahoo! Inc. All rights reserved.
+Licensed under the BSD License.
+https://github.com/yahoo/pure/blob/master/LICENSE.md
+*/
+.pure-table {
+    /* Remove spacing between table cells (from Normalize.css) */
+    border-collapse: collapse;
+    border-spacing: 0;
+    empty-cells: show;
+    border: 1px solid #cbcbcb;
+}
+
+.pure-table caption {
+    color: #000;
+    font: italic 85%/1 arial, sans-serif;
+    padding: 1em 0;
+    text-align: center;
+}
+
+.pure-table td,
+.pure-table th {
+    border-left: 1px solid #cbcbcb;/*  inner column border */
+    border-width: 0 0 0 1px;
+    font-size: inherit;
+    margin: 0;
+    overflow: visible; /*to make ths where the title is really long work*/
+    padding: 0.5em 1em; /* cell padding */
+}
+
+
+.pure-table thead {
+    background-color: #e0e0e0;
+    color: #000;
+    text-align: left;
+    vertical-align: bottom;
+}
+
+.pure-table td {
+    background-color: transparent;
+}
+.pure-table-odd td {
+    background-color: #f2f2f2;
+}
+
+/* nth-child selector for modern browsers */
+.pure-table-striped tr:nth-child(2n-1) td {
+    background-color: #f2f2f2;
+}
+
+/* BORDERED TABLES */
+.pure-table-bordered td {
+    border-bottom: 1px solid #cbcbcb;
+}
+.pure-table-bordered tbody > tr:last-child > td {
+    border-bottom-width: 0;
+}
+
+
+/* HORIZONTAL BORDERED TABLES */
+
+.pure-table-horizontal td,
+.pure-table-horizontal th {
+    border-width: 0 0 1px 0;
+    border-bottom: 1px solid #cbcbcb;
+}
+.pure-table-horizontal tbody > tr:last-child > td {
+    border-bottom-width: 0;
+}
+
+
+.bookx-reports {
+    line-height: 1.5;
+    width: 80%;
+    box-shadow: 10px 10px 5px #888888;
+    border:1px solid #333;
+    border-collapse: collapse;
+}
+/*tr.bookx-reports-top th {
+    padding: 10px 0;
+    background: #ccc;
+    border-bottom: 2px solid #333;
+}
+th.bookx-reports-th-left {
+   border-right: 1px solid #333;
+    background: #ccc;
+    border-bottom: 2px solid #333;
+    padding: 0;
+}
+th.bookx-reports-th-left:before {
+   content: "";
+    display: block;
+    background: #333;
+    height: 16px;
+    position: relative;
+    top: -72px;
+    width: 100%;
+    padding: 5px 0;
+}
+th.bookx-reports-th-caption {
+    background: #333;
+    color: #fff;
+    padding: 5px 0;
+}*/
+.odd,.even {
+    padding: 5px 10px;
+    border-bottom:1px solid #333;
+}
+/*.odd {
+    background: #F4F4F4;
+}
+.even {
+    background: #E9E9E9;
+   
+}*/
+
+.bookx-report-type {
+    font-weight: bold;
+}
+
+/*#epfiles {
+border-collapse:collapse;
+border: 1px solid #ccc;
+}
+#epfiles th {
+    color:#666;
+    background: #ccc;
+    border-bottom: 1px solid #333;
+    border-top: 1px solid #333;
+}
+#epfiles b {
+    color: #D9534F;
+}
+#epfiles td {
+    padding:2px;
+}*/
+
+.ep4bookx-section fieldset, #default-fields {
+    margin: 25px 5px;
+    border: 1px solid #607D8B;
+    border-radius: 2px;
+}
+.ep4bookx-section legend {
+    font-weight: bold;
+    font-size: 1.2em;
+    display: block;
+    color: #F44336;
+}
+
+#ep4bookx-options {
+}
+
+legend {
+    display:block;
+}
+
+#ep4bookx-options label {
+    display: inline-block;
+
+}
+
+label.ep4bookx-select {
+    border-bottom: 1px solid #99C2DA;
+    font-weight: bold;
+    text-align: center;
+}
+#ep4bookx-options input {
+    width: 16px;
+}
+#ep4bookx-options input[type="submit"] {
+    cursor: pointer;
+    width: auto;
+    padding: 3px;
+}
+fieldset#enable-fields, fieldset#enable-reports {
+
+    /* background: #f4f4f4; */
+}
+#customize-fields h3 { 
+    color: #F44336;
+}
+#enable-fields div, #enable-reports div {
+    border-bottom: 1px solid #def;
+    display: inline-block;
+    border-radius: 2px;
+    margin: 0px 5px;
+    padding: 5px;
+    width: calc(100% - 72%);
+    position: relative;
+    line-height: 1.5;
+}
+#enable-fields div:hover, #customize-fields div:hover {
+    background: #f2f2f2;
+}
+#enable-fields div input, #enable-reports div input {
+    height: 16px;
+    float: right;
+}
+#customize-fields {
+    margin: 10px 5px;
+    padding: .35em .625em .75em;
+    /*border: 1px solid #607D8B;*/
+    border-radius: 2px; 
+}
+
+#customize-fields input {
+
+}
+.customize-fields-single input, #ep4bookx-options input[type="submit"] {
+    background-repeat: no-repeat;
+    padding: 5px;
+    background-position-x: right;
+    padding-right: 20px;
+    background-position-y: 2px;
+    color: #fff;
+    margin: 0 5px;
+}
+.customize-fields-single input[type=button] {
+    background-image: url('ic_delete_forever_white_18dp_1x.png');
+
+}
+.customize-fields-single input[type=submit], #ep4bookx-options input[type="submit"] {
+    background-image: url('ic_file_download_white_18dp_1x.png');
+    background-color: #607D8B;
+}
+
+.customize-fields-single input[type=button].read-file {
+
+    background-color: #607D8B;
+    background-image: url('ic_visibility_white_18dp_1x.png');
+    background-position-x: 3px;
+    background-position-y: 2px;
+
+}
+
+.customize-fields h3 {
+    color:#F44336;
+}
+
+fieldset#default-fields div {
+    display: block;
+    border: 1px solid #e9e9e9;
+    display: inline-block; 
+    border-radius: 2px;
+    box-shadow: 1px 1px 1px #ccc;
+    margin: 2px;
+    padding: 4px;
+    width: 31.8%; 
+    position: relative;
+    background: #fff;
+}
+
+fieldset#default-fields input {
+    width: 68%;
+    border: 1px solid #f2f2f2;
+    padding: 8px;
+    border-radius: 2px;
+    margin-top: 5px;
+}
+
+fieldset#default-fields label {
+    display: inline-block;
+    width: 25%;
+}
+
+.bookx-options {
+
+}   
+.bookx-options-l, .bookx-options-r {
+    display: inline-block;
+}
+#bookx-display-options h3 {
+    background: #F4F4F4;
+}
+#ep4bookx-btn-options {
+    background: #4CAF50;
+    position: absolute;
+    right: 1px;
+    top: 1px;
+    height: 98%;;
+}
+#ep4bookx-btn-options-open {
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+.ep4bookx-section {
+    width: 40vw;
+    /*background: #f2f2f2;*/
+    position: relative;
+    /*box-shadow: 2px 2px 4px #eee;*/
+    padding: 5px 0;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: 1px solid #f2f2f2;
+}
+.ep4bookx-section h4{
+    font-size: 11px;
+    margin: 2px 0;
+}
+.ep4bookx-section-open {
+    width:60vw;
+    padding: 10px;
+    margin-left: 2%;
+}
+#ep4bookx-form {
+    margin: 5px 0;
+}
+.ep4-right {
+    float: right !important;
+    width: 20% !important;
+}
+.ep4-left {
+    float: left;
+    width: 75%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 5px 5px 5px #ccc;
+    padding: 15px;
+}
+.ep4-left input, .ep4-left select  {
+    padding:3px !important;
+}
+.ep4-left input  {
+    border:1px solid #ccc;
+
+}
+
+.ep4bookx-btn-info {
+
+    background-image: url('ic_info_outline_white_18dp_1x.png');
+    background-color: #2196F3;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 25px;
+    width: 25px;
+}
+.ep4bookx-btn-info-close {
+    background-image: url('ic_highlight_off_white_18dp_1x.png');  
+    background-color: #607D8B;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 25px;
+    width: 25px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.ep4bookx-btn-info:hover, .ep4bookx-btn-info:focus {
+    background-image: url('ic_info_outline_white_18dp_1x.png');
+}
+.ep4bookx-btn-info-close:hover, .ep4bookx-btn-info-close:focus {
+    background-image: url('ic_highlight_off_white_18dp_1x.png');  
+}
+#ep4bookx-btn-close {
+    background: url('ic_highlight_off_white_18dp_1x.png');  
+    background-color: #607D8B;
+    position: absolute;
+    right: 0;
+    background-repeat: no-repeat;
+    background-position: center;
+    top: 0;
+    padding: 1.1em 1.3em;
+}
+.icon-settings {
+    background: url('ic_settings_white_18dp_1x.png');
+    background-size: cover;
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    content: "";
+    vertical-align: middle;  
+}
+
+button#ep4bookx-btn-options span {
+    /* width: 74%; */
+    display: inline-block;
+    vertical-align: middle;
+    /* word-break: break-word; */
+    /* word-wrap: break-word; */
+    font-weight: bold;
+}
+#ep4bookx-submit {
+    background: #FAFAFA;
+    padding: 10px 0;
+}
+#ep4bookx-submit input {
+    width: 40%;
+    padding: 5px;
+    margin: 10px;
+}
+#ep4bookx-submit label {
+    display: initial;
+}
+/* For customize layouts section */
+.box {
+    margin: 0;
+    display: table;
+    border-spacing: 3px;
+    width: 100%;
+    border-bottom: 1px solid #def;
+    text-align: right;
+}
+.box span {
+    display: table-cell;
+    vertical-align: middle;
+    width: 50%;
+    text-align: left;
+}
+.box input {
+    display: inline-block;
+}
+/* ends For customize layouts section */
+
+.delete {
+    display: table-cell;
+    background: #F44336;
+    border-radius: 2px;
+    zoom: 1;
+    padding: 0px 0px 0px 1px;
+}
+.action {
+    display: table-cell;
+    vertical-align: middle;
+    width: 80%;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.action:hover {
+    background-color: #f4f4f4;
+}
+.delete:hover {
+    background-color: #ff0000;
+}
+
+
+#load {
+    position: absolute;
+    background-image: url(../../../../images/loading.gif);
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    background-color: rgba(33, 32, 32, 0.54);
+    z-index: 1000;
+}
+.lightcolor {
+    color: #9E9E9E;
+}
+/** How to - readme file */
+
+.ep4bookx-howto  {
+    position: relative;
+    padding: 1px;
+
+}
+.ep4bookx-howto-open {
+    background-color: #f7f6ef;
+    padding: 10px;
+    border-radius: 2px;
+
+}
+.wrap-read {
+    display:none;
+}
+.wrap-read-inner:before {
+    position: absolute;
+    content: "";
+    right: 0;
+    top: 0;
+    background: url('ic_highlight_off_white_18dp_1x.png');  
+    background-color: #607D8B;
+    background-repeat: no-repeat;
+    background-position: center;
+    border-radius: 2px;
+    height: 25px;
+    width: 25px;
+    cursor: pointer;
+
+}
+
+.wrap-read-inner {
+    padding: 0 15px;
+    line-height: 1.5;
+    font-family: sans-serif;
+    font-size: 12px;
+    height: 70vh;
+    overflow-x: auto;
+    border-top: 25px solid #FF5722;
+}
+/** How to - readme file */
+
+.ep4bookx-msg {
+    background: #FAFAFA;
+    padding: 10px;
+    border-radius: 2px;
+}
+
+#report-files {
+    z-index: 10000;
+    position: relative;
+    width: 60vw;
+    margin: auto;
+}
+#report-files span {
+    background: #424242;
+    padding: 10px;
+    color: #FFA000;
+    border-radius: 2px;
+    line-height: 1.5;
+    display:block;
+
+}
+#report-files pre {
+    text-align: left;
+    font-family: monospace;
+}
+#ep4bookx-form, #load, .ep4bookx-msg {
+    display: none;
+}
+.error {
+    display: block;
+    padding: 10px;
+    color: #F44336;
+}
+
+.l-left {
+    width: 75%;
+    padding: 10px;
+    box-shadow: 0px 2px 2px 2px #CFD8DC;
+}
+.l-right {
+    width: 20% !important;
+    padding: 10px;
+}
+.l-content {
+    padding:15px !important;
+}
+
+
+.at-error {
+    /* placed on a error labels */
+    color: #F44336;
+    margin: 6px 0;
+    display: inline;
+}
+
+.at-warning {
+    /* placed on a warning (invalid) labels */
+    color: #8A6D3B;
+    margin: 6px 0;
+}
+
+.at-invalid {
+    /* placed on a invalid fields (which do not match with their filters or masks) */
+}
+
+.at-required {
+    /* placed on a required fields (which are not filled) */
+}
+
+.at-description {
+    /* placed on description paragrapher, right after TEXTAREA fields. */
+}
+
+.at-description > span {
+    /* into description paragrapher, right after TEXTAREA fields there are 2 span TAGs. */
+}
+
+.at-required-highlight {
+    /* highlight required form fields */
+    color: red;
+}
