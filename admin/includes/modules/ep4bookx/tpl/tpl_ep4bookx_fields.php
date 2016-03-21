@@ -15,7 +15,7 @@
   <div id ="load">&nbsp;</div>
   <h4><?php echo EASYPOPULATE_4_DISPLAY_TITLE_BOOKX_FILES; ?>
     <span>
-      <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'ep4bookx_action=' . $toogle_config . ' class="ep4bookx-download-link" ', $request_type); ?>">
+      <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'ep4bookx_action=' . $toogle_config . '" class="ep4bookx-download-link" ', $request_type); ?>>
         <?php echo $toogle_text; ?></a>
     </span>
   </h4>
