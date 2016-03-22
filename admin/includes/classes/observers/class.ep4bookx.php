@@ -460,7 +460,7 @@ class ep4bookx extends base {
 
                 $filelayout_sql .= '
 			ptoc.categories_id = subc.categories_id ' . $sql_filter;
-               
+                //pr($filelayout_sql);
                 break;
 
             case 'TEST_2':
@@ -576,7 +576,7 @@ class ep4bookx extends base {
     // EP4_EXPORT_WHILE_START
     function updateEP4ExportWhileStart(&$callingClass, $notifier, $paramsArray) {
         global $result;
-       
+        //pr($result);
     }
 
     //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
@@ -702,7 +702,10 @@ class ep4bookx extends base {
     }
 
     function update(&$callingClass, $notifier, $paramsArray) {
-
+        
+        if ( $notifier == 'EP4_START' ) {
+            $this->updateEP4Start($callingClass, $notifier, $paramsArray);
+        }
 //        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START' ) {
 //            $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
 //        }
