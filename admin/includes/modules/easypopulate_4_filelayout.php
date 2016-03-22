@@ -808,7 +808,7 @@ $filelayout_sql .= '
 
   default:
     $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT');
-    pr($zco_notifier, "EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT");
+    
     break;
 	}
 

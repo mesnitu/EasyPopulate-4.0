@@ -188,7 +188,7 @@ if ( isset($get_action) && ('bookx' == $get_action['export']) || isset($post_act
 
         $load_config = get_object_vars(json_decode(file_get_contents($ep4bookx_layout)));
 
-        pr($load_config, " ON THIS $layout_name");
+        
         $enable_ep4bookx_specials = $load_config['setFields']->ep4bookx_export_specials;
         $enable_ep4bookx_metatags = $load_config['setFields']->ep4bookx_export_metatags;
         // $enable_ep4bookx_categories = $load_config['setFields']->ep4bookx_export_categories; // No good. For new products they must be on the file

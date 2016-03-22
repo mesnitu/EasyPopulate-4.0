@@ -28,7 +28,7 @@ foreach ($langcode as $key2 => $lang2) {
       $sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
       $sqlMeta = $db->bindVars($sqlMeta, ':products_id:', $row['v_products_id'], 'integer');
       $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid2, 'integer');
-      pr($sqlMeta);
+     
       $resultMeta = ep_4_query($sqlMeta);
       $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
       $row['v_metatags_title_'.$lid2] = $rowMeta['metatags_title'];
@@ -131,7 +131,7 @@ foreach ($langcode as $key2 => $lang2) {
             $sql = $db->bindVars($sql, ':v_products_id:', $row['v_products_id'], 'integer');
             $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
             $result_subtitle = ep_4_query($sql);
-            pr($sql);
+           
             if ($row_bookx_subtitle = ($ep_uses_mysqli ? mysqli_fetch_array($result_subtitle) : mysql_fetch_array($result_subtitle))) {
                 $row['v_bookx_subtitle_'.$l_id] = $row_bookx_subtitle['products_subtitle'];
             } else {
