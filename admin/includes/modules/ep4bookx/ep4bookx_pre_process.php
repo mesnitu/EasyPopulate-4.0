@@ -75,10 +75,11 @@ if ( isset($post_action['ep4bookx_action']) ) {
 
         case 'delete':
             $layout_name = filter_input(INPUT_POST, 'ep4bookx_layout', FILTER_SANITIZE_STRING, FILTER_FLAG_NO_ENCODE_QUOTES) . '.json';
+           
             if ( $numf == 1 ) {
                 @unlink($ep4bookx_layout_path . $layout_name);
                 // This msg in on jquery return delete process
-                // If numf == 1 it will reload the page
+                // If numf == 1 when deleting it will reload the page
                 $jmsg = 0;
                 echo $jmsg;
                 exit();
@@ -188,7 +189,6 @@ if ( isset($get_action) && ('bookx' == $get_action['export']) || isset($post_act
 
         $load_config = get_object_vars(json_decode(file_get_contents($ep4bookx_layout)));
 
-        
         $enable_ep4bookx_specials = $load_config['setFields']->ep4bookx_export_specials;
         $enable_ep4bookx_metatags = $load_config['setFields']->ep4bookx_export_metatags;
         // $enable_ep4bookx_categories = $load_config['setFields']->ep4bookx_export_categories; // No good. For new products they must be on the file
@@ -233,7 +233,12 @@ if ( isset($get_action) && ('bookx' == $get_action['export']) || isset($post_act
         $default_ep4bookx_condition = $load_config['setFields']->default_ep4bookx_condition;
     } else {
         $ep4bookx_customize_files = false;
-        zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
+        // @ todo I left it here, cause on export, page should be redirect to easypopulate. 
+        // No doing so, upon the creation of a file, one is exporting also, but as the page doesn't reload
+        // one doesn't see that the layout has been created. 
+        // But, if no customize layout is found on export, it comes to here, and it can't be reloaded here, cause it will break
+        // the export. 
+        //zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4)); 
     }
 }
 
