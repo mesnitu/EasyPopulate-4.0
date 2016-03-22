@@ -43,7 +43,7 @@ class ep4bookx extends base {
         $notifyme[] = 'EP4_IMPORT_AFTER_CATEGORY';
         $notifyme[] = 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE';
         $notifyme[] = 'EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT';
-        $notifyme[] = 'EP4_EASYPOPULATE_4_LINK_END'; // This is for placing js in the end of body
+      
         $notifyme[] = 'EP4_IMPORT_FILE_END'; // For some reason, the only way
 
         $this->attach($this, $notifyme);
@@ -114,19 +114,10 @@ class ep4bookx extends base {
 
     // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
     function updateEP4Easypopulate4Link(&$callingClass, $notifier, $paramsArray) {
-        global $ep4bookx, $ep4bookx_module_path, $ep4bookx_tpl_path;
+        global $ep4bookx, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf;
         // load header scripts
         if ( $ep4bookx == 1 ) {
-            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
-        }
-    }
-
-    // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK_END');
-    function updateEP4Easypopulate4LinkEnd(&$callingClass, $notifier, $paramsArray) {
-        global $ep4bookx, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf;
-        // load footer scripts
-        if ( $ep4bookx == 1 ) {
-            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_footer.php';
+            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';      
         }
     }
 
@@ -702,10 +693,12 @@ class ep4bookx extends base {
     }
 
     function update(&$callingClass, $notifier, $paramsArray) {
-        
-        if ( $notifier == 'EP4_START' ) {
+		
+		
+		 if ( $notifier == 'EP4_START' ) {
             $this->updateEP4Start($callingClass, $notifier, $paramsArray);
         }
+
 //        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START' ) {
 //            $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
 //        }
