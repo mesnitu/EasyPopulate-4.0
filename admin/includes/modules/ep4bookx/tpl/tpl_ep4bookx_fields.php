@@ -15,8 +15,10 @@
   <div id ="load">&nbsp;</div>
   <h4><?php echo EASYPOPULATE_4_DISPLAY_TITLE_BOOKX_FILES; ?>
     <span>
-      <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'ep4bookx_action=' . $toogle_config . '" class="ep4bookx-download-link" ', $request_type); ?>>
+      <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'ep4bookx_action=' . $toogle_config . '" class="ep4bookx-download-link" ', $request_type);?> class="ep4bookx-download-link">
+        
         <?php echo $toogle_text; ?></a>
+
     </span>
   </h4>
   <?php
@@ -25,7 +27,7 @@
 
       if ( empty($ep4bookx_customize_files) ) {
           ?>
-          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx" class="ep4bookx-download-link"', $request_type); ?>">
+          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx', $request_type); ?>" class="ep4bookx-download-link">
             Complete Fields<?php //echo EASYPOPULATE_4_DISPLAY_BOOKX_PRODUCTS;       ?></a>
           <?php
       } else {
@@ -36,7 +38,7 @@
 //               echo '</form>';
           ?>
           
-          <span><?php echo EP4BOOKX_EXPORT_CUSTOMIZE; ?></span><a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx&ep4bookxLayoutName=' . current($ep4bookx_customize_files) . '" id="roundabout"', $request_type); ?>"><?php echo current($ep4bookx_customize_files); ?></a>
+          <span><?php echo EP4BOOKX_EXPORT_CUSTOMIZE; ?></span><a id="roundabout" href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx&ep4bookxLayoutName=' . current($ep4bookx_customize_files) , $request_type); ?>"><?php echo current($ep4bookx_customize_files); ?></a>
           <?php
       } // ends else
       ?>
@@ -275,14 +277,14 @@
   else { // just list the layouts, when config is disable
       if ( empty($ep4bookx_customize_files) ) {
           ?>
-          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx" class="ep4bookx-download-link"', $request_type); ?>">
+          <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx', $request_type); ?>" class="ep4bookx-download-link">
             Complete Fields<?php //echo EASYPOPULATE_4_DISPLAY_BOOKX_PRODUCTS;      ?></a>
           <?php
       } else {
           foreach ( $ep4bookx_customize_files as $key => $customize_file ) {
               ?>
               <div class="customize-fields-single">
-                <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx&ep4bookx_layout=' . $customize_file . '" id="roundabout"', $request_type); ?>"><?php echo $customize_file; ?></a>
+                <a href="<?php echo zen_href_link(FILENAME_EASYPOPULATE_4, 'export=bookx&ep4bookx_layout=' . $customize_file , $request_type); ?>" id="roundabout"><?php echo $customize_file; ?></a>
               </div>
               <?php
           }
