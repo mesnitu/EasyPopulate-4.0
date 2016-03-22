@@ -28,7 +28,7 @@ foreach ($langcode as $key2 => $lang2) {
       $sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
       $sqlMeta = $db->bindVars($sqlMeta, ':products_id:', $row['v_products_id'], 'integer');
       $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid2, 'integer');
-     
+      
       $resultMeta = ep_4_query($sqlMeta);
       $rowMeta = ($ep_uses_mysqli ? mysqli_fetch_array($resultMeta) : mysql_fetch_array($resultMeta));
       $row['v_metatags_title_'.$lid2] = $rowMeta['metatags_title'];
@@ -131,7 +131,7 @@ foreach ($langcode as $key2 => $lang2) {
             $sql = $db->bindVars($sql, ':v_products_id:', $row['v_products_id'], 'integer');
             $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
             $result_subtitle = ep_4_query($sql);
-           
+          
             if ($row_bookx_subtitle = ($ep_uses_mysqli ? mysqli_fetch_array($result_subtitle) : mysql_fetch_array($result_subtitle))) {
                 $row['v_bookx_subtitle_'.$l_id] = $row_bookx_subtitle['products_subtitle'];
             } else {
@@ -182,7 +182,7 @@ foreach ($langcode as $key2 => $lang2) {
             $sql = $db->bindVars($sql, ':languages_id:', $l_id, 'integer');
             $result_binding_name = ep_4_query($sql);
 
-            if ($row_binding_name = ($ep_uses_mysqli ? mysqli_fetch_array($result_binding_name) : mysql_fetch_array($result))) {
+            if ($row_binding_name = ($ep_uses_mysqli ? mysqli_fetch_array($result_binding_name) : mysql_fetch_array($result_binding_name))) {
                 $row['v_bookx_binding_'.$l_id] = $row_binding_name['binding_description'];
             } else {
                 $row['v_bookx_binding_'.$l_id] = '';
@@ -227,7 +227,7 @@ foreach ($langcode as $key2 => $lang2) {
 
     // Genre name
     if (isset($filelayout['v_bookx_genre_name_'.$epdlanguage_id])) {
-
+	
         //$category_delimiter = '^' // stick to the same delimiter for genres and authors, already presente in EP4
         $genreID_array = array(); // Creates a empty array to get the genres_id for the loop
         $genre_names_array = array(); // Creates a empty array to get the genres_names
@@ -235,16 +235,23 @@ foreach ($langcode as $key2 => $lang2) {
         $sql_genres_to_products = "SELECT * FROM ".TABLE_PRODUCT_BOOKX_GENRES_TO_PRODUCTS." WHERE products_id = :products_id:";
         $sql_genres_to_products = $db->bindVars($sql_genres_to_products, ':products_id:', $row['v_products_id'], 'integer');
         $result_genres_to_products = ep_4_query($sql_genres_to_products);
-
+		
         $count_genres = $result_genres_to_products->num_rows; // count the num_rows (not in use, but possibly a way, to just loop, if needed)
-        if ($result_genres_to_products->num_rows != 0 || $result_genres_to_products->num_rows != '') {
-            // makes a index into $genre_array[] with all the genre_id related to the book
-            while ($row_bookx_genres_to_products = ($ep_uses_mysqli ? mysqli_fetch_assoc($result_genres_to_products) : mysql_fetch_assoc($result_genres_to_products))) {
-                $genreID_array[] = $row_bookx_genres_to_products['bookx_genre_id']; // we have all book genres_id
-            } //ends while
+		
+		while ( $row_bookx_genres_to_products = ($ep_uses_mysqli ? mysqli_fetch_assoc($result_genres_to_products) : mysql_fetch_assoc($result_genres_to_products)) ) {
+			$genreID_array[] = $row_bookx_genres_to_products['bookx_genre_id'];
+			
+		}
 
+        if (!empty($genreID_array)) {
+		
+            // makes a index into $genre_array[] with all the genre_id related to the book
+            
+             $genreID_array[] = $row_bookx_genres_to_products['bookx_genre_id']; // we have all book genres_id
+		
             foreach($genreID_array as $key => $value) { // start looping
                 //query genre name by the values in the genreID_array
+				
                 foreach($langcode as $lang) {
                     $l_id = $lang['id'];
                     $sql_genres_names = "SELECT genre_description FROM ".TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION." WHERE bookx_genre_id = :bookx_genre_id: AND languages_id = :languages_id:";
@@ -253,24 +260,27 @@ foreach ($langcode as $key2 => $lang2) {
                     $result_genres_names = ep_4_query($sql_genres_names);
 
                     $genre_name = ($ep_uses_mysqli ? mysqli_fetch_array($result_genres_names) : mysql_fetch_array($result_genres_names));
-
-                    if ($genre_name['genre_description'] != '') {
+					
+					
+                    if ($genre_name['genre_description'] !='' ) {
                         // @todo : With several langs, If a genre is not translated or if a book as two genres, the string will end or start with a "^".
                         $genre_names_array[$l_id][] = $genre_name['genre_description']; // adds langcode key to the array
-                    } else {
-                        $genre_names_array[$l_id][] = 'Missing Translation';
+                    } elseif ($genre_name['genre_description'] !='' && (count($lancode)!=1)) {
+                        $genre_names_array[$l_id][] = '####';
                     }
                 } //ends foreach lang
             } //ends foreach
-            
+			
             foreach($genre_names_array as $lang => $value) {
                 $row['v_bookx_genre_name_'.$lang] = implode($category_delimiter, $value);
             }
         } else {
             //nothing there
+			
             foreach($langcode as $lang) {
                 $l_id = $lang['id'];
                 $row['v_bookx_genre_name_'.$l_id] = '';
+				
             }
         }
     } //ends Genre name
@@ -285,9 +295,7 @@ foreach ($langcode as $key2 => $lang2) {
         $sql_authors_to_products = $db->bindVars($sql_authors_to_products, ':products_id:', $row['v_products_id'], 'integer');
         $result_authors_to_products = ep_4_query($sql_authors_to_products);
 
-        $count_authors = $result_authors_to_products->num_rows; // count the num_rows (not in use, but possibly a way, to just loop, if the num_rows > 1)
-
-        if ($result_authors_to_products->num_rows != 0 || $result_authors_to_products->num_rows != '') {
+        //$count_authors = $result_authors_to_products->num_rows; // count the num_rows (not in use, but possibly a way, to just loop, if the num_rows > 1)
 
             while ($row_bookx_authors_to_products = ($ep_uses_mysqli ? mysqli_fetch_assoc($result_authors_to_products) : mysql_fetch_assoc($result_authors_to_products))) {
 
@@ -295,7 +303,7 @@ foreach ($langcode as $key2 => $lang2) {
                 $author_typeID_array[] = $row_bookx_authors_to_products['bookx_author_type_id']; // This is the type ID, not the default type.
 
             } //ends while
-
+            if ($authorID_array) {
             foreach($authorID_array as $key => $value) { // start looping
                 //query genre name by the values in the genreID_array
                 $sql_authors_names = "SELECT * FROM ".TABLE_PRODUCT_BOOKX_AUTHORS." WHERE bookx_author_id = :bookx_author_id:";
