@@ -100,7 +100,7 @@ foreach ($langcode as $key2 => $lang2) {
       $row['v_manufacturers_name'] = ''; // no manufacturer name
     }
   } //End if isset v_manufacturers_name
-  
+         
         if (
                 ($row['v_bookx_isbn'] != '0') && ($row['v_bookx_isbn'] != '') || 
                 (isset($filelayout['v_bookx_size']) && $row['v_bookx_size'] != '0') && ($row['v_bookx_size'] != '') || 
@@ -110,9 +110,9 @@ foreach ($langcode as $key2 => $lang2) {
             
             $row['v_bookx_isbn'];
             $row['v_bookx_size'];
-            $row['v_bookx_pages'];
-            $row['v_bookx_publishing_date'];
+            $row['v_bookx_pages'];           
             $row['v_bookx_volume'];
+            $row['v_bookx_publishing_date'];
 
         } else {
             $row['v_bookx_isbn'] = '';
@@ -323,13 +323,14 @@ foreach ($langcode as $key2 => $lang2) {
         }
     } // ends authors if
 
-    // Bookx Author Type
-    if (isset($filelayout['v_bookx_author_type_'.$epdlanguage_id])) { // '0' is correct, but '' NULL is possible
+    // Bookx Author Type. If the Authors is not selected for export, it wont do anything. No logic on that. 
+    if (isset($filelayout['v_bookx_author_type_'.$epdlanguage_id]) && isset($filelayout['v_bookx_author_name'])) { // '0' is correct, but '' NULL is possible
 
         $author_type_name_array = array();
         // If AuthorA as no type, and AuthorB is of Writer, in the file something must be written, otherwise, AuthorA becomes Writer, and authorB empty on import...This is not good. Don't see a simple way, but to use a default type to fill those empty types.
         foreach($author_typeID_array as $typeID) { // start looping
             //query genre name by the values in the genreID_array
+
             if (($typeID != '0') && ($typeID != '')) {
                 foreach($langcode as $lang) {
                     $l_id = $lang['id'];

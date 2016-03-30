@@ -10,8 +10,12 @@ class ep4bookx extends base {
 
     //private $_product = array();
 
+    public $tplForm;
+    public $setFields = array();
+    public $names_len = array();
+
     function __construct() { // ep4bookx if this class has difficulty loading
-//    global $zco_notifier;
+        //global $zco_notifier;
         $notifyme = array();
 
         $notifyme[] = 'EP4_START';
@@ -43,38 +47,95 @@ class ep4bookx extends base {
         $notifyme[] = 'EP4_IMPORT_AFTER_CATEGORY';
         $notifyme[] = 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE';
         $notifyme[] = 'EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT';
-      
+
         $notifyme[] = 'EP4_IMPORT_FILE_END'; // For some reason, the only way
 
         $this->attach($this, $notifyme);
     }
 
+
+
+    public function __set($variable, $value) {
+        global $variable, $value;
+        $this->setFields[$variable] = $value;
+    }
+
+    public function __get($variable) {
+        $this->setFields[$variable];
+    }
+
+    
+    /**
+     * it builds the fields array
+     * @param type array 
+     * @param type boolean - If not null, sets the fields variables names and values. If null, it will fetch all fields ( used by tplForm) 
+     * @param type string  to call the form group tpl fields
+     * @return type
+     */
+    public function ep4bookxBuild($param, $vars = null, $group = null) {
+
+        if ( !$vars ) {
+            if ( !$group ) {
+                foreach ( $param as $key => $fields ) {
+                    $this->tplForm[$key] = $fields;
+                }
+            } else {
+                $tmp = array();
+                $param = get_object_vars($param);
+                foreach ( $param[$group] as $k => $fields ) {
+                    $tmp[$group][$k] = $fields;
+                }
+                foreach ( $tmp as $field_name ) {
+                    foreach ( $field_name as $key => $value ) {
+                        $this->tplForm[$key] = $value;
+                    }
+                }
+                //@todo sort the names for tpl build
+//                usort($this->tplForm->name, function($a, $b) {                  
+//                    return strcmp($a->name, $b->name);
+//                });
+            }
+        } else {
+            foreach ( $param as $values ) {            
+                foreach ( $values as $variables => $value ) {
+                    $this->setFields[$variables] = $value->value;
+                }
+            }
+        }
+    }
+
     /* Function run/called by notifier: EP4_START */
 
     function updateEP4Start(&$callingClass, $notifier, $paramsArray) {
-        global $db, $curver, $ep4bookx, $ep4bookx_version, $ep4bookx_fields_conf, $bookx_product_type, $messageStack, $toogle_config, $toogle_text, $ep4bookx_msg;
+        global $db, $curver, $ep4bookx_enabled, $ep4bookx_version, $ep4bookx_fields_conf, $bookx_product_type, $messageStack, $toogle_config, $toogle_text, $ep4bookx_msg;
         global $bookx_author_name_max_len, $bookx_author_types_name_max_len,
         $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
         $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
         $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len;
 
+        global $ep4bookx_default_cnf, $build_vars, $ep4bookx_configuration;
+  
+        
         $curver .= '<br />'; // Intent of this is to show that the option is available not that it is "active", though if that is desired instead, then suggest adding an "active/inactive"
         $curver .= 'w/ BookX' . $ep4bookx_version;
-
-        if ( $ep4bookx == 1 ) {
-
+       
+        
+        if ( $ep4bookx_enabled == 1 ) {
+           
             require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
-
-            $bookx_author_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name');
-            $bookx_author_types_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION, 'type_description');
-            $bookx_genre_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION, 'genre_description');
-            $bookx_series_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_SERIES_DESCRIPTION, 'series_name');
-            $bookx_publisher_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PUBLISHERS, 'publisher_name');
-            $bookx_binding_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_BINDING_DESCRIPTION, 'binding_description');
-            $bookx_printing_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION, 'printing_description');
-            $bookx_condition_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION, 'condition_description');
-            $bookx_imprint_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'imprint_name');
-            $bookx_subtitle_name_max_len = zen_field_length(TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION, 'products_subtitle');
+            foreach ( $ep4bookx_default_cnf->ep4bookx_default_fields as $value ) {
+                
+                $bookx_author_name_max_len = $value->length;
+                $bookx_author_types_name_max_len = $value->length;
+                $bookx_genre_name_max_len = $value->length;
+                $bookx_series_name_max_len = $value->length;
+                $bookx_publisher_name_max_len = $value->length;
+                $bookx_binding_name_max_len = $value->length;
+                $bookx_printing_name_max_len = $value->length;
+                $bookx_condition_name_max_len = $value->length;
+                $bookx_imprint_name_max_len = $value->length;
+                $bookx_subtitle_name_max_len = $value->length;
+            }
 
             // Some messages
             switch ( $ep4bookx_msg ) {
@@ -114,19 +175,20 @@ class ep4bookx extends base {
 
     // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
     function updateEP4Easypopulate4Link(&$callingClass, $notifier, $paramsArray) {
-        global $ep4bookx, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf;
+        global $ep4bookx_enabled, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf, $ep4bookx_configuration;
+        global $progress_bar, $maintenance, $maintenance_state;
         // load header scripts
-        if ( $ep4bookx == 1 ) {
-            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';      
+       
+       
+        if ( $ep4bookx_enabled == 1 ) {
+            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
         }
     }
 
     // $zco_notifier->notify('EP4_DISPLAY_STATUS');
     function updateEP4DisplayStatus(&$callingClass, $notifier, $paramsArray) {
-        global $ep4bookx;
-        /*
-         * @todo - $ep4bookx is a object
-         */
+        global $ep4bookx_enabled;
+
         $ep_bookx = (int) EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
         echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX . $ep_bookx . '<br/>';
     }
@@ -135,9 +197,9 @@ class ep4bookx extends base {
     function updateEP4MaxLen(&$callingClass, $notifier, $paramsArray) {
         global $bookx_author_name_max_len, $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
         $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
-        $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len, $ep4bookx;
+        $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len, $ep4bookx_enabled;
         // Not sure if this is really usefull for a user  
-        if ( $ep4bookx == 1 ) {
+        if ( $ep4bookx_enabled == 1 ) {
             echo 'author_name:' . $bookx_author_name_max_len . '<br/>';
             echo 'genre_description:' . $bookx_genre_name_max_len . '<br/>';
             echo 'series_name:' . $bookx_series_name_max_len . '<br/>';
@@ -151,42 +213,48 @@ class ep4bookx extends base {
     }
 
     // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START');
-//    function updateEP4ExtraFunctionsSetFilelayoutFullStart(&$callingClass, $notifier, $paramsArray) {
-//        
-//    }
+    function updateEP4ExtraFunctionsSetFilelayoutFullStart(&$callingClass, $notifier, $paramsArray) {
+        
+    }
+
     //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
     function updateEP4ExtraFunctionsSetFilelayoutFullFilelayout(&$callingClass, $notifier, $paramsArray) {
-        global $filelayout, $langcode, $ep4bookx_query, $ep4bookx_query_join, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $epdlanguage_id, $ep4bookx_flag_import;
-        global $enable_ep4bookx_genre_name, $enable_ep4bookx_publisher_name, $enable_ep4bookx_series_name, $enable_ep4bookx_imprint_name, $enable_ep4bookx_binding, $enable_ep4bookx_printing, $enable_ep4bookx_condition, $enable_ep4bookx_size, $enable_ep4bookx_volume, $enable_ep4bookx_pages, $enable_ep4bookx_publishing_date, $enable_ep4bookx_author_name, $enable_ep4bookx_author_type, $enable_ep4bookx_subtitle;
+        global $filelayout, $langcode, $ep4bookx_query, $ep4bookx_query_join, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $epdlanguage_id, $ep4bookx_flag_import, $ep4bookx_flag_export;
+
         global $bind_publisher, $bind_series, $bind_binding, $bind_printing, $bind_condition, $bind_binding, $bind_publishing_date, $bind_pages, $bind_volume, $bind_size, $bind_imprint;
+
+        global $build_vars;
+
+
 //@ALTERED Bookx Info - 23-04-2015
 // If import flag is 1, set the conditional querys to bookx_extra table
 // IF Paradaise     
+
         if ( (int) EASYPOPULATE_4_CONFIG_BOOKX_DATA == true ) { // probably it could be removed
-            if ( !$ep4bookx_flag_import ) { // Prevents all this to be attached to import filelayout
+            if ( !$ep4bookx_flag_import && $ep4bookx_flag_export == 1 ) { // Prevents all this to be attached to import filelayout
                 $ep4bookx_query = '';
 
-                if ( $enable_ep4bookx_subtitle == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_subtitle'] == true ) {
                     foreach ( $langcode as $key => $lang ) { // create variables for each language id
                         $l_id = $lang['id'];
                         $filelayout[] = 'v_bookx_subtitle_' . $l_id;
                     }
                 }
 
-                if ( $enable_ep4bookx_genre_name == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_genre_name'] == true ) {
                     foreach ( $langcode as $key => $lang ) {
                         $l_id = $lang['id'];
                         $filelayout[] = 'v_bookx_genre_name_' . $l_id;
                     }
                 }
 
-                if ( $enable_ep4bookx_publisher_name == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_publisher_name'] == true ) {
                     $filelayout[] = 'v_bookx_publisher_name';
                     $ep4bookx_query .= 'bp.publisher_name AS v_bookx_publisher_name, ';
                     $ep4bookx_query_join = 'LEFT JOIN ' . TABLE_PRODUCT_BOOKX_PUBLISHERS . ' AS bp ON be.bookx_publisher_id = bp.bookx_publisher_id ';
                 }
 
-                if ( $enable_ep4bookx_series_name == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_series_name'] == true ) {
                     foreach ( $langcode as $key => $lang ) {
                         $l_id = $lang['id'];
                         $filelayout[] = 'v_bookx_series_name_' . $l_id; // Series name, as Lang ID
@@ -194,27 +262,27 @@ class ep4bookx extends base {
                     $ep4bookx_query .='be.bookx_series_id, ';
                 }
 
-                if ( $enable_ep4bookx_imprint_name == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_imprint_name'] == true ) {
                     $filelayout[] = 'v_bookx_imprint_name';
                     $ep4bookx_query .= 'bi.imprint_name AS v_bookx_imprint_name, ';
                     $ep4bookx_query_join .= 'LEFT JOIN ' . TABLE_PRODUCT_BOOKX_IMPRINTS . ' AS bi ON be.bookx_imprint_id = bi.bookx_imprint_id ';
                 }
 
-                if ( $enable_ep4bookx_binding == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_binding'] == true ) {
                     foreach ( $langcode as $key => $lang ) {
                         $l_id = $lang['id'];
                         $filelayout[] = 'v_bookx_binding_' . $l_id; //   Lang ID
                     }
                     $ep4bookx_query .= 'be.bookx_binding_id, ';
                 }
-                if ( $enable_ep4bookx_printing == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_printing'] == true ) {
                     foreach ( $langcode as $key => $lang ) {
                         $l_id = $lang['id'];
                         $filelayout[] = 'v_bookx_printing_' . $l_id; //   Lang ID
                     }
                     $ep4bookx_query .= 'be.bookx_printing_id, ';
                 }
-                if ( $enable_ep4bookx_condition == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_condition'] == true ) {
                     foreach ( $langcode as $key => $lang ) {
                         $l_id = $lang['id'];
                         $filelayout[] = 'v_bookx_condition_' . $l_id; //  Lang ID
@@ -224,26 +292,26 @@ class ep4bookx extends base {
                 // ISBN is mandatory. At least one fields must get the values from bookx_extra table. ISBN is a good one     
                 $filelayout[] = 'v_bookx_isbn';
                 //$ep4bookx_query = 'be.isbn AS v_bookx_isbn';
-                if ( $enable_ep4bookx_size == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_size'] == true ) {
                     $filelayout[] = 'v_bookx_size';
                     $ep4bookx_query .= 'be.size AS v_bookx_size, ';
                 }
-                if ( $enable_ep4bookx_volume == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_volume'] == true ) {
                     $filelayout[] = 'v_bookx_volume';
                     $ep4bookx_query .= 'be.volume  AS v_bookx_volume, ';
                 }
-                if ( $enable_ep4bookx_pages == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_pages'] == true ) {
                     $filelayout[] = 'v_bookx_pages';
                     $ep4bookx_query .= 'be.pages AS v_bookx_pages, ';
                 }
-                if ( $enable_ep4bookx_publishing_date == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_publishing_date'] == true ) {
                     $filelayout[] = 'v_bookx_publishing_date';
                     $ep4bookx_query .= 'be.publishing_date AS v_bookx_publishing_date, ';
                 }
-                if ( $enable_ep4bookx_author_name == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_author_name'] == true ) {
                     $filelayout[] = 'v_bookx_author_name';
                 }
-                if ( $enable_ep4bookx_author_type == true ) {
+                if ( $build_vars->setFields['enable_ep4bookx_author_type'] == true ) {
                     foreach ( $langcode as $key => $lang ) {
                         $l_id = $lang['id'];
                         $filelayout[] = 'v_bookx_author_type_' . $l_id;
@@ -349,6 +417,8 @@ class ep4bookx extends base {
     function updateEP4ExtraFunctionsSetFilelayoutCaseDefault(&$callingClass, $notifier, $paramsArray) {
 
         global $zco_notifier, $ep_dltype, $filelayout, $filelayout_sql, $langcode, $bookx_product_type, $enable_ep4bookx_specials, $enable_ep4bookx_metatags, $enable_ep4bookx_manufacturers, $enable_ep4bookx_weight, $sql_filter, $ep4bookx_query, $ep4bookx_query_join;
+        global $build_vars;
+
 
         switch ( $ep_dltype ) {
             case 'bookx':
@@ -366,20 +436,20 @@ class ep4bookx extends base {
                     $filelayout[] = 'v_products_url_' . $l_id;
                 }
                 $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
-                if ( $enable_ep4bookx_specials == 1 ) {
+                if ( $build_vars->setFields['enable_ep4bookx_specials'] == 1 ) {
                     $filelayout[] = 'v_specials_price';
                     $filelayout[] = 'v_specials_date_avail';
                     $filelayout[] = 'v_specials_expires_date';
                 }
                 $filelayout[] = 'v_products_price';
-                if ( $enable_ep4bookx_weight == 1 ) {
+                if ( $build_vars->setFields['enable_ep4bookx_weight'] == 1 ) {
                     $filelayout[] = 'v_products_weight';
                 }
                 $filelayout[] = 'v_date_avail'; // should be changed to v_products_date_available for clarity
                 $filelayout[] = 'v_date_added'; // should be changed to v_products_date_added for clarity
                 $filelayout[] = 'v_products_quantity';
 
-                if ( $enable_ep4bookx_manufacturers == 1 ) {
+                if ( $build_vars->setFields['enable_ep4bookx_manufacturers'] == 1 ) {
                     $filelayout[] = 'v_manufacturers_name';
                 }
 
@@ -391,7 +461,7 @@ class ep4bookx extends base {
                 $filelayout[] = 'v_tax_class_title';
 
                 // metatags - 4-23-2012: added switch
-                if ( (int) EASYPOPULATE_4_CONFIG_META_DATA && $enable_ep4bookx_metatags == 1 ) {
+                if ( (int) EASYPOPULATE_4_CONFIG_META_DATA && $build_vars->setFields['enable_ep4bookx_metatags'] == 1 ) {
                     $filelayout[] = 'v_metatags_products_name_status';
                     $filelayout[] = 'v_metatags_title_status';
                     $filelayout[] = 'v_metatags_model_status';
@@ -414,9 +484,10 @@ class ep4bookx extends base {
 
                 $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
 
-                if ( $enable_ep4bookx_weight == 1 ) {
+                if ( $build_vars->setFields['enable_ep4bookx_weight'] == 1 ) {
                     $filelayout_sql .= ' p.products_weight as v_products_weight, ';
                 }
+
                 $filelayout_sql .= '
 			p.products_date_available		as v_date_avail,
 			p.products_date_added			as v_date_added,
@@ -426,7 +497,8 @@ class ep4bookx extends base {
 			p.manufacturers_id				as v_manufacturers_id,
 			subc.categories_id				as v_categories_id,
 			p.products_status				as v_status, ';
-                if ( $enable_ep4bookx_metatags == 1 ) {
+
+                if ( $build_vars->setFields['enable_ep4bookx_metatags'] == 1 ) {
                     $filelayout_sql .= '
                         p.metatags_title_status         as v_metatags_title_status,
 			p.metatags_products_name_status as v_metatags_products_name_status,
@@ -434,6 +506,7 @@ class ep4bookx extends base {
 			p.metatags_price_status         as v_metatags_price_status,
 			p.metatags_title_tagline_status as v_metatags_title_tagline_status, ';
                 }
+
                 $filelayout_sql .= $ep4bookx_query;
                 $filelayout_sql .= ' be.isbn AS v_bookx_isbn         
 
@@ -443,7 +516,8 @@ class ep4bookx extends base {
                     . TABLE_PRODUCTS . ' AS p, '
                     . TABLE_PRODUCT_BOOKX_EXTRA . ' AS be ';
                 $filelayout_sql .= $ep4bookx_query_join;
-                $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
+                // THe $ep4bookx_query_join could be done in this notifier bellow.
+                //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
 
                 $filelayout_sql .= ' WHERE p.products_type = ' . $bookx_product_type . ' AND p.products_id = ptoc.products_id 
                         AND p.products_id = be.products_id AND ';
@@ -451,7 +525,7 @@ class ep4bookx extends base {
 
                 $filelayout_sql .= '
 			ptoc.categories_id = subc.categories_id ' . $sql_filter;
-                //pr($filelayout_sql);
+
                 break;
 
             case 'TEST_2':
@@ -494,13 +568,12 @@ class ep4bookx extends base {
 
     // $zco_notifier->notify('EP4_LINK_SELECTION_END');
     function updateEP4LinkSelectionEnd(&$callingClass, $notifier, $paramsArray) {
-        global $ep4bookx, $request_type, $ep4bookx_module_path, $ep4bookx_customize_files, $ep4bookx_fields_conf, $toogle_config, $toogle_text;
-        global $bookx_author_name_max_len, $bookx_author_types_name_max_len,
-        $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
-        $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
-        $bookx_imprint_name_max_len, $bookx_subtitle_max_len, $parsedown, $text;
+        global $ep4bookx_enabled, $request_type, $ep4bookx_module_path, $ep4bookx_customize_files, $ep4bookx_fields_conf, $toogle_config, $toogle_text;
+        global $parsedown, $text;
+        global $ep4bookx_fields, $ep4bookx_report_fields, $ep4bookx_default_fields;
+        global $ep4bookx_default_cnf, $ep4bookx_configuration, $progress_bar, $maintenance, $optimize_table;
         //global $file_location, $file, $ep4bookx_csv, $tempdir, $csv_delimiter, $csv_enclosure, $ly, $display_output;
-        // Toogle Quick Enable / Disable fields table link
+            // Toogle Quick Enable / Disable fields table link
         switch ( $ep4bookx_fields_conf ) {
             case '1':
                 $toogle_config = 'ep4bookx_fdis_cnf';
@@ -511,6 +584,7 @@ class ep4bookx extends base {
                 $toogle_text = EP4BOOK_QUICK_EDIT_ENABLE;
                 break;
         }
+        
         /**
          * @todo Map the fields  
           $file_location = (EP4_ADMIN_TEMP_DIRECTORY !== 'true' ?  DIR_FS_CATALOG :  DIR_FS_ADMIN) . $tempdir;
@@ -527,10 +601,11 @@ class ep4bookx extends base {
           }
          */
         /**
-         * @todo Should check if all this $ep4bookx == 1 are really necessary, since all this as been started in init file
+         * @todo Should check if all this $ep4bookx_enabled == 1 are really necessary, since all this as been started in init file
          */
-        if ( $ep4bookx == 1 ) {
-
+       
+        if ( $ep4bookx_enabled == 1 ) {
+ 
             // will load the ep4bookx fields form          
             include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_fields.php';
         }
@@ -547,16 +622,17 @@ class ep4bookx extends base {
     }
 
 //    // 'EP4_EXPORT_FILE_ARRAY_START'
-//    function updateEP4ExportFileArrayStart(&$callingClass, $notifier, $paramsArray) { // mc12345678 doesn't work on ZC 1.5.1 and below
-//        //global $ep_dltype, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row;
-//    }
+    function updateEP4ExportFileArrayStart(&$callingClass, $notifier, $paramsArray) { // mc12345678 doesn't work on ZC 1.5.1 and below
+        global $ep_dltype, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row;
+        
+    }
+
     // 'EP4_EXPORT_CASE_EXPORT_FILE_END'
     function updateEP4ExportCaseExportFileEnd(&$callingClass, $notifier, $paramsArray) {
-        global $ep_dltype, $EXPORT_FILE, $nanobar;
+        global $ep_dltype, $EXPORT_FILE;
 
         if ( $ep_dltype == 'bookx' ) {
             $EXPORT_FILE = 'BookX-EP';
-            $nanobar = true; // 
         } elseif ( $ep_dltype == 'DEMO-2' ) {
             $EXPORT_FILE = 'DEMO-2-EP';
         } elseif ( $ep_dltype == 'DEMO-3' ) {
@@ -566,27 +642,38 @@ class ep4bookx extends base {
 
     // EP4_EXPORT_WHILE_START
     function updateEP4ExportWhileStart(&$callingClass, $notifier, $paramsArray) {
-        global $result;
-        //pr($result);
+        global $result, $categories_name_max_len;
     }
 
     //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
-//    function updateEP4ExportLoopFullOrSBAStock(&$callingClass, $notifier, $paramsArray) {      
-//    }
+    function updateEP4ExportLoopFullOrSBAStock(&$callingClass, $notifier, $paramsArray) {
+        // global $result;
+    }
+
     //  $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
-//    function updateEP4ExportLoopFullOrSBAStockLoop(&$callingClass, $notifier, $paramsArray) {       
-//    }
+    function updateEP4ExportLoopFullOrSBAStockLoop(&$callingClass, $notifier, $paramsArray) {
+        // global $result;
+    }
+
 //	$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END');
-//    function updateEP4ExportLoopFullOrSBAStockEnd(&$callingClass, $notifier, $paramsArray) {      
-//    }
+    function updateEP4ExportLoopFullOrSBAStockEnd(&$callingClass, $notifier, $paramsArray) {
+        // global $result;
+    }
+
 //  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
     function updateEP4ExportSpecialsAfter(&$callingClass, $notifier, $paramsArray) {
-        global $ep_dltype, $db, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row, $langcode, $epdlanguage_id, $ep4bookx, $category_delimiter, $ep4bookx_module_path;
+        global $ep_dltype, $db, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row, $langcode, $epdlanguage_id, $ep4bookx_enabled, $category_delimiter, $ep4bookx_module_path;
         global $enable_ep4bookx_specials, $enable_ep4bookx_metatags, $enable_ep4bookx_genre_name, $enable_ep4bookx_publisher_name, $enable_ep4bookx_series_name, $enable_ep4bookx_imprint_name, $enable_ep4bookx_binding, $enable_ep4bookx_printing, $enable_ep4bookx_condition, $enable_ep4bookx_size, $enable_ep4bookx_volume, $enable_ep4bookx_pages, $enable_ep4bookx_publishing_date, $enable_ep4bookx_author_name, $enable_ep4bookx_author_type, $enable_ep4bookx_subtitle, /* $enable_ep4bookx_categories, */ $enable_ep4bookx_manufacturers, $enable_ep4bookx_weight;
 
-        if ( $ep_dltype == 'bookx' && $ep4bookx == 1 ) {
+
+        if ( $ep_dltype == 'bookx' && $ep4bookx_enabled == 1 ) {
             include $ep4bookx_module_path . 'easypopulate_4_export_bookx.php';
         }
+    }
+
+//  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
+    function updateEP4ExportFullOrCatFullAfter(&$callingClass, $notifier, $paramsArray) {
+        
     }
 
     //     $notifyme[] = 'EP4_IMPORT_START';
@@ -595,13 +682,14 @@ class ep4bookx extends base {
         // @global $ep4bookx_load_config, will load the last layout config from pre_process file on import
         global $ep4bookx_load_config;
         // Flag this as import start. This will set conditions on filelayout 
-        $ep4bookx_flag_import = 1;
-        /* [It aggregates missing fields in a report linked to the imported book. 
-         * Uses Bookx languages files as key so it can be tranlated ie: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
-         * @see   [adminFolder/includes/languades/YOUR_lang/extra_definitions/product_bookx.php]
-         * @var array
-         */
-        $ep4bookx_reports = array();
+        if ( $ep4bookx_flag_import == 1 ) {
+            /* [It aggregates missing fields in a report linked to the imported book. 
+             * Uses Bookx languages files as key so it can be tranlated ie: BOX_CATALOG_PRODUCT_BOOKX_PUBLISHERS]
+             * @see   [adminFolder/includes/languades/YOUR_lang/extra_definitions/product_bookx.php]
+             * @var array
+             */
+            $ep4bookx_reports = array();
+        }
     }
 
     // EP4_IMPORT_FILE_EARLY_ROW_PROCESSING
@@ -619,39 +707,37 @@ class ep4bookx extends base {
     }
 
     // EP4_IMPORT_AFTER_CATEGORY
-//    function updateEP4ImportAfterCategory(&$callingClass, $notifier, $paramsArray) {
-//        
-//    }
+    function updateEP4ImportAfterCategory(&$callingClass, $notifier, $paramsArray) {
+        
+    }
+
     // EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE
     function updateEP4ImportFileNewProductProductType(&$callingClass, $notifier, $paramsArray) {
-        global $v_products_type, $v_artists_name, $bookx_product_type, $ep4bookx;
+        global $v_products_type, $v_artists_name, $bookx_product_type, $ep4bookx_enabled;
 
         // Assign product_type to bookx product type (overriding any previous product type assignment)
         //  if the either of the applicable bookx product type fields are populated.  Otherwise,
         //  will use the default which is a product type of 1 (generic product), this means that
         //  for all new product, at least one of these fields must be included as a part of this
         //  addin in order for the product type to be properly entered.
-        if ( $ep4bookx == 1 ) {
+        if ( $ep4bookx_enabled == 1 ) {
             $v_products_type = $bookx_product_type;
         }
     }
 
     function updateEP4ImportFileEnd(&$callingClass, $notifier, $paramsArray) {
-        global $zco_notifier, $bookx_product_type, $langcode, $epdlanguage_id, $edit_link, $items, $filelayout, $db, $ep4bookx_reports, $display_output, $ep_error_count, $ep_warning_count, $ep4bookx_module_path, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $ep4bookx_flag_import;
+        
+        global $zco_notifier, $bookx_product_type, $langcode, $epdlanguage_id, $edit_link, $items, $filelayout, $db, $ep4bookx_reports, $display_output, $ep_error_count, $ep_warning_count, $ep4bookx_module_path, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $ep4bookx_flag_import, $result, $build_vars;
+        
         global $bind_publisher, $bind_series, $bind_binding, $bind_printing, $bind_condition, $bind_binding, $bind_publishing_date, $bind_pages, $bind_volume, $bind_size, $bind_imprint;
-        global $v_products_id, $v_products_model, $v_products_name, $v_bookx_isbn, $v_bookx_genre_name, $v_bookx_publisher_name, $v_bookx_volume, $v_bookx_size, $v_bookx_pages, $v_bookx_publishing_date, $v_bookx_author_name;
+        
+        global $v_products_id, $v_products_model, $v_products_name, $v_bookx_isbn, $v_bookx_genre_name, $v_bookx_publisher_name, $v_bookx_volume, $v_bookx_size, $v_bookx_pages, $v_bookx_publishing_date, $v_bookx_author_name, $v_bookx_author_type;
+        
         global $bookx_author_name_max_len, $bookx_author_types_name_max_len,
         $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
         $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
         $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len;
-        /**
-         * Overrides the default config values for import from pre_process. This values were first loaded 
-         * on the "updateEP4ImportStart" notifier global $ep4bookx_load_config. This way, no need to loop that array, and the values are here.
-         * Not sure where is the best place to work those variables, there, or here.
-         * I've tested in both places, are both work. For me, I find it easier to maintain it, in pre_process file, cause this file is getting big.
-         */
-        global $report_ep4bookx_subtitle, $report_ep4bookx_genre_name, $report_ep4bookx_binding, $report_ep4bookx_printing, $report_ep4bookx_condition, $report_ep4bookx_isbn, $report_ep4bookx_publishing_date, $report_ep4bookx_publisher_name, $report_ep4bookx_series_name, $report_ep4bookx_imprint_name, $report_ep4bookx_author_name, $report_ep4bookx_author_type;
-        global $default_ep4bookx_author_name, $default_ep4bookx_author_type, $default_ep4bookx_printing, $default_ep4bookx_binding, $default_ep4bookx_genre_name, $default_ep4bookx_publisher_name, $default_ep4bookx_imprint_name, $default_ep4bookx_condition;
+
 
         /**
          * The flag was set on import start notifier. Now calls the EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT notifier. 
@@ -661,47 +747,51 @@ class ep4bookx extends base {
          */
         if ( $ep4bookx_flag_import == 1 ) {
             $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
+            include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
         }
-
-        include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
     }
 
     // EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT
     function updateEP4ImportFilePreDisplayOutput(&$callingClass, $notifier, $paramsArray) {
         global $ep4bookx_reports, $display_output, $edit_link;
+        global $ep4bookx_flag_import_ends;
         /**
          * @EP4Bookx
          * Reports missing fields with the book edit link
          */
         if ( !empty($ep4bookx_reports) ) {
-            $display_output .= '<table class="pure-table pure-table-bordered /*bookx-reports*/"><caption>' . EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER . '</caption><tr class="bookx-reports-top"><th >Type</th><th>' . EASYPOPULATE_4_BOOKX_TABLE_BOOK . '</th></tr>';
+            $display_output .= '<table class="pure-table pure-table-bordered bookx-reports"><caption>' . EASYPOPULATE_4_DISPLAY_BOOKX_REPORTS_BOOKX_HEADER . '</caption><tr class="bookx-reports-top"><th >Type</th><th>' . EASYPOPULATE_4_BOOKX_TABLE_BOOK . '</th></tr>';
 
             foreach ( $ep4bookx_reports as $key => $value ) {
-                $display_output .= '<tr><th class="bookx-reports-th-left" rowspan ="' . (count($value) + 1) . '">' . strtoupper($key) . '</th>';
-                $display_output .= '<th class="bookx-reports-th-caption">' . EASYPOPULATE_4_BOOKX_TABLE_CAPTION . '</th></tr>';
+                
+                $display_output .= '<tr><th class="bookx-reports-th-left" rowspan ="' . (count($value) + 1) . '">' . $key . '</th>';
+                $display_output .= '<th class="bookx-reports-th-caption">' . EASYPOPULATE_4_BOOKX_TABLE_CAPTION . ' : '. $key .'</th></tr>';
 
                 $lastKey = count($value) - 1;
 
                 for ( $i = 0; $i < (count($value)); $i++ ) {
-                    $class = ($i & 1) ? 'pure-table-odd odd' : 'even';
+                    $class = ($i & 1) ? 'odd' : 'even';
                     ($i == $lastKey ? $class .=' last' : '');
                     $display_output .= '<tr ><td class="' . $class . '">' . $value[$i] . '</td></tr>';
                 }
             }
             $display_output .='</table>';
         }
+        
+        // This will signal that the import has ended, to optimize talbe 
+        $_SESSION['ep4bookx_flag_import_ends'] = 1;
     }
 
     function update(&$callingClass, $notifier, $paramsArray) {
-		
-		
-		 if ( $notifier == 'EP4_START' ) {
+
+
+        if ( $notifier == 'EP4_START' ) {
             $this->updateEP4Start($callingClass, $notifier, $paramsArray);
         }
 
-//        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START' ) {
-//            $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
-//        }
+        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START' ) {
+            $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
+        }
         // $zco_notifier->notify('EP4_COLLATION_UTF8_ZC13X');
         if ( $notifier == 'EP4_COLLATION_UTF8_ZC13X' ) {
             $this->updateEP4CollationUTF8ZC13x($callingClass, $notifier, $paramsArray);
@@ -732,23 +822,23 @@ class ep4bookx extends base {
             $this->updateEP4ExtraFunctionsSetFilelayoutFullFilelayout($callingClass, $notifier, $paramsArray);
         }
 
-        // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
-//        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT' ) {
-//            $this->updateEP4ExtraFunctionsSetFilelayoutFullSQLSelect($callingClass, $notifier, $paramsArray);
-//        }
-        // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
-//        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE' ) {
-//            $this->updateEP4ExtraFunctionsSetFilelayoutFullSQLTable($callingClass, $notifier, $paramsArray);
-//        }
-        // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT');
+        //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT');
+        //if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_SELECT' ) {
+        //    $this->updateEP4ExtraFunctionsSetFilelayoutFullSQLSelect($callingClass, $notifier, $paramsArray);
+        //}
+        //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
+        //if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE' ) {
+        //$this->updateEP4ExtraFunctionsSetFilelayoutFullSQLTable($callingClass, $notifier, $paramsArray);
+        // }
+        //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT');
 //        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_FILELAYOUT' ) {
 //            $this->updateEP4ExtraFunctionsSetFilelayoutCategoryFilelayout($callingClass, $notifier, $paramsArray);
 //        }
-        //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
+        //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT');
 //        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORY_SQL_SELECT' ) {
 //            $this->updateEP4ExtraFunctionsSetFilelayoutCategorySQLSelect($callingClass, $notifier, $paramsArray);
 //        }
-        //  $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT');
+        //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT');
 //        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CATEGORYMETA_FILELAYOUT' ) {
 //            $this->updateEP4ExtraFunctionsSetFilelayoutCategorymetaFilelayout($callingClass, $notifier, $paramsArray);
 //        }
@@ -772,10 +862,10 @@ class ep4bookx extends base {
             $this->updateEP4Filenames($callingClass, $notifier, $paramsArray);
         }
 
-        // 'EP4_EXPORT_FILE_ARRAY_START'
-//        if ( $notifier == 'EP4_EXPORT_FILE_ARRAY_START' ) {
-//            $this->updateEP4ExportFileArrayStart($callingClass, $notifier, $paramsArray); // mc12345678 doesn't work on ZC 1.5.1 and below
-//        }
+        //     'EP4_EXPORT_FILE_ARRAY_START'
+        if ( $notifier == 'EP4_EXPORT_FILE_ARRAY_START' ) {
+            $this->updateEP4ExportFileArrayStart($callingClass, $notifier, $paramsArray); // mc12345678 doesn't work on ZC 1.5.1 and below
+        }
         // 'EP4_EXPORT_CASE_EXPORT_FILE_END'
         if ( $notifier == 'EP4_EXPORT_CASE_EXPORT_FILE_END' ) {
             $this->updateEP4ExportCaseExportFileEnd($callingClass, $notifier, $paramsArray);
@@ -787,17 +877,17 @@ class ep4bookx extends base {
         }
 
         //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK');
-//        if ( $notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK' ) {
-//            $this->updateEP4ExportLoopFullOrSBAStock($callingClass, $notifier, $paramsArray);
-//        }
-        //  $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
-//        if ( $notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP' ) {
-//            $this->updateEP4ExportLoopFullOrSBAStockLoop($callingClass, $notifier, $paramsArray);
-//        }
-//	$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END');
-//        if ( $notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END' ) {
-//            $this->updateEP4ExportLoopFullOrSBAStockEnd($callingClass, $notifier, $paramsArray);
-//        }
+        if ( $notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK' ) {
+            $this->updateEP4ExportLoopFullOrSBAStock($callingClass, $notifier, $paramsArray);
+        }
+        // $zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP');
+        if ( $notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_LOOP' ) {
+            $this->updateEP4ExportLoopFullOrSBAStockLoop($callingClass, $notifier, $paramsArray);
+        }
+        //$zco_notifier->notify('EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END');
+        if ( $notifier == 'EP4_EXPORT_LOOP_FULL_OR_SBASTOCK_END' ) {
+            $this->updateEP4ExportLoopFullOrSBAStockEnd($callingClass, $notifier, $paramsArray);
+        }
 //  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
         if ( $notifier == 'EP4_EXPORT_SPECIALS_AFTER' ) {
             $this->updateEP4ExportSpecialsAfter($callingClass, $notifier, $paramsArray);
@@ -816,9 +906,9 @@ class ep4bookx extends base {
             $this->updateEP4ImportFileEarlyRowProcessing($callingClass, $notifier, $paramsArray);
         }
 
-//        if ( $notifier == 'EP4_IMPORT_AFTER_CATEGORY' ) {
-//            $this->updateEP4ImportAfterCategory($callingClass, $notifier, $paramsArray);
-//        }
+        if ( $notifier == 'EP4_IMPORT_AFTER_CATEGORY' ) {
+            $this->updateEP4ImportAfterCategory($callingClass, $notifier, $paramsArray);
+        }
 
         if ( $notifier == 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE' ) {
             $this->updateEP4ImportFileNewProductProductType($callingClass, $notifier, $paramsArray);
@@ -834,4 +924,336 @@ class ep4bookx extends base {
     }
 
 // EOF Update()
+}
+
+class ep4BookxVarsOverRide {
+    
+    private $installed = false;
+    
+    public $configuration;
+    
+    public $name;
+    /**
+     *
+     * It simple overrides the default values of SetFields in ep4bookx when a customize file is selected
+     */
+    public $setFields = array();
+    
+  
+    public function __set($variable, $value) {
+        global $variable, $value;
+
+        $this->setFields[$variable] = $value;
+    }
+
+    public function __get($variable) {
+        global $variable;
+        $this->setFields[$variable];
+    }
+
+    public function ep4bookxBuild($param) {
+
+        foreach ( $param as $values ) {
+
+            foreach ( $values as $key => $value ) {
+
+                $this->setFields[$key] = $value[0];
+            }
+        }
+    }
+    
+        public function ep4BookxConfiguration($table) {
+        global $db, $conf, $post_action, $process, $ep4bookx_flag_import_ends;
+
+        $post_action = filter_input_array(INPUT_POST);
+  
+        $sql = "SELECT configuration FROM " . $table . "";
+        $result = $db->Execute($sql);
+
+        if ( $result == 1 ) {
+            $cnf = json_decode($result->fields['configuration']);
+
+            foreach ( $cnf as $value ) {
+                $this->name[$value->name] = $value->text;
+                $this->configuration[$value->name] = $value->value;
+          
+            }  
+              
+                foreach ( $this->configuration as $keys => $conf ) {
+                if ( $this->configuration[$keys] == 1 ) {
+                  
+                     $process = $this->ep4BookxConfigurationAction($keys);                 
+                }
+            }
+        }
+     
+         
+    }
+
+    private function ep4BookxConfigurationAction($action) {
+
+        global $db, $maintenance, $maintenance_state, $process, $messageStack, $progress_bar;
+
+        if ( $action == 'maintenance' ) {
+
+            $sql = "SELECT configuration_value, configuration_key FROM " . CONFIGURATION . " WHERE  configuration_key  LIKE 'DOWN_FOR_MAINTENANCE' ";
+            $result = $db->Execute($sql);
+
+            if ( $result->fields['configuration_value'] == 'false' ) {
+                $maintenance_state[] = $result->fields['configuration_value'];
+            }
+
+            if ( isset($_GET['export']) && ('bookx' == $_GET['export']) || isset($_POST['export']) && ('ep4bookx_action' == $_POST['export']) ) {
+                
+                if ( $maintenance_state[0] == 'false' ) {
+                    $sql = "UPDATE " . CONFIGURATION . " SET configuration_value = 'true' WHERE  configuration_key  LIKE 'DOWN_FOR_MAINTENANCE' ";
+                    $result = $db->Execute($sql);
+                    $messageStack->add(sprintf("EP4Bookx as put down the site in maintenance while processing the file. You'll have put on line in zencart configuration"));
+                }
+            }
+        }
+
+        if ( $action == 'optimize_table' ) {
+
+            if ( $_SESSION['ep4bookx_flag_import_ends'] == true ) {
+                /** This part of the zencart store manager */
+                $sql = "SHOW TABLE STATUS FROM `" . DB_DATABASE . "`";
+                $tables = $db->Execute($sql);
+                while ( !$tables->EOF ) {
+                    // skip tables not matching prefixes
+                    if ( DB_PREFIX != '' && substr($tables->fields['Name'], 0, strlen(DB_PREFIX)) != DB_PREFIX ) {
+                        $tables->MoveNext();
+                        continue;
+                    }
+                    zen_set_time_limit(600);
+                    $db->Execute("OPTIMIZE TABLE `" . $tables->fields['Name'] . "`");
+                    $i++;
+                    if ( $i / 7 == (int) ($i / 7) )
+                        sleep(2);
+                    $tables->MoveNext();
+                }
+                $messageStack->add_session(SUCCESS_DB_OPTIMIZE . ' ' . $i, 'success');
+                $action = '';
+                unset($_SESSION['ep4bookx_flag_import_ends']);
+            }
+        }
+        
+         if ( $action == 'optimize_table' ) {
+             $progress_bar = 1;
+         }
+    }
+
+    private function ep4Bookxinstall() {
+
+        global $db, $ep4bookx_install_configuration, $ep4bookx_install_default_fields_conf, $data, $data2, $messageStack;
+        global $ep4bookx_db_table;
+
+        $this->ep4BookxInstallConfig();
+
+        $data = json_encode($ep4bookx_install_configuration);  
+        $data2 = json_encode($ep4bookx_install_default_fields_conf);
+
+        $sql = "SELECT configuration_value, configuration_key FROM " . CONFIGURATION . "  WHERE (configuration_key) LIKE 'EASYPOPULATE_4_CONFIG_BOOKX_DATA' ";
+        $result = $db->Execute($sql);
+
+        if ( $result->fields['configuration_value'] == 1 ) {
+
+            $db->Execute("DROP TABLE IF EXISTS " . $ep4bookx_db_table . " ");
+
+            $sql2 = " CREATE TABLE " . $ep4bookx_db_table . " ( configuration TEXT NOT NULL, default_fields TEXT NOT NULL, map_fields TEXT NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+            $result2 = $db->Execute($sql2);
+
+            if ( $result2 == 1 ) {
+
+                $sql_insert = "INSERT INTO " . $ep4bookx_db_table . " (configuration, default_fields) VALUES ('" . $data . "', '" . $data2 . "')";
+                $result = $db->Execute($sql_insert);
+
+                //include_once(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
+                $messageStack->add(EP4BOOKX_MSG_INSTALL, 'success');
+            }
+        }
+    }
+
+    private function ep4BookxRemove() {
+        
+        global $db, $messageStack, $ep4bookx_db_table;
+
+        $sql = "SELECT configuration_value, configuration_key FROM " . CONFIGURATION . "  WHERE (configuration_key) LIKE 'EASYPOPULATE_4_CONFIG_BOOKX_DATA' ";
+        $result = $db->Execute($sql);
+
+        if ( $result->fields['configuration_value'] == 0 ) {
+
+            $db->Execute( "DROP TABLE IF EXISTS " . $ep4bookx_db_table . " ");
+            //include_once(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
+            $messageStack->add(EP4BOOKX_MSG_INSTALL_REMOVED, 'warning');
+        }
+    }
+
+    public function ep4BookxCheckInstall($table) {
+        global $db;
+
+        $sql = "SHOW TABLES LIKE '" . $table . "'";
+        $result = $db->Execute($sql);
+
+        if ( $result->RecordCount() == 0 ) {
+            $this->installed = false;
+            if ( !$current_page['login.php'] ) {
+                $this->ep4BookxInstall();
+            }
+        } else {
+            $this->installed = true;
+        }
+
+        // If EP4 is removed we go in solidarity 
+        if ( !is_null($_GET['epinstaller']) && $_GET['epinstaller'] == 'remove' || $this->installed == true ) {
+            $this->ep4BookxRemove();
+        }
+    }
+
+    private function ep4BookxInstallConfig() {
+        
+        global $ep4bookx_project, $ep4bookx_install_configuration, $ep4bookx_install_default_fields_conf;
+
+        $proj_prefix = $ep4bookx_project . '_';
+
+        $ep4bookx_install_configuration = array( 
+            '0'=>array('name'=>'progress_bar','value' => 0,'text'=>EP4BOOKX_CONF_PROGRESS_BAR),
+            '1'=>array( 'name'=>'maintenance','value' => 0, 'text'=>EP4BOOKX_CONF_MAINTENANCE_MODE),
+            '2'=>array('name'=>'optimize_table','value' => 1, 'text'=>EP4BOOKX_CONF_OPTIMIZE_TABLES)
+        );
+
+        $proj_prefix = $ep4bookx_project . '_';
+        $ep4bookx_install_default_fields_conf = array(
+            'ep4bookx_fields' => array(
+                'enable_' . $proj_prefix . 'specials' => array(
+                    'name' => EP4BOOKX_FIELD_SPECIALS,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'metatags' => array(
+                    'name' => EP4BOOKX_FIELD_METATAGS,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'subtitle' => array(
+                    'name' => EP4BOOKX_FIELD_SUBTITLE,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'genre_name' => array(
+                    'name' => EP4BOOKX_FIELD_GENRE_NAME,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'publisher_name' => array(
+                    'name' => EP4BOOKX_FIELD_PUBLISHER_NAME,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'series_name' => array(
+                    'name' => EP4BOOKX_FIELD_SERIES_NAME,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'imprint_name' => array(
+                    'name' => EP4BOOKX_FIELD_IMPRINT_NAME,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'binding' => array(
+                    'name' => EP4BOOKX_FIELD_BINDING,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'printing' => array(
+                    'name' => EP4BOOKX_FIELD_PRINTING,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'condition' => array(
+                    'name' => EP4BOOKX_FIELD_CONDITION,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'size' => array(
+                    'name' => EP4BOOKX_FIELD_SIZE,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'volume' => array(
+                    'name' => EP4BOOKX_FIELD_VOLUME,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'pages' => array(
+                    'name' => EP4BOOKX_FIELD_PAGES,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'publishing_date' => array(
+                    'name' => EP4BOOKX_FIELD_PUBLISHING_DATE,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'author_name' => array(
+                    'name' => EP4BOOKX_FIELD_AUTHOR_NAME,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'author_type' => array(
+                    'name' => EP4BOOKX_FIELD_AUTHOR_TYPE,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'manufacturers' => array(
+                    'name' => EP4BOOKX_FIELD_MANUFACTURERS,
+                    'value' => true),
+                'enable_' . $proj_prefix . 'weight' => array(
+                    'name' => EP4BOOKX_FIELD_WEIGHT,
+                    'value' => true),
+            ),
+            'ep4bookx_report_fields' => array(
+                'report_' . $proj_prefix . 'subtitle' => array(
+                    'name' => EP4BOOKX_FIELD_SUBTITLE,
+                    'value' => true),
+                'report_' . $proj_prefix . 'genre_name' => array(
+                    'name' => EP4BOOKX_FIELD_GENRE_NAME,
+                    'value' => true),
+                'report_' . $proj_prefix . 'publisher_name' => array(
+                    'name' => EP4BOOKX_FIELD_PUBLISHER_NAME,
+                    'value' => false),
+                'report_' . $proj_prefix . 'series_name' => array(
+                    'name' => EP4BOOKX_FIELD_SERIES_NAME,
+                    'value' => false),
+                'report_' . $proj_prefix . 'imprint_name' => array(
+                    'name' => EP4BOOKX_FIELD_IMPRINT_NAME,
+                    'value' => false),
+                'report_' . $proj_prefix . 'binding' => array(
+                    'name' => EP4BOOKX_FIELD_BINDING,
+                    'value' => false),
+                'report_' . $proj_prefix . 'printing' => array(
+                    'name' => EP4BOOKX_FIELD_PRINTING,
+                    'value' => false),
+                'report_' . $proj_prefix . 'condition' => array(
+                    'name' => EP4BOOKX_FIELD_CONDITION,
+                    'value' => false),
+                'report_' . $proj_prefix . 'isbn' => array(
+                    'name' => EP4BOOKX_FIELD_ISBN,
+                    'value' => false),
+                'report_' . $proj_prefix . 'publishing_date' => array(
+                    'name' => EP4BOOKX_FIELD_PUBLISHING_DATE,
+                    'value' => false),
+                'report_' . $proj_prefix . 'author_name' => array(
+                    'name' => EP4BOOKX_FIELD_AUTHOR_NAME,
+                    'value' => false),
+                'report_' . $proj_prefix . 'author_type' => array(
+                    'name' => EP4BOOKX_FIELD_AUTHOR_TYPE,
+                    'value' => false),
+            ),
+            'ep4bookx_default_fields' => array(
+                'default_' . $proj_prefix . 'author_name' => array(
+                    'name' => EP4BOOKX_FIELD_AUTHOR_NAME,
+                    'value' => '',
+                    'length' => zen_field_length(TABLE_PRODUCT_BOOKX_AUTHORS, 'author_name')),
+                'default_' . $proj_prefix . 'author_type' => array(
+                    'name' => EP4BOOKX_FIELD_AUTHOR_TYPE,
+                    'value' => '',
+                    'length' => zen_field_length(TABLE_PRODUCT_BOOKX_AUTHOR_TYPES_DESCRIPTION, 'type_description')),
+                'default_' . $proj_prefix . 'printing' => array(
+                    'name' => EP4BOOKX_FIELD_PRINTING,
+                    'value' => '',
+                    'length' => zen_field_length(TABLE_PRODUCT_BOOKX_PRINTING_DESCRIPTION, 'printing_description')),
+                'default_' . $proj_prefix . 'binding' => array(
+                    'name' => EP4BOOKX_FIELD_BINDING,
+                    'value' => '',
+                    'length' => zen_field_length(TABLE_PRODUCT_BOOKX_BINDING_DESCRIPTION, 'binding_description')),
+                'default_' . $proj_prefix . 'genre_name' => array(
+                    'name' => EP4BOOKX_FIELD_GENRE_NAME,
+                    'value' => '',
+                    'length' => zen_field_length(TABLE_PRODUCT_BOOKX_GENRES_DESCRIPTION, 'genre_description')),
+                'default_' . $proj_prefix . 'publisher_name' => array(
+                    'name' => EP4BOOKX_FIELD_PUBLISHER_NAME,
+                    'value' => '',
+                    'length' => zen_field_length(TABLE_PRODUCT_BOOKX_PUBLISHERS, 'publisher_name')),
+                'default_' . $proj_prefix . 'imprint_name' => array(
+                    'name' => EP4BOOKX_FIELD_IMPRINT_NAME,
+                    'value' => '',
+                    'length' => zen_field_length(TABLE_PRODUCT_BOOKX_IMPRINTS, 'imprint_name')),
+                'default_' . $proj_prefix . 'condition' => array(
+                    'name' => EP4BOOKX_FIELD_CONDITION,
+                    'value' => '',
+                    'length' => zen_field_length(TABLE_PRODUCT_BOOKX_CONDITIONS_DESCRIPTION, 'condition_description')),
+            )
+        );
+    }
+    
 }

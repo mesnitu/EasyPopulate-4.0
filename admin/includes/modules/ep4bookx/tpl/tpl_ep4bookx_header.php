@@ -10,12 +10,12 @@
  * 
  * This loads the script files to the header. But it would be nice to have a option to load in to the footer also, and separate the js from css and also ** * have the possibility to include in the <body>
  */
+
 ?>
 
 <link rel="stylesheet" type="text/css" href="<?php echo $ep4bookx_tpl_path . 'ep4bookx.css'; ?>" />
-
-// Only loads if the config is enable
-<?php if ( $ep4bookx_fields_conf == true ) {  ?>
+    
+<?php if ( $ep4bookx_fields_conf == true ) {  // Only loads if the config is enable ?>
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script language="javascript" type="text/javascript" src="<?php echo $ep4bookx_tpl_path . 'ep4bookx.js'; ?> "></script>
@@ -33,8 +33,35 @@
             });
             return formvals;
         };
-
+        
         $(document).ready(function () {
+            
+           // This was another way of placing the site in maintenance before importing. It would alert and then import or export.
+           // Now it's beeing made on the class, with a SESSION message. Not so fancy, but it will do.  
+//           var state = <?php //print json_encode($maintenance_state); ?>;
+//           
+//            $(".export-file, #roundabout").click(function() {
+//                console.log(state);
+//               if (state == "false") {
+//                   $("#load").fadeIn("slow");
+//                   var putDown = "maintanance";
+//                   
+//                   $.post("easypopulate_4.php", {
+//                    ep4bookx_action: putDown
+//                })          
+//                            .done(function (data, textStatus, jqXHR) {
+//                                var msg = jqXHR.responseText; 
+//                                alert("The site is now in maintance mode. After the process , You'll have to put him online manually");
+//                                $("#load").fadeOut("slow");
+//                                      
+//                        })
+//                        .fail(function (jqXHR, textStatus, errorThrown) {
+//                            alert(jqXHR.responseText);       
+//                        });          
+//               }
+//               return false;             
+//            });
+            
             $(".pageHeading").parent().addClass("l-content");
             // add class left and right to easypolulate 
             $(".pageHeading").next().addClass("l-right");
@@ -48,7 +75,13 @@
                 $("#ep4bookx-form").css("background", "white");
                 $(".ep4bookx-section").toggleClass("ep4bookx-section-open");
             });
-            
+     
+           // for input hidden field at configuration form 
+           $("#ep4bookx-config input[type=checkbox]").click(function() {
+               var data = $(this).val();
+                $(this).next().attr("value", data);
+           });
+
             // Click to open info           
             $(".ep4bookx-btn-info").click(function() {
                 
@@ -93,7 +126,7 @@
                     $(this).val(inputtitle).addClass("lightcolor");
                 }
             });
-            
+          
             // Delete the layout file
             $(".delete").click(function () {
                 $("#load").fadeIn();
@@ -105,20 +138,23 @@
                 $.post("easypopulate_4.php", {
                     ep4bookx_layout: idToDelete,
                     ep4bookx_action: identifier
-                })
-                        .done(function (data, textStatus, jqXHR) {
+                })          
+                            .done(function (data, textStatus, jqXHR) {
 
-                            var countfiles = jqXHR.responseText;
-                            container.slideUp("slow", function () {
-                                $(this).remove();
-                            });
-                            if (countfiles == 0) {
-                                location.reload(true);
-                            }
-                            $("#load").fadeOut("slow");
+                                var countfiles = jqXHR.responseText;
+                                
+                                container.slideUp("slow", function () {
+                                  $(this).remove();
+                                });
+                            if ( countfiles == 0 ) {
+                                    location.reload(true);
+                                }
+                                $("#load").fadeOut("slow");
+                                      
                         })
                         .fail(function (jqXHR, textStatus, errorThrown) {
                             alert(jqXHR.responseText);
+                            location.reload(true);
                         });
                 return false;
             });
@@ -197,4 +233,24 @@
     </script>
     <?php
 }
+ if ( $progress_bar == 1 ) {   ?>
+
+    <script>
+   var options = {
+    bg: '#acf',
+    // leave target blank for global nanobar
+    target: document.getElementById('myDivId'),
+    // id for new nanobar
+    id: 'mynano'
+};
+
+var nanobar = new Nanobar( options );
+
+//move bar
+nanobar.go( 30 ); // size bar 30%
+
+// Finish progress bar
+nanobar.go(100);
+    </script>
+<?php }
 

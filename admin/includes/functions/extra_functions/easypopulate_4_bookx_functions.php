@@ -48,13 +48,26 @@ function ep_4_remove_product_bookx($product_model) {
     return;
 }
 
-function pr($var, $title = null) {
+/*function pr($var, $title = null) {
     echo '<pre style="background:#ccc;">';
     if ($title):
         echo '<b>' . $title . ':</b> ';
     endif;
     print_r($var);
     echo '</pre>';
+}
+*/
+
+/**
+ * 
+ * @param type $obj
+ * @return constant
+ * @todo this is re assingned the constants. It should look or search for the constant and assing to it
+ */
+function _string($obj) {
+    $temp = serialize($obj);
+    $string = unserialize($temp);
+    return constant($string);
 }
 
 /**
@@ -125,7 +138,3 @@ function ep4bookx_list_layouts($path, $ext, $index = true) {
 //    }
 //    return $arr2;
 //}
-
-
-
-

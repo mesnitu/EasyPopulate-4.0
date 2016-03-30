@@ -149,19 +149,11 @@ https://github.com/yahoo/pure/blob/master/LICENSE.md
     padding: 0.5em 1em; /* cell padding */
 }
 
-
 .pure-table thead {
     background-color: #e0e0e0;
     color: #000;
     text-align: left;
     vertical-align: bottom;
-}
-
-.pure-table td {
-    background-color: transparent;
-}
-.pure-table-odd td {
-    background-color: #f2f2f2;
 }
 
 /* nth-child selector for modern browsers */
@@ -170,9 +162,7 @@ https://github.com/yahoo/pure/blob/master/LICENSE.md
 }
 
 /* BORDERED TABLES */
-.pure-table-bordered td {
-    border-bottom: 1px solid #cbcbcb;
-}
+
 .pure-table-bordered tbody > tr:last-child > td {
     border-bottom-width: 0;
 }
@@ -189,74 +179,37 @@ https://github.com/yahoo/pure/blob/master/LICENSE.md
     border-bottom-width: 0;
 }
 
-
 .bookx-reports {
-    line-height: 1.5;
+    font-size: 11px;
     width: 80%;
-    box-shadow: 10px 10px 5px #888888;
-    border:1px solid #333;
-    border-collapse: collapse;
+    box-shadow: 5px 5px 5px #888888;
 }
-/*tr.bookx-reports-top th {
-    padding: 10px 0;
-    background: #ccc;
-    border-bottom: 2px solid #333;
+tr.bookx-reports-top th {
+    background: #607D8B;
 }
 th.bookx-reports-th-left {
-   border-right: 1px solid #333;
-    background: #ccc;
-    border-bottom: 2px solid #333;
     padding: 0;
+    border-bottom: 1px solid #cbcbcb;
 }
-th.bookx-reports-th-left:before {
-   content: "";
-    display: block;
-    background: #333;
-    height: 16px;
-    position: relative;
-    top: -72px;
-    width: 100%;
-    padding: 5px 0;
-}
+
 th.bookx-reports-th-caption {
-    background: #333;
-    color: #fff;
-    padding: 5px 0;
-}*/
+        color: #FF5722;
+}
 .odd,.even {
     padding: 5px 10px;
-    border-bottom:1px solid #333;
+    border-bottom:1px solid #cbcbcb;
 }
-/*.odd {
-    background: #F4F4F4;
+.odd {
+        background: #ECEFF1;
 }
 .even {
-    background: #E9E9E9;
-   
-}*/
-
+   background: #CFD8DC;
+}
 .bookx-report-type {
     font-weight: bold;
 }
 
-/*#epfiles {
-border-collapse:collapse;
-border: 1px solid #ccc;
-}
-#epfiles th {
-    color:#666;
-    background: #ccc;
-    border-bottom: 1px solid #333;
-    border-top: 1px solid #333;
-}
-#epfiles b {
-    color: #D9534F;
-}
-#epfiles td {
-    padding:2px;
-}*/
-
-.ep4bookx-section fieldset, #default-fields {
+.ep4bookx-section fieldset, #default-fields, #ep4bookx-config fieldset {
     margin: 25px 5px;
     border: 1px solid #607D8B;
     border-radius: 2px;
@@ -268,16 +221,12 @@ border: 1px solid #ccc;
     color: #F44336;
 }
 
-#ep4bookx-options {
-}
-
 legend {
     display:block;
 }
 
-#ep4bookx-options label {
+#ep4bookx-options label, #ep4bookx-config label {
     display: inline-block;
-
 }
 
 label.ep4bookx-select {
@@ -293,14 +242,11 @@ label.ep4bookx-select {
     width: auto;
     padding: 3px;
 }
-fieldset#enable-fields, fieldset#enable-reports {
 
-    /* background: #f4f4f4; */
-}
 #customize-fields h3 { 
     color: #F44336;
 }
-#enable-fields div, #enable-reports div {
+#enable-fields div, #enable-reports div, #ep4bookx-config div {
     border-bottom: 1px solid #def;
     display: inline-block;
     border-radius: 2px;
@@ -313,8 +259,9 @@ fieldset#enable-fields, fieldset#enable-reports {
 #enable-fields div:hover, #customize-fields div:hover {
     background: #f2f2f2;
 }
-#enable-fields div input, #enable-reports div input {
+#enable-fields div input, #enable-reports div input, #ep4bookx-config div input {
     height: 16px;
+    width: 16px;
     float: right;
 }
 #customize-fields {
@@ -324,10 +271,7 @@ fieldset#enable-fields, fieldset#enable-reports {
     border-radius: 2px; 
 }
 
-#customize-fields input {
-
-}
-.customize-fields-single input, #ep4bookx-options input[type="submit"] {
+.customize-fields-single input, #ep4bookx-options input[type="submit"], #ep4bookx-conf-submit input[type="submit"] {
     background-repeat: no-repeat;
     padding: 5px;
     background-position-x: right;
@@ -336,11 +280,12 @@ fieldset#enable-fields, fieldset#enable-reports {
     color: #fff;
     margin: 0 5px;
 }
+
 .customize-fields-single input[type=button] {
     background-image: url('ic_delete_forever_white_18dp_1x.png');
 
 }
-.customize-fields-single input[type=submit], #ep4bookx-options input[type="submit"] {
+.customize-fields-single input[type=submit], #ep4bookx-options input[type="submit"], #ep4bookx-conf-submit input[type="submit"]  {
     background-image: url('ic_file_download_white_18dp_1x.png');
     background-color: #607D8B;
 }
@@ -358,7 +303,7 @@ fieldset#enable-fields, fieldset#enable-reports {
     color:#F44336;
 }
 
-fieldset#default-fields div {
+#default-fields div {
     display: block;
     border: 1px solid #e9e9e9;
     display: inline-block; 
@@ -371,7 +316,7 @@ fieldset#default-fields div {
     background: #fff;
 }
 
-fieldset#default-fields input {
+#default-fields input[type=text] {
     width: 68%;
     border: 1px solid #f2f2f2;
     padding: 8px;
@@ -379,14 +324,10 @@ fieldset#default-fields input {
     margin-top: 5px;
 }
 
-fieldset#default-fields label {
-    display: inline-block;
+#default-fields label {
     width: 25%;
 }
-
-.bookx-options {
-
-}   
+  
 .bookx-options-l, .bookx-options-r {
     display: inline-block;
 }
@@ -448,7 +389,6 @@ fieldset#default-fields label {
 }
 
 .ep4bookx-btn-info {
-
     background-image: url('ic_info_outline_white_18dp_1x.png');
     background-color: #2196F3;
     background-repeat: no-repeat;
@@ -459,6 +399,7 @@ fieldset#default-fields label {
     height: 25px;
     width: 25px;
 }
+
 .ep4bookx-btn-info-close {
     background-image: url('ic_highlight_off_white_18dp_1x.png');  
     background-color: #607D8B;
@@ -504,14 +445,18 @@ button#ep4bookx-btn-options span {
     /* word-wrap: break-word; */
     font-weight: bold;
 }
-#ep4bookx-submit {
+#ep4bookx-submit, #ep4bookx-conf-submit {
     background: #FAFAFA;
     padding: 10px 0;
+    text-align: right;
 }
-#ep4bookx-submit input {
-    width: 40%;
+#ep4bookx-submit input, #ep4bookx-conf-submit input {
+   
     padding: 5px;
     margin: 10px;
+}
+#ep4bookx-submit input {
+     width: 40%;
 }
 #ep4bookx-submit label {
     display: initial;
@@ -557,7 +502,10 @@ button#ep4bookx-btn-options span {
     background-color: #ff0000;
 }
 
-
+#ep4bookx-config i {
+   font-size: smaller;
+   display: block;
+}
 #load {
     position: absolute;
     background-image: url(../../../../images/loading.gif);
@@ -569,9 +517,7 @@ button#ep4bookx-btn-options span {
     background-color: rgba(33, 32, 32, 0.54);
     z-index: 1000;
 }
-.lightcolor {
-    color: #9E9E9E;
-}
+
 /** How to - readme file */
 
 .ep4bookx-howto  {
@@ -648,7 +594,9 @@ button#ep4bookx-btn-options span {
     padding: 10px;
     color: #F44336;
 }
-
+#customize-fields, #ep4bookx-options, #ep4bookx-form-config {
+    /*background: #ECEFF1;*/
+} 
 .l-left {
     width: 75%;
     padding: 10px;
@@ -661,7 +609,6 @@ button#ep4bookx-btn-options span {
 .l-content {
     padding:15px !important;
 }
-
 
 .at-error {
     /* placed on a error labels */
@@ -676,23 +623,24 @@ button#ep4bookx-btn-options span {
     margin: 6px 0;
 }
 
-.at-invalid {
-    /* placed on a invalid fields (which do not match with their filters or masks) */
-}
-
-.at-required {
-    /* placed on a required fields (which are not filled) */
-}
-
-.at-description {
-    /* placed on description paragrapher, right after TEXTAREA fields. */
-}
-
-.at-description > span {
-    /* into description paragrapher, right after TEXTAREA fields there are 2 span TAGs. */
-}
-
 .at-required-highlight {
     /* highlight required form fields */
     color: red;
 }
+.at-active {
+    /* highlight required form fields */
+    color: #FF9800;
+}
+
+.lightcolor, .at-inactive {
+    color: #9E9E9E;
+}
+.edit-link {
+    display: inline;
+    float: right;
+}
+
+.smallText {
+    max-height: 70vh;
+    overflow: auto;
+}    

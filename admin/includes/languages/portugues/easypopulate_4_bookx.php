@@ -57,6 +57,8 @@ define ('EP4BOOK_QUICK_EDIT_ENABLE', 'Quick Enable');
 define ('E4BOOKX_MSG_DISABLE_FIELDS_CONFIG', 'Ep4Bookx Fields Configuration are now Disable');
 define ('E4BOOKX_MSG_ENABLE_FIELDS_CONFIG', 'Ep4Bookx Fields Configuration are now Enable');
 define ('E4BOOKX_MSG_LAYOUT_SAVED', 'Data successfully save');
+define ('EP4BOOKX_MSG_INSTALL','<b>EP4Bookx Configuration Table was installled.</b> This table will be removed when disabling Bookx fields or removing EP4. Have a nice day!');
+define ('EP4BOOKX_MSG_INSTALL_REMOVED','<b>EP4Bookx Configuration Table was removed from database.</b>  To enable it, enable Bookx Fields');
 //define ('EP4BOOKX_MSG_FIELDS_HOWTO', '');
 
 //Fields 
@@ -80,8 +82,26 @@ define ('EP4BOOKX_FIELD_CATEGORIES', 'Categories');
 define ('EP4BOOKX_FIELD_MANUFACTURERS', 'Manufacturers');
 define ('EP4BOOKX_FIELD_WEIGHT', 'Weight');
 define ('EP4BOOKX_FIELD_ISBN', 'ISBN');
+
+define ('EP4BOOKX_CONF_PROGRESS_BAR', 'Progress Bar');
+define ('EP4BOOKX_CONF_OPTIMIZE_TABLES', 'Optimize Table');
+define ('EP4BOOKX_CONF_MAINTENANCE_MODE', 'Maintenance Mode ');
+define ('EP4BOOKX_CONF_TXT', 'Progress Bar during file process, Optimize table at import, down for maintanence during file process ');
+
 //define ('E4BOOKX_MSG_LAYOUT_SAVED', 'Data successfully save');
 define ('EP4BOOKX_LEGEND_REPORTS', 'Generate Report for');
 define ('EP4BOOKX_LEGEND_FIELDS', 'Export this fields');
 define ('EP4BOOKX_LEGEND_DEFAULT_NAMES', 'Default Values for');
 define ('EP4BOOKX_LEGEND_LAYOUT_NAME', 'Layout Name');
+define ('EP4BOOKX_LEGEND_CONFIGURATION', 'EP4Bookx Configuration');
+define ('EP4BOOKX_LEGEND_SAVE_CONFIGURATION', 'Save This Configuration');
+
+define ('EP4BOOKX_CONFIGURATION_ACTIVE', 'Active');
+define ('EP4BOOKX_CONFIGURATION_INACTIVE', 'Inactive');
+
+define ('EP4BOOKX_BOOKX_NOT_FOUND', 'No Bookx database tables were found! ');
+
+define ('EPBOOKX_TABLE_CAPTION', 'Reported some empty fields on the import <strong> %s </strong>.');
+
+
+
