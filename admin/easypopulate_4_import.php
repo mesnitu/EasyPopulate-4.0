@@ -1109,8 +1109,8 @@ if (!is_null($_POST['import']) && isset($_POST['import'])) {
             // iso-8859-1
             // $categories_names_array[$lang['id']] = explode($categories_delimiter,$items[$filelayout['v_categories_name_'.$lang['id']]]); 
             // utf-8 
-            $categories_names_array[$lang['id']] = mb_split($categories_delimiter, $items[$filelayout['v_categories_name_' . $lang['id']]]);
-
+            //$categories_names_array[$lang['id']] = mb_split($categories_delimiter, $items[$filelayout['v_categories_name_' . $lang['id']]]);
+            $categories_names_array[$lang['id']] = mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_categories_name_' . $lang['id']]]);
             // get the number of tokens in $categories_names_array[]
             $categories_count[$lang['id']] = count($categories_names_array[$lang['id']]);
             // check category names for length violation. abort on error
