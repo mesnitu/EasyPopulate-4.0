@@ -24,7 +24,8 @@ foreach ($langcode as $key2 => $lang2) {
       $row['v_products_url_'.$lid2] = $row2['products_url'];
       // metaData start
       // for each language, get the description and set the vals
-      if ($enable_ep4bookx_metatags == 1) {
+      if ($build_vars->setFields['enable_ep4bookx_metatags'] == 1) {
+          
       $sqlMeta = 'SELECT * FROM ' . TABLE_META_TAGS_PRODUCTS_DESCRIPTION . ' WHERE products_id = :products_id: AND language_id = :language_id: LIMIT 1 ';
       $sqlMeta = $db->bindVars($sqlMeta, ':products_id:', $row['v_products_id'], 'integer');
       $sqlMeta = $db->bindVars($sqlMeta, ':language_id:', $lid2, 'integer');
@@ -53,7 +54,7 @@ foreach ($langcode as $key2 => $lang2) {
     }
      //$zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
      //
-    // if ($enable_ep4bookx_categories == 1) { // Categories are mandatory for new products, so this gets complicated. Better to disable this option
+ 
     
 // if parent_id is not null ('0'), then follow it up.  Perhaps this could be replaced by Zen's zen_not_null() function?
     while (!empty($thecategory_id)) {
@@ -84,10 +85,10 @@ foreach ($langcode as $key2 => $lang2) {
       $row['v_categories_name_' . $lid] = rtrim($row['v_categories_name_' . $lid], $category_delimiter);
     } // foreach
    
-  //  } //ends if categories
    
   // MANUFACTURERS EXPORT - THIS NEEDS MULTI-LINGUAL SUPPORT LIKE EVERYTHING ELSE!
   // if the filelayout says we need a manfacturers name, get it for download file
+    
   if (isset($filelayout['v_manufacturers_name'])) {
     if (($row['v_manufacturers_id'] != '0') && ($row['v_manufacturers_id'] != '')) { // '0' is correct, but '' NULL is possible
       $sql2 = 'SELECT manufacturers_name FROM ' . TABLE_MANUFACTURERS . ' WHERE manufacturers_id = :manufacturers_id:';

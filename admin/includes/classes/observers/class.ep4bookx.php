@@ -416,9 +416,7 @@ class ep4bookx extends base {
     // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_CASE_DEFAULT');
     function updateEP4ExtraFunctionsSetFilelayoutCaseDefault(&$callingClass, $notifier, $paramsArray) {
 
-        global $zco_notifier, $ep_dltype, $filelayout, $filelayout_sql, $langcode, $bookx_product_type, $enable_ep4bookx_specials, $enable_ep4bookx_metatags, $enable_ep4bookx_manufacturers, $enable_ep4bookx_weight, $sql_filter, $ep4bookx_query, $ep4bookx_query_join;
-        global $build_vars;
-
+        global $zco_notifier, $ep_dltype, $filelayout, $filelayout_sql, $langcode, $bookx_product_type, $sql_filter, $ep4bookx_query, $ep4bookx_query_join, $build_vars;
 
         switch ( $ep_dltype ) {
             case 'bookx':
@@ -498,7 +496,7 @@ class ep4bookx extends base {
 			subc.categories_id				as v_categories_id,
 			p.products_status				as v_status, ';
 
-                if ( $build_vars->setFields['enable_ep4bookx_metatags'] == 1 ) {
+          if ( $build_vars->setFields['enable_ep4bookx_metatags'] == 1 ) {
                     $filelayout_sql .= '
                         p.metatags_title_status         as v_metatags_title_status,
 			p.metatags_products_name_status as v_metatags_products_name_status,
@@ -662,8 +660,8 @@ class ep4bookx extends base {
 
 //  $zco_notifier->notify('EP4_EXPORT_SPECIALS_AFTER');
     function updateEP4ExportSpecialsAfter(&$callingClass, $notifier, $paramsArray) {
-        global $ep_dltype, $db, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row, $langcode, $epdlanguage_id, $ep4bookx_enabled, $category_delimiter, $ep4bookx_module_path;
-        global $enable_ep4bookx_specials, $enable_ep4bookx_metatags, $enable_ep4bookx_genre_name, $enable_ep4bookx_publisher_name, $enable_ep4bookx_series_name, $enable_ep4bookx_imprint_name, $enable_ep4bookx_binding, $enable_ep4bookx_printing, $enable_ep4bookx_condition, $enable_ep4bookx_size, $enable_ep4bookx_volume, $enable_ep4bookx_pages, $enable_ep4bookx_publishing_date, $enable_ep4bookx_author_name, $enable_ep4bookx_author_type, $enable_ep4bookx_subtitle, /* $enable_ep4bookx_categories, */ $enable_ep4bookx_manufacturers, $enable_ep4bookx_weight;
+        global $ep_dltype, $db, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row, $langcode, $epdlanguage_id, $ep4bookx_enabled, $category_delimiter, $ep4bookx_module_path, $build_vars;
+        /*global $enable_ep4bookx_specials, $enable_ep4bookx_metatags, $enable_ep4bookx_genre_name, $enable_ep4bookx_publisher_name, $enable_ep4bookx_series_name, $enable_ep4bookx_imprint_name, $enable_ep4bookx_binding, $enable_ep4bookx_printing, $enable_ep4bookx_condition, $enable_ep4bookx_size, $enable_ep4bookx_volume, $enable_ep4bookx_pages, $enable_ep4bookx_publishing_date, $enable_ep4bookx_author_name, $enable_ep4bookx_author_type, $enable_ep4bookx_subtitle, /* $enable_ep4bookx_categories, $enable_ep4bookx_manufacturers, $enable_ep4bookx_weight; */
 
 
         if ( $ep_dltype == 'bookx' && $ep4bookx_enabled == 1 ) {
@@ -1038,7 +1036,7 @@ class ep4BookxVarsOverRide {
             }
         }
         
-         if ( $action == 'optimize_table' ) {
+         if ( $action == 'progress_bar' ) {
              $progress_bar = 1;
          }
     }
@@ -1184,10 +1182,10 @@ class ep4BookxVarsOverRide {
             'ep4bookx_report_fields' => array(
                 'report_' . $proj_prefix . 'subtitle' => array(
                     'name' => EP4BOOKX_FIELD_SUBTITLE,
-                    'value' => true),
+                    'value' => false),
                 'report_' . $proj_prefix . 'genre_name' => array(
                     'name' => EP4BOOKX_FIELD_GENRE_NAME,
-                    'value' => true),
+                    'value' => false),
                 'report_' . $proj_prefix . 'publisher_name' => array(
                     'name' => EP4BOOKX_FIELD_PUBLISHER_NAME,
                     'value' => false),
