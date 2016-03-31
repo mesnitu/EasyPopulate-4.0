@@ -29,7 +29,7 @@ if ( isset($GLOBALS['current_page']) && 'easypopulate_4.php' == $GLOBALS['curren
          * From this config, the vars and the tpl fields can be built.
          */
         $build_vars->ep4bookxBuild($ep4bookx_default_cnf, true);
-        
+       
         // Fill the array with customize layouts   
         $ep4bookx_customize_files = ep4bookx_list_layouts($ep4bookx_layout_path, '.json', false);
     
@@ -229,10 +229,11 @@ if ( isset($get_action['export']) && ('bookx' == $get_action['export']) || isset
 if ( (mb_substr($post_action['import'], 0, 5)) == 'BookX' ) {
    
     $ep4bookx_flag_import = 1;
-     
-    $ep4bookx_load_config = json_decode(file_get_contents($ep4bookx_layout_path . $ep4bookx_last_conf . '.json'));
     
-    $build_vars = new ep4BookxVarsOverRide();
-    $build_vars->ep4bookxBuild($ep4bookx_load_config);
-    
+    if ( !empty($ep4bookx_customize_files) ) {
+        $ep4bookx_load_config = json_decode(file_get_contents($ep4bookx_layout_path . $ep4bookx_last_conf . '.json'));
+
+        $build_vars = new ep4BookxVarsOverRide();
+        $build_vars->ep4bookxBuild($ep4bookx_load_config);
+    }
 }
