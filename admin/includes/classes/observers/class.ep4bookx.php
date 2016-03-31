@@ -48,7 +48,7 @@ class ep4bookx extends base {
         $notifyme[] = 'EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE';
         $notifyme[] = 'EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT';
 
-        $notifyme[] = 'EP4_IMPORT_FILE_END'; // For some reason, the only way
+        //$notifyme[] = 'EP4_IMPORT_FILE_END'; // For some reason, the only way
 
         $this->attach($this, $notifyme);
     }
@@ -706,7 +706,143 @@ class ep4bookx extends base {
 
     // EP4_IMPORT_AFTER_CATEGORY
     function updateEP4ImportAfterCategory(&$callingClass, $notifier, $paramsArray) {
-        
+        // by @mc12345678
+
+        global $ep_uses_mysqli, $products_name_max_len;
+
+        global $zco_notifier, $bookx_product_type, $langcode, $epdlanguage_id, $edit_link, $items, $filelayout, $db, $ep4bookx_reports, $display_output, $ep_error_count, $ep_warning_count, $ep4bookx_module_path, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $ep4bookx_flag_import, $result, $build_vars;
+
+        global $bind_publisher, $bind_series, $bind_binding, $bind_printing, $bind_condition, $bind_binding, $bind_publishing_date, $bind_pages, $bind_volume, $bind_size, $bind_imprint;
+
+        global $v_bookx_isbn, $v_bookx_genre_name, $v_bookx_publisher_name, $v_bookx_volume, $v_bookx_size, $v_bookx_pages, $v_bookx_publishing_date, $v_bookx_author_name, $v_bookx_author_type;
+
+        global $bookx_author_name_max_len, $bookx_author_types_name_max_len,
+        $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
+        $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
+        $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len;
+
+        $chosen_key = '';
+
+        switch ( EP4_DB_FILTER_KEY ) {
+            case 'products_model':
+                $chosen_key = 'v_products_model';
+                break;
+            case 'blank_new':
+            case 'products_id':
+                $chosen_key = 'v_products_id';
+                break;
+            default:
+                $chosen_key = 'v_products_model';
+                break;
+        }
+
+        if ( zen_not_null($items[$filelayout[$chosen_key]]) ) {
+// Master key exists in file, therefore can process information...
+
+            ${$chosen_key} = $items[$filelayout[$chosen_key]];
+
+            // First we check to see if this is a product in the current db. 
+            $sql = "SELECT products_id, products_model FROM " . TABLE_PRODUCTS;
+            switch ( $chosen_key ) {
+                case 'v_products_model':
+                    $sql .= " WHERE (products_model = :products_model:)";
+                    break;
+                case 'v_products_id':
+                    $sql .= " WHERE (products_id = :products_id:) LIMIT 1";
+                    break;
+                default:
+                    $sql .= " WHERE (products_model = :products_model:)";
+                    break;
+            }
+            $sql = $db->bindVars($sql, ':products_model:', $v_products_model, 'string');
+            $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
+            $result = ep_4_query($sql);
+        }
+
+        if ( ($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0 ) { // new item, insert using new file data where applicable
+            // Need to identify/obtain $v_products_model and the multilinqual $v_products_name
+            $sql = "SHOW TABLE STATUS LIKE '" . TABLE_PRODUCTS . "'";
+            $result = ep_4_query($sql);
+            $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+            $max_product_id = $row['Auto_increment'];
+            if ( !is_numeric($max_product_id) ) {
+                $max_product_id = 1;
+            }
+            if ( $chosen_key == 'v_products_model' || ($chosen_key == 'v_products_id' && defined('EP4_DB_FILTER_KEY') && EP4_DB_FILTER_KEY === 'blank_new' && ${$chosen_key} == "") ) {
+                $v_products_id = $max_product_id;
+            }
+            if ( isset($filelayout['v_products_model']) ) {
+                $v_products_model = $items[$filelayout['v_products_model']];
+            } else {
+                $v_products_model = "";
+            }
+
+            foreach ( $langcode as $lang ) {
+                $l_id = $lang['id'];
+
+                if ( isset($filelayout['v_products_name_' . $l_id]) ) { // do for each language in our upload file if exist
+                    // check products name length and display warning on error, but still process record
+                    $v_products_name[$l_id] = ep_4_curly_quotes($items[$filelayout['v_products_name_' . $l_id]]);
+                    if ( mb_strlen($v_products_name[$l_id]) > $products_name_max_len ) {
+                        $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, $v_products_model, $v_products_name[$l_id], $products_name_max_len);
+                        $ep_warning_count++;
+                    }
+                } else { // column doesn't exist in the IMPORT file
+                    $v_products_name[$l_id] = "";
+                }
+            }
+
+
+            if ( $ep4bookx_flag_import == 1 ) {
+                $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
+                include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
+            }
+        } else { //existing item, and need to use file data to update information.
+      //      while ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)) ) {
+//        $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)); 
+                $v_products_id = $row['products_id'];
+
+                if ( isset($filelayout['v_products_model']) ) {
+                    $v_products_model = $items[$filelayout['v_products_model']];
+                } else {
+                    $v_products_model = $row['products_model'];
+                }
+
+                foreach ( $langcode as $lang ) {
+                    $l_id = $lang['id'];
+
+                    if ( isset($filelayout['v_products_name_' . $l_id]) ) { // do for each language in our upload file if exist
+                        // check products name length and display warning on error, but still process record
+                        $v_products_name[$l_id] = ep_4_curly_quotes($items[$filelayout['v_products_name_' . $l_id]]);
+                        if ( mb_strlen($v_products_name[$l_id]) > $products_name_max_len ) {
+                            $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_PRODUCTS_NAME_LONG, $v_products_model, $v_products_name[$l_id], $products_name_max_len);
+                            $ep_warning_count++;
+                        }
+                    } else { // column doesn't exist in the IMPORT file use existing
+                        // Need to Select search the existing 
+                        $sql2 = "SELECT products_name FROM " . TABLE_PRODUCTS_DESCRIPTION . " WHERE
+                      products_id = :products_id: AND
+                      language_id = :language_id:";
+                        $sql2 = $db->bindVars($sql2, ':products_id:', $v_products_id, 'integer');
+                        $sql2 = $db->bindVars($sql2, ':language_id:', $l_id, 'integer');
+
+                        $result2 = ep_4_query($sql2);
+
+                        if ( ($ep_uses_mysqli ? mysqli_num_rows($result2) : mysql_num_rows($result2)) == 0 ) {
+                            $v_products_name[$l_id] = "";
+                        } else { // already in the description, update it
+                            $row2 = ($ep_uses_mysqli ? mysqli_fetch_array($result2) : mysql_fetch_array($result2));
+                            $v_products_name[$l_id] = $row2['products_name'];
+                        }
+                    }
+                }
+
+                if ( $ep4bookx_flag_import == 1 ) {
+                    $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
+                    include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
+                }
+          //  }
+        }
     }
 
     // EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE
@@ -723,31 +859,9 @@ class ep4bookx extends base {
         }
     }
 
-    function updateEP4ImportFileEnd(&$callingClass, $notifier, $paramsArray) {
-        
-        global $zco_notifier, $bookx_product_type, $langcode, $epdlanguage_id, $edit_link, $items, $filelayout, $db, $ep4bookx_reports, $display_output, $ep_error_count, $ep_warning_count, $ep4bookx_module_path, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $ep4bookx_flag_import, $result, $build_vars;
-        
-        global $bind_publisher, $bind_series, $bind_binding, $bind_printing, $bind_condition, $bind_binding, $bind_publishing_date, $bind_pages, $bind_volume, $bind_size, $bind_imprint;
-        
-        global $v_products_id, $v_products_model, $v_products_name, $v_bookx_isbn, $v_bookx_genre_name, $v_bookx_publisher_name, $v_bookx_volume, $v_bookx_size, $v_bookx_pages, $v_bookx_publishing_date, $v_bookx_author_name, $v_bookx_author_type;
-        
-        global $bookx_author_name_max_len, $bookx_author_types_name_max_len,
-        $bookx_genre_name_max_len, $bookx_series_name_max_len, $bookx_publisher_name_max_len,
-        $bookx_binding_name_max_len, $bookx_printing_name_max_len, $bookx_condition_name_max_len,
-        $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len;
-
-
-        /**
-         * The flag was set on import start notifier. Now calls the EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT notifier. 
-         * I might be moving backwards, but this way, all file sets and conditions will be at the same place.
-         * Or, what's now beeing made on that notifier, could be made in the import file....
-         * I'm not sure what's best, in terms of logic and performance. I've went both ways, and either way, they work. 
-         */
-        if ( $ep4bookx_flag_import == 1 ) {
-            $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
-            include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
-        }
-    }
+//    function updateEP4ImportFileEnd(&$callingClass, $notifier, $paramsArray) {
+//        
+//    }
 
     // EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT
     function updateEP4ImportFilePreDisplayOutput(&$callingClass, $notifier, $paramsArray) {
@@ -912,9 +1026,9 @@ class ep4bookx extends base {
             $this->updateEP4ImportFileNewProductProductType($callingClass, $notifier, $paramsArray);
         }
 
-        if ( $notifier == 'EP4_IMPORT_FILE_END' ) {
-            $this->updateEP4ImportFileEnd($callingClass, $notifier, $paramsArray);
-        }
+//        if ( $notifier == 'EP4_IMPORT_FILE_END' ) {
+//            $this->updateEP4ImportFileEnd($callingClass, $notifier, $paramsArray);
+//        }
 
         if ( $notifier == 'EP4_IMPORT_FILE_PRE_DISPLAY_OUTPUT' ) {
             $this->updateEP4ImportFilePreDisplayOutput($callingClass, $notifier, $paramsArray);
@@ -1118,7 +1232,7 @@ class ep4BookxVarsOverRide {
         $ep4bookx_install_configuration = array( 
             '0'=>array('name'=>'progress_bar','value' => 0,'text'=>EP4BOOKX_CONF_PROGRESS_BAR),
             '1'=>array( 'name'=>'maintenance','value' => 0, 'text'=>EP4BOOKX_CONF_MAINTENANCE_MODE),
-            '2'=>array('name'=>'optimize_table','value' => 1, 'text'=>EP4BOOKX_CONF_OPTIMIZE_TABLES)
+            '2'=>array('name'=>'optimize_table','value' => 0, 'text'=>EP4BOOKX_CONF_OPTIMIZE_TABLES)
         );
 
         $proj_prefix = $ep4bookx_project . '_';
