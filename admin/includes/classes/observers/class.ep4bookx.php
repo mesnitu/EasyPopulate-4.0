@@ -757,7 +757,6 @@ class ep4bookx extends base {
             $sql = $db->bindVars($sql, ':products_model:', $v_products_model, 'string');
             $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
             $result = ep_4_query($sql);
-        }
 
         if ( ($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0 ) { // new item, insert using new file data where applicable
             // Need to identify/obtain $v_products_model and the multilinqual $v_products_name
@@ -798,8 +797,7 @@ class ep4bookx extends base {
                 include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
             }
         } else { //existing item, and need to use file data to update information.
-      //      while ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)) ) {
-//        $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)); 
+            while ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)) ) {
                 $v_products_id = $row['products_id'];
 
                 if ( isset($filelayout['v_products_model']) ) {
@@ -841,8 +839,9 @@ class ep4bookx extends base {
                     $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
                     include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
                 }
-          //  }
+            }
         }
+		}
     }
 
     // EP4_IMPORT_FILE_NEW_PRODUCT_PRODUCT_TYPE
