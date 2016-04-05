@@ -14,10 +14,13 @@
 ?>
 
 <link rel="stylesheet" type="text/css" href="<?php echo $ep4bookx_tpl_path . 'ep4bookx.css'; ?>" />
-    
-<?php if ( $ep4bookx_fields_conf == true ) {  // Only loads if the config is enable ?>
 
+<?php if ($which_zc < "5.5" ) { // Only load jquery in zc version > 1.5.5 ?>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<?php }
+    
+if ( $ep4bookx_fields_conf == true ) {  // Only loads if the config is enable ?>
+   
     <script language="javascript" type="text/javascript" src="<?php echo $ep4bookx_tpl_path . 'ep4bookx.js'; ?> "></script>
     
     <script>

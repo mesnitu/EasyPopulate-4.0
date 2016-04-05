@@ -175,14 +175,14 @@ class ep4bookx extends base {
 
     // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
     function updateEP4Easypopulate4Link(&$callingClass, $notifier, $paramsArray) {
-        global $ep4bookx_enabled, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf, $ep4bookx_configuration;
-        global $progress_bar, $maintenance, $maintenance_state;
-        // load header scripts
-       
-       
-        if ( $ep4bookx_enabled == 1 ) {
-            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
-        }
+//        global $ep4bookx_enabled, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf, $ep4bookx_configuration;
+//        global $progress_bar, $maintenance, $maintenance_state;
+//        // load header scripts
+//       
+//       
+//        if ( $ep4bookx_enabled == 1 ) {
+//            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
+//        }
     }
 
     // $zco_notifier->notify('EP4_DISPLAY_STATUS');
@@ -542,22 +542,22 @@ class ep4bookx extends base {
         if ( (substr($project, 0, 5) == "1.3.8") || (substr($project, 0, 5) == "1.3.9") ) {
             $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
         ('Enable Products Bookx','EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Bookx Data Columns
-        (default 0).<br><br>0=Disable<br>1=Enable', " . $group_id . ", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
+        (default 0).<br><br>0=Disable<br>1=Enable', " . $group_id . ", '1000', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 	  ");
 
             $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
         ('Enable Ep4Bookx Fields Configuration','EASYPOPULATE_4_ENABLE_FIELDS_CONFIG_BOOKX_DATA', '0', 'Enable Ep4Bookx fields configuration. <br>This will load the table to config the fields.
-        (default 0).<br><br>0=Disable<br>1=Enable', " . $group_id . ", '231', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
+        (default 0).<br><br>0=Disable<br>1=Enable', " . $group_id . ", '1001', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 	  ");
         } elseif ( PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.0' ) {
             $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
         ('Enable Products Bookx','EASYPOPULATE_4_CONFIG_BOOKX_DATA', '0', 'Enable Products Bookx Data Columns
-        (default 0).<br><br>0=Disable<br>1=Enable', " . $group_id . ", '230', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
+        (default 0).<br><br>0=Disable<br>1=Enable', " . $group_id . ", '1000', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 	  ");
 
             $db->Execute("INSERT INTO " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, last_modified, date_added, use_function, set_function) VALUES 
         ('Enable Ep4Bookx Fields Configuration','EASYPOPULATE_4_ENABLE_FIELDS_CONFIG_BOOKX_DATA', '0', 'Enable Ep4Bookx fields configuration. <br>This will load the table to config the fields.
-        (default 0).<br><br>0=Disable<br>1=Enable', " . $group_id . ", '231', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
+        (default 0).<br><br>0=Disable<br>1=Enable', " . $group_id . ", '1001', NULL, now(), NULL, 'zen_cfg_select_option(array(\"0\", \"1\"),')
 	  ");
         } else { // unsupported version
             // i should do something here!
@@ -612,7 +612,19 @@ class ep4bookx extends base {
     // $zco_notifier->notify('EP4_FILENAMES');
     function updateEP4Filenames(&$callingClass, $notifier, $paramsArray) {
         global $filenames;
-
+        
+         global $ep4bookx_enabled, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf, $ep4bookx_configuration;
+	     global $progress_bar, $maintenance, $maintenance_state, $which_zc;
+		 
+		 $which_zc = PROJECT_VERSION_MINOR;
+             
+        if ( $ep4bookx_enabled == 1 ) {
+			// load header scripts
+			$load_jquery = PROJECT_VERSION_MINOR;
+			
+            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
+        }
+        
         $filenames = array_merge($filenames, array(
             'bookx-ep' => BOOKX_EP_DESC,
             'bookx-auth-ep' => BOOKX_AUTH_EP_DESC)
@@ -708,9 +720,9 @@ class ep4bookx extends base {
     function updateEP4ImportAfterCategory(&$callingClass, $notifier, $paramsArray) {
         // by @mc12345678
 
-        global $ep_uses_mysqli, $products_name_max_len;
-
-        global $zco_notifier, $bookx_product_type, $langcode, $epdlanguage_id, $edit_link, $items, $filelayout, $db, $ep4bookx_reports, $display_output, $ep_error_count, $ep_warning_count, $ep4bookx_module_path, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $ep4bookx_flag_import, $result, $build_vars;
+        global $products_name_max_len;
+        global $ep_dltype, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row, $items, $db, $result;
+        global $zco_notifier, $bookx_product_type, $langcode, $epdlanguage_id, $edit_link, $ep4bookx_reports, $display_output, $ep_error_count, $ep_warning_count, $ep4bookx_module_path, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $ep4bookx_flag_import, $build_vars;
 
         global $bind_publisher, $bind_series, $bind_binding, $bind_printing, $bind_condition, $bind_binding, $bind_publishing_date, $bind_pages, $bind_volume, $bind_size, $bind_imprint;
 
@@ -797,6 +809,7 @@ class ep4bookx extends base {
                 include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
             }
         } else { //existing item, and need to use file data to update information.
+            $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
             while ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)) ) {
                 $v_products_id = $row['products_id'];
 
