@@ -348,7 +348,9 @@ if (((isset($error) && !$error) || !isset($error)) && (!is_null($_POST["delete"]
     </style>
   </head>
   <body onLoad="init()">
-       <?php require(DIR_WS_INCLUDES . 'header.php'); ?>
+        <?php require(DIR_WS_INCLUDES . 'header.php'); 
+        $zco_notifier->notify('EP4_ZC155_AFTER_HEADER');
+        ?>
 
     <!-- body -->
     <div style="padding:5px">
