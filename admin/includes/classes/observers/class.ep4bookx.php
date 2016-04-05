@@ -21,6 +21,7 @@ class ep4bookx extends base {
         $notifyme[] = 'EP4_START';
         $notifyme[] = 'EP4_COLLATION_UTF8_ZC13X';
         $notifyme[] = 'EP4_EASYPOPULATE_4_LINK';
+		$notifyme[] = 'EP4_ZC155_AFTER_HEADER';	
         $notifyme[] = 'EP4_DISPLAY_STATUS';
         $notifyme[] = 'EP4_MAX_LEN';
         $notifyme[] = 'EP4_FILENAMES';
@@ -174,17 +175,22 @@ class ep4bookx extends base {
     }
 
     // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
-    function updateEP4Easypopulate4Link(&$callingClass, $notifier, $paramsArray) {
-//        global $ep4bookx_enabled, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf, $ep4bookx_configuration;
-//        global $progress_bar, $maintenance, $maintenance_state;
-//        // load header scripts
-//       
-//       
-//        if ( $ep4bookx_enabled == 1 ) {
-//            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
-//        }
+    //function updateEP4Easypopulate4Link(&$callingClass, $notifier, $paramsArray) {
+    //}
+	
+	 // $zco_notifier->notify('EP4_ZC155_AFTER_HEADER');
+    function updateEP4ZC155AfterHeader(&$callingClass, $notifier, $paramsArray) {
+         global $ep4bookx_enabled, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf, $ep4bookx_configuration;
+	     global $progress_bar, $maintenance, $maintenance_state, $which_zc;
+		 
+		$which_zc = PROJECT_VERSION_MINOR;
+             
+        if ( $ep4bookx_enabled == 1 ) {
+			// load header scripts			
+            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
+        }
     }
-
+	
     // $zco_notifier->notify('EP4_DISPLAY_STATUS');
     function updateEP4DisplayStatus(&$callingClass, $notifier, $paramsArray) {
         global $ep4bookx_enabled;
@@ -612,19 +618,7 @@ class ep4bookx extends base {
     // $zco_notifier->notify('EP4_FILENAMES');
     function updateEP4Filenames(&$callingClass, $notifier, $paramsArray) {
         global $filenames;
-        
-         global $ep4bookx_enabled, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf, $ep4bookx_configuration;
-	     global $progress_bar, $maintenance, $maintenance_state, $which_zc;
-		 
-		 $which_zc = PROJECT_VERSION_MINOR;
-             
-        if ( $ep4bookx_enabled == 1 ) {
-			// load header scripts
-			$load_jquery = PROJECT_VERSION_MINOR;
-			
-            include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
-        }
-        
+                
         $filenames = array_merge($filenames, array(
             'bookx-ep' => BOOKX_EP_DESC,
             'bookx-auth-ep' => BOOKX_AUTH_EP_DESC)
@@ -682,8 +676,7 @@ class ep4bookx extends base {
     }
 
 //  $zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
-    function updateEP4ExportFullOrCatFullAfter(&$callingClass, $notifier, $paramsArray) {
-        
+    function updateEP4ExportFullOrCatFullAfter(&$callingClass, $notifier, $paramsArray) {       
     }
 
     //     $notifyme[] = 'EP4_IMPORT_START';
@@ -912,7 +905,11 @@ class ep4bookx extends base {
         if ( $notifier == 'EP4_START' ) {
             $this->updateEP4Start($callingClass, $notifier, $paramsArray);
         }
-
+		// $zco_notifier->notify('EP4_ZC155_AFTER_HEADER');
+		if ( $notifier == 'EP4_ZC155_AFTER_HEADER' ) {
+            $this->updateEP4ZC155AfterHeader($callingClass, $notifier, $paramsArray);
+        }
+		
         if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START' ) {
             $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
         }
@@ -922,9 +919,9 @@ class ep4bookx extends base {
         }
 
         // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
-        if ( $notifier == 'EP4_EASYPOPULATE_4_LINK' ) {
-            $this->updateEP4Easypopulate4Link($callingClass, $notifier, $paramsArray);
-        }
+        //if ( $notifier == 'EP4_EASYPOPULATE_4_LINK' ) {
+        //    $this->updateEP4Easypopulate4Link($callingClass, $notifier, $paramsArray);
+        // }
 
         // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
         if ( $notifier == 'EP4_EASYPOPULATE_4_LINK_END' ) {
