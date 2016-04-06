@@ -5,7 +5,7 @@ if ( !defined('IS_ADMIN_FLAG') ) {
 }
 
 $ep4bookx_project = 'ep4bookx';
-$ep4bookx_version = '0.9.9';
+$ep4bookx_version = '0.9.9-rc1';
 $const = get_defined_constants();
 
 $ep4bookx_enabled = $const['EASYPOPULATE_4_CONFIG_BOOKX_DATA'];

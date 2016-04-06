@@ -196,7 +196,8 @@ class ep4bookx extends base {
         global $ep4bookx_enabled;
 
         $ep_bookx = (int) EASYPOPULATE_4_CONFIG_BOOKX_DATA; // 0-Disable, 1-Enable
-        echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX . $ep_bookx . '<br/>';
+        echo EASYPOPULATE_4_DISPLAY_ENABLE_BOOKX . (($ep_bookx) ? '<font color="green">TRUE</font>' : "FALSE") . '<br />';
+  
     }
 
     // $zco_notifier->notify('EP4_MAX_LEN');
