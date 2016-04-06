@@ -714,8 +714,8 @@ class ep4bookx extends base {
         // by @mc12345678
 
         global $products_name_max_len;
-        global $ep_dltype, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row, $items, $db, $result;
-        global $zco_notifier, $bookx_product_type, $langcode, $epdlanguage_id, $edit_link, $ep4bookx_reports, $display_output, $ep_error_count, $ep_warning_count, $ep4bookx_module_path, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $ep4bookx_flag_import, $build_vars;
+        global $ep_dltype, $filelayout_sql, $ep_uses_mysqli, $filelayout, $row, $items, $db;
+        global $zco_notifier, $bookx_product_type, $langcode, $epdlanguage_id, $edit_link, $ep4bookx_reports, $display_output, $ep_error_count, $ep_warning_count, $ep4bookx_module_path, $ep4bookx_extra_sqlwhere, $ep4bookx_extra_sqlcol, $ep4bookx_extra_sqlbind, $ep4bookx_flag_import, $build_vars, $categories_delimiter;
 
         global $bind_publisher, $bind_series, $bind_binding, $bind_printing, $bind_condition, $bind_binding, $bind_publishing_date, $bind_pages, $bind_volume, $bind_size, $bind_imprint;
 
@@ -761,15 +761,15 @@ class ep4bookx extends base {
             }
             $sql = $db->bindVars($sql, ':products_model:', $v_products_model, 'string');
             $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
-            $result = ep_4_query($sql);
-            
-        if ( ($row = $ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0 ) { // new item, insert using new file data where applicable
+            $result = $db->Execute($sql);
+                 
+        if ( $result->RecordCount() == 0 ) { // new item, insert using new file data where applicable
             // Need to identify/obtain $v_products_model and the multilinqual $v_products_name
             
             $sql = "SHOW TABLE STATUS LIKE '" . TABLE_PRODUCTS . "'";
-            $result = ep_4_query($sql);
-            $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
-            $max_product_id = $row['Auto_increment'];
+            $result = $db->Execute($sql);
+ 
+            $max_product_id = $result->fields['Auto_increment'];
             if ( !is_numeric($max_product_id) ) {
                 $max_product_id = 1;
             }
@@ -803,19 +803,17 @@ class ep4bookx extends base {
             }
             
         } else { //existing item, and need to use file data to update information.
-            
-            //$row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
-           
-            while ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)) ) {
-             
-                $v_products_id = $row['products_id'];
+
+            while ( !$result->EOF ) { 
+               // $v_products_id = $row['products_id'];
+                $v_products_id = $result->fields['products_id'];
 
                 if ( isset($filelayout['v_products_model']) ) {
                     $v_products_model = $items[$filelayout['v_products_model']];
                 } else {
-                    $v_products_model = $row['products_model'];
+                    $v_products_model = $result->fields['products_model'];
                 }
-
+              
                 foreach ( $langcode as $lang ) {
                     $l_id = $lang['id'];
 
@@ -833,9 +831,8 @@ class ep4bookx extends base {
                       language_id = :language_id:";
                         $sql2 = $db->bindVars($sql2, ':products_id:', $v_products_id, 'integer');
                         $sql2 = $db->bindVars($sql2, ':language_id:', $l_id, 'integer');
-
                         $result2 = ep_4_query($sql2);
-
+                      
                         if ( ($ep_uses_mysqli ? mysqli_num_rows($result2) : mysql_num_rows($result2)) == 0 ) {
                             $v_products_name[$l_id] = "";
                         } else { // already in the description, update it
@@ -845,10 +842,12 @@ class ep4bookx extends base {
                     }
                 }
 
-                if ( $ep4bookx_flag_import == 1 ) {        
+                if ( $ep4bookx_flag_import == 1 ) {  
+                    
                     $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
                     include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
                 }
+                $result->MoveNext();
             }
         }
 		}
