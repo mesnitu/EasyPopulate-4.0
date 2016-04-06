@@ -727,7 +727,7 @@ class ep4bookx extends base {
         $bookx_imprint_name_max_len, $bookx_subtitle_name_max_len;
 
         $chosen_key = '';
-
+       
         switch ( EP4_DB_FILTER_KEY ) {
             case 'products_model':
                 $chosen_key = 'v_products_model';
@@ -762,9 +762,10 @@ class ep4bookx extends base {
             $sql = $db->bindVars($sql, ':products_model:', $v_products_model, 'string');
             $sql = $db->bindVars($sql, ':products_id:', $v_products_id, 'integer');
             $result = ep_4_query($sql);
-
-        if ( ($ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0 ) { // new item, insert using new file data where applicable
+            
+        if ( ($row = $ep_uses_mysqli ? mysqli_num_rows($result) : mysql_num_rows($result)) == 0 ) { // new item, insert using new file data where applicable
             // Need to identify/obtain $v_products_model and the multilinqual $v_products_name
+            
             $sql = "SHOW TABLE STATUS LIKE '" . TABLE_PRODUCTS . "'";
             $result = ep_4_query($sql);
             $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
@@ -796,14 +797,17 @@ class ep4bookx extends base {
                 }
             }
 
-
-            if ( $ep4bookx_flag_import == 1 ) {
+            if ( $ep4bookx_flag_import == 1 ) {         
                 $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
                 include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
             }
+            
         } else { //existing item, and need to use file data to update information.
-            $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+            
+            //$row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result));
+           
             while ( $row = ($ep_uses_mysqli ? mysqli_fetch_array($result) : mysql_fetch_array($result)) ) {
+             
                 $v_products_id = $row['products_id'];
 
                 if ( isset($filelayout['v_products_model']) ) {
@@ -841,7 +845,7 @@ class ep4bookx extends base {
                     }
                 }
 
-                if ( $ep4bookx_flag_import == 1 ) {
+                if ( $ep4bookx_flag_import == 1 ) {        
                     $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
                     include $ep4bookx_module_path . 'easypopulate_4_import_bookx.php';
                 }

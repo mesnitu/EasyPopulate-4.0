@@ -44,15 +44,15 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
             if ( !empty($build_vars->setFields['default_ep4bookx_genre_name']) && empty($items[$filelayout['v_bookx_genre_name_' . $l_id]]) ) {
                 $items[$filelayout['v_bookx_genre_name_' . $l_id]] = $build_vars->setFields['default_ep4bookx_genre_name'];
             }
-            $genres_names_array[$l_id] = mb_split('\x5e', $items[$filelayout['v_bookx_genre_name_' . $l_id]]); // names to array 
+            $genres_names_array[$l_id] = mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_bookx_genre_name_' . $l_id]]); // names to array 
         }
-     
+   
         foreach ( $genres_names_array as $key => $genres_lang_array ) {
             foreach ( $genres_lang_array as $names ) {
                 ((mb_strlen($names) <= $bookx_genre_name_max_len) ? $flag[] = '1' : $flag[] = '0');
             }
         }
-      
+        
         if ( (!in_array('0', $flag) && ($items[$filelayout['v_bookx_genre_name_' . $epdlanguage_id]] != '') ) ) {
 
             for ( $i = 0; $i < count($genres_names_array[$epdlanguage_id]); $i++ ) { // go for the default language  
@@ -98,15 +98,17 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                 $genres_to_products = $db->bindVars($genres_to_products, ':v_genre_id:', $v_genre_id, 'integer');
                 $genres_to_products = $db->bindVars($genres_to_products, ':v_products_id:', $v_products_id, 'integer');
                 $result_genres_to_products = $db->Execute($genres_to_products);
-
+               
                 if ( $result_genres_to_products->RecordCount() > 0 ) {
                     $v_genre_id = $result_genres_to_products->fields['bookx_genre_id'];
                     $updated_id[] = $result_genres_to_products->fields['bookx_genre_id'];
+                    
                     $query = "UPDATE " . TABLE_PRODUCT_BOOKX_GENRES_TO_PRODUCTS . " SET bookx_genre_id = :v_genre_id: WHERE products_id = :v_products_id: and primary_id =:primary_id:";
                     $query = $db->bindVars($query, ':v_genre_id:', $v_genre_id, 'integer');
                     $query = $db->bindVars($query, ':v_products_id:', $v_products_id, 'integer');
-                    $query = $db->bindVars($query, ':primary_id:', $row_genre_to_products['primary_id'], 'integer');
+                    $query = $db->bindVars($query, ':primary_id:', $result_genres_to_products->fields['primary_id'], 'integer');
                     $result = $db->Execute($query);
+     
                 } else {
                     $query = "INSERT INTO " . TABLE_PRODUCT_BOOKX_GENRES_TO_PRODUCTS . " (bookx_genre_id, products_id) VALUES (:v_genre_id:, :v_products_id:)";
                     $query = $db->bindVars($query, ':v_genre_id:', $v_genre_id, 'integer');
@@ -513,7 +515,7 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                 $items[$filelayout['v_bookx_author_type_' . $l_id]] = $build_vars->setFields['bookx_default_author_type'];
             }
 
-            $author_types_array[$l_id] = mb_split('\x5e', ep_4_curly_quotes($items[$filelayout['v_bookx_author_type_' . $l_id]]));
+            $author_types_array[$l_id] = mb_split(preg_quote($categories_delimiter), ep_4_curly_quotes($items[$filelayout['v_bookx_author_type_' . $l_id]]));
             // Check the lenght names
             for ( $ck_lengh = 0; $ck_lengh < (count($author_types_array[$l_id])); $ck_lengh++ ) {
 
@@ -531,7 +533,7 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
             // Count the authors if field is present, to make the array with the same number of entrys 
             // This is used when more authors than types are found. It fills the types array with the default type ( if enable )  
             if ( isset($filelayout['v_bookx_author_name']) ) {
-                $count_authors = count(mb_split('\x5e', $items[$filelayout['v_bookx_author_name']]));
+                $count_authors = count(mb_split(preg_quote($categories_delimiter), $items[$filelayout['v_bookx_author_name']]));
                 // if there's more than one author, and one of them as a empty field, but the default type in not empty
                 // It really makes no sense to use the author types wiithou the authors, but if that happens even by mistake, 
                 // it proccesses the author types. 
@@ -622,7 +624,7 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
         if ( !empty($build_vars->setFields['default_ep4bookx_author_name']) && empty(ep_4_curly_quotes($items[$filelayout['v_bookx_author_name']])) ) {
             $items[$filelayout['v_bookx_author_name']] = ep_4_curly_quotes($build_vars->setFields['default_ep4bookx_author_name']);
         }
-        $authors_array = mb_split('\x5e', ep_4_curly_quotes($items[$filelayout['v_bookx_author_name']]));
+        $authors_array = mb_split(preg_quote($categories_delimiter), ep_4_curly_quotes($items[$filelayout['v_bookx_author_name']]));
         //If there's something , Check the authors names lengh
         if ( !empty(ep_4_curly_quotes($items[$filelayout['v_bookx_author_name']])) ) {
             foreach ( $authors_array as $authors_names ) {
