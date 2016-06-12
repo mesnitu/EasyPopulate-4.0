@@ -1121,7 +1121,7 @@ class ep4BookxVarsOverRide {
 
         if ( $action == 'maintenance' ) {
 
-            $sql = "SELECT configuration_value, configuration_key FROM " . CONFIGURATION . " WHERE  configuration_key  LIKE 'DOWN_FOR_MAINTENANCE' ";
+            $sql = "SELECT configuration_value, configuration_key FROM " . TABLE_CONFIGURATION . " WHERE  configuration_key  LIKE 'DOWN_FOR_MAINTENANCE' ";
             $result = $db->Execute($sql);
 
             if ( $result->fields['configuration_value'] == 'false' ) {
@@ -1131,7 +1131,7 @@ class ep4BookxVarsOverRide {
             if ( isset($_GET['export']) && ('bookx' == $_GET['export']) || isset($_POST['export']) && ('ep4bookx_action' == $_POST['export']) ) {
                 
                 if ( $maintenance_state[0] == 'false' ) {
-                    $sql = "UPDATE " . CONFIGURATION . " SET configuration_value = 'true' WHERE  configuration_key  LIKE 'DOWN_FOR_MAINTENANCE' ";
+                    $sql = "UPDATE " . TABLE_CONFIGURATION . " SET configuration_value = 'true' WHERE  configuration_key  LIKE 'DOWN_FOR_MAINTENANCE' ";
                     $result = $db->Execute($sql);
                     $messageStack->add(sprintf("EP4Bookx as put down the site in maintenance while processing the file. You'll have put on line in zencart configuration"));
                 }
@@ -1204,7 +1204,7 @@ class ep4BookxVarsOverRide {
         
         global $db, $messageStack, $ep4bookx_db_table;
 
-        $sql = "SELECT configuration_value, configuration_key FROM " . CONFIGURATION . "  WHERE (configuration_key) LIKE 'EASYPOPULATE_4_CONFIG_BOOKX_DATA' ";
+        $sql = "SELECT configuration_value, configuration_key FROM " . TABLE_CONFIGURATION . "  WHERE (configuration_key) LIKE 'EASYPOPULATE_4_CONFIG_BOOKX_DATA' ";
         $result = $db->Execute($sql);
 
         if ( $result->fields['configuration_value'] == 0 ) {
