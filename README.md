@@ -1,9 +1,9 @@
 
-# EP4Bookx v0.9.9 - A EasyPopulate 4.0 fork
+# EP4Bookx v0.9.9-rc2 - A EasyPopulate 4.0 fork
  
 To import Bookx fields by CSV - tested with **Zencart 1.5.4** and **EP4 v4.0.33**
 
- * @version  0.9.9 - **Still in development, make your changes in a local environment**
+ * @version  0.9.9-rc2 - **Still in development, make your changes in a local environment**
  * @see Bookx module for ZenCart
  * Contribution by: @mesnitu
  * Special thanks to **@joaosantacruz** for putting me in the right track when a foreach was a issue.
@@ -40,16 +40,15 @@ For now, this are the supported fields (just the names).
 * bookx_pages
 * bookx_publishing_date
 
-Besides this Bookx fields, the EP4Bookx export file has others fields available belonging to the normal product type, such as categories , weight, metatags, manufacturers, special price, date available. Except for categories ( mandatory for new products ), they are configurable whether to be present in the export or not.  
+Besides this Bookx fields, the EP4Bookx export file has others fields available belonging to the normal product type, such as categories , weight, metatags, manufacturers, special price, date available, products rewards. Except for categories ( mandatory for new products ), they are configurable whether to be present in the export or not.  
 
 ### Installation
 
 * This is a full EP4 (v0.33) package plus the EP4BookX files. Download and install EasyPopulate as you would.
-* Enable Bookx fields in EP configuration page.
-
->Note: It's quite possible that in the future EP4Bookx becomes a separated package (a copy / paste ) EP4 featured, as now it fully integrates with EP4, without changing his core files. It's quite normal that EP4 evolution will go much faster, and for me it's not going to be easy to always keep track of new EP4 versions. 
+* Enable Bookx fields in EP configuration page. This will install the EP4Bookx database table. 
+ 
   
-### Use it (still in idea stage)
+### Use it
 
 EP4Bookx brings some flexibility to the file and some features, but the main key, is to be as much flexible as possible.
 
@@ -59,6 +58,9 @@ You can enable it there, but also in the **easypopulate_4 page**, where you'll f
 This will bring the fields configuration section, where you can make your changes.
 
 By default, **all fields names are enable, no reports, no default names are set**. 
+> NOTE: For now, the product rewards field is the only one disable by default, since it belongs to another module. If you want to use it, you'll have
+to create a customized file. 
+
 If no customize layout is created, this is the export configuration. 
 If this configuration suits your needs, you may disable this configuration table and simply use the Bookx default export link.
 
@@ -163,6 +165,11 @@ If you've never worked with this csv importers , be aware that "Author A" it's d
 **NOTE** While EP4 shines for style simplicity, EP4Bookx comes with some colors and stylesheet and jquery. 
 I've made this specially for my personal use because I need it, however, I've try to separated the code from the html and css. 
 You'll find a tpl folder, where all related style occurs, where you can change to your desire style. 
+
+### Uninstall
+
+Disabling the EP4bookx plugin on EP4 configuration, almost none will interfere with the normal EP4 process.
+To completely remove EP4Bookx, uninstall EP4. This will remove EP4bookx plugin database table, and delete the files. 
 
 ## Todo  
 
