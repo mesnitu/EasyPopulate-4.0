@@ -124,6 +124,9 @@ class ep4bookx extends base {
         if ( $ep4bookx_enabled == 1 ) {
            
             require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
+            
+           
+            
             foreach ( $ep4bookx_default_cnf->ep4bookx_default_fields as $value ) {
                 
                 $bookx_author_name_max_len = $value->length;
@@ -136,6 +139,7 @@ class ep4bookx extends base {
                 $bookx_condition_name_max_len = $value->length;
                 $bookx_imprint_name_max_len = $value->length;
                 $bookx_subtitle_name_max_len = $value->length;
+                    
             }
 
             // Some messages
@@ -181,10 +185,10 @@ class ep4bookx extends base {
 	 // $zco_notifier->notify('EP4_ZC155_AFTER_HEADER');
     function updateEP4ZC155AfterHeader(&$callingClass, $notifier, $paramsArray) {
          global $ep4bookx_enabled, $ep4bookx_module_path, $ep4bookx_tpl_path, $ep4bookx_fields_conf, $ep4bookx_configuration;
-	     global $progress_bar, $maintenance, $maintenance_state, $which_zc;
+	     global $maintenance, $maintenance_state, $which_zc;
 		 
 		$which_zc = PROJECT_VERSION_MINOR;
-             
+          
         if ( $ep4bookx_enabled == 1 ) {
 			// load header scripts			
             include_once $ep4bookx_module_path . 'tpl/tpl_ep4bookx_header.php';
@@ -220,9 +224,8 @@ class ep4bookx extends base {
     }
 
     // $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START');
-    function updateEP4ExtraFunctionsSetFilelayoutFullStart(&$callingClass, $notifier, $paramsArray) {
-        
-    }
+    //function updateEP4ExtraFunctionsSetFilelayoutFullStart(&$callingClass, $notifier, $paramsArray) {
+    //}
 
     //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_FILELAYOUT');
     function updateEP4ExtraFunctionsSetFilelayoutFullFilelayout(&$callingClass, $notifier, $paramsArray) {
@@ -324,6 +327,7 @@ class ep4bookx extends base {
                         $filelayout[] = 'v_bookx_author_type_' . $l_id;
                     }
                 }
+                //$filelayout['v_rewards_product_points']
             }
             //For import
             if ( $ep4bookx_flag_import == true ) {
@@ -447,9 +451,13 @@ class ep4bookx extends base {
                     $filelayout[] = 'v_specials_expires_date';
                 }
                 $filelayout[] = 'v_products_price';
+                if ( $build_vars->setFields['enable_ep4bookx_product_reward_points'] == 1 ) {
+                   $filelayout[] = 'v_rewards_product_points';
+                }
                 if ( $build_vars->setFields['enable_ep4bookx_weight'] == 1 ) {
                     $filelayout[] = 'v_products_weight';
                 }
+ 
                 $filelayout[] = 'v_date_avail'; // should be changed to v_products_date_available for clarity
                 $filelayout[] = 'v_date_added'; // should be changed to v_products_date_added for clarity
                 $filelayout[] = 'v_products_quantity';
@@ -464,7 +472,8 @@ class ep4bookx extends base {
                 }
 
                 $filelayout[] = 'v_tax_class_title';
-
+                $filelayout[] = 'v_products_quantity_order_min';
+                $filelayout[] = 'v_products_quantity_order_units';
                 // metatags - 4-23-2012: added switch
                 if ( (int) EASYPOPULATE_4_CONFIG_META_DATA && $build_vars->setFields['enable_ep4bookx_metatags'] == 1 ) {
                     $filelayout[] = 'v_metatags_products_name_status';
@@ -502,7 +511,7 @@ class ep4bookx extends base {
 			p.manufacturers_id				as v_manufacturers_id,
 			subc.categories_id				as v_categories_id,
 			p.products_status				as v_status, ';
-
+                
           if ( $build_vars->setFields['enable_ep4bookx_metatags'] == 1 ) {
                     $filelayout_sql .= '
                         p.metatags_title_status         as v_metatags_title_status,
@@ -511,24 +520,24 @@ class ep4bookx extends base {
 			p.metatags_price_status         as v_metatags_price_status,
 			p.metatags_title_tagline_status as v_metatags_title_tagline_status, ';
                 }
-
+                
                 $filelayout_sql .= $ep4bookx_query;
                 $filelayout_sql .= ' be.isbn AS v_bookx_isbn         
 
 			FROM '
                     . TABLE_CATEGORIES . ' AS subc, '
                     . TABLE_PRODUCTS_TO_CATEGORIES . ' AS ptoc, '
-                    . TABLE_PRODUCTS . ' AS p, '
+                    . TABLE_PRODUCTS . ' AS p, '   
                     . TABLE_PRODUCT_BOOKX_EXTRA . ' AS be ';
                 $filelayout_sql .= $ep4bookx_query_join;
                 // THe $ep4bookx_query_join could be done in this notifier bellow.
                 //$zco_notifier->notify('EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_SQL_TABLE');
 
                 $filelayout_sql .= ' WHERE p.products_type = ' . $bookx_product_type . ' AND p.products_id = ptoc.products_id 
-                        AND p.products_id = be.products_id AND ';
+                        AND p.products_id = be.products_id ';
                 $zco_notifier->notify('EP4_EXTRA_FUNCTIONS_WHERE_FILELAYOUT_FULL_SQL_TABLE');
 
-                $filelayout_sql .= '
+                $filelayout_sql .= ' AND
 			ptoc.categories_id = subc.categories_id ' . $sql_filter;
 
                 break;
@@ -576,7 +585,7 @@ class ep4bookx extends base {
         global $ep4bookx_enabled, $request_type, $ep4bookx_module_path, $ep4bookx_customize_files, $ep4bookx_fields_conf, $toogle_config, $toogle_text;
         global $parsedown, $text;
         global $ep4bookx_fields, $ep4bookx_report_fields, $ep4bookx_default_fields;
-        global $ep4bookx_default_cnf, $ep4bookx_configuration, $progress_bar, $maintenance, $optimize_table;
+        global $ep4bookx_default_cnf, $ep4bookx_configuration, $maintenance, $optimize_table;
         //global $file_location, $file, $ep4bookx_csv, $tempdir, $csv_delimiter, $csv_enclosure, $ly, $display_output;
             // Toogle Quick Enable / Disable fields table link
         switch ( $ep4bookx_fields_conf ) {
@@ -910,22 +919,23 @@ class ep4bookx extends base {
             $this->updateEP4Start($callingClass, $notifier, $paramsArray);
         }
 		// $zco_notifier->notify('EP4_ZC155_AFTER_HEADER');
-		if ( $notifier == 'EP4_ZC155_AFTER_HEADER' ) {
+	if ( $notifier == 'EP4_ZC155_AFTER_HEADER' ) {
             $this->updateEP4ZC155AfterHeader($callingClass, $notifier, $paramsArray);
-        }
+       }
 		
-        if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START' ) {
-            $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
-        }
+        //if ( $notifier == 'EP4_EXTRA_FUNCTIONS_SET_FILELAYOUT_FULL_START' ) {
+        //    $this->updateEP4ExtraFunctionsSetFilelayoutFullStart($callingClass, $notifier, $paramsArray);
+       // }
+       
         // $zco_notifier->notify('EP4_COLLATION_UTF8_ZC13X');
         if ( $notifier == 'EP4_COLLATION_UTF8_ZC13X' ) {
             $this->updateEP4CollationUTF8ZC13x($callingClass, $notifier, $paramsArray);
         }
 
         // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
-        //if ( $notifier == 'EP4_EASYPOPULATE_4_LINK' ) {
-        //    $this->updateEP4Easypopulate4Link($callingClass, $notifier, $paramsArray);
-        // }
+//        if ( $notifier == 'EP4_EASYPOPULATE_4_LINK' ) {
+//        $this->updateEP4ZC155AfterHeader($callingClass, $notifier, $paramsArray);
+//         }
 
         // $zco_notifier->notify('EP4_EASYPOPULATE_4_LINK');
         if ( $notifier == 'EP4_EASYPOPULATE_4_LINK_END' ) {
@@ -1053,7 +1063,7 @@ class ep4bookx extends base {
 
 class ep4BookxVarsOverRide {
     
-    private $installed = false;
+    public $installed = false;
     
     public $configuration;
     
@@ -1117,7 +1127,7 @@ class ep4BookxVarsOverRide {
 
     private function ep4BookxConfigurationAction($action) {
 
-        global $db, $maintenance, $maintenance_state, $process, $messageStack, $progress_bar;
+        global $db, $maintenance, $maintenance_state, $process, $messageStack;
 
         if ( $action == 'maintenance' ) {
 
@@ -1163,9 +1173,6 @@ class ep4BookxVarsOverRide {
             }
         }
         
-         if ( $action == 'progress_bar' ) {
-             $progress_bar = 1;
-         }
     }
 
     private function ep4Bookxinstall() {
@@ -1178,9 +1185,9 @@ class ep4BookxVarsOverRide {
         $data = json_encode($ep4bookx_install_configuration);  
         $data2 = json_encode($ep4bookx_install_default_fields_conf);
 
-        $sql = "SELECT configuration_value, configuration_key FROM " . CONFIGURATION . "  WHERE (configuration_key) LIKE 'EASYPOPULATE_4_CONFIG_BOOKX_DATA' ";
+        $sql = "SELECT configuration_value, configuration_key FROM " . TABLE_CONFIGURATION . "  WHERE (configuration_key) LIKE 'EASYPOPULATE_4_CONFIG_BOOKX_DATA' ";
         $result = $db->Execute($sql);
-
+       // pr($result);
         if ( $result->fields['configuration_value'] == 1 ) {
 
             $db->Execute("DROP TABLE IF EXISTS " . $ep4bookx_db_table . " ");
@@ -1195,7 +1202,8 @@ class ep4BookxVarsOverRide {
                 $result = $db->Execute($sql_insert);
 
                 //include_once(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
-                $messageStack->add(EP4BOOKX_MSG_INSTALL, 'success');
+                $messageStack->add_session(EP4BOOKX_MSG_INSTALL, 'success');
+                
             }
         }
     }
@@ -1204,34 +1212,30 @@ class ep4BookxVarsOverRide {
         
         global $db, $messageStack, $ep4bookx_db_table;
 
-        $sql = "SELECT configuration_value, configuration_key FROM " . TABLE_CONFIGURATION . "  WHERE (configuration_key) LIKE 'EASYPOPULATE_4_CONFIG_BOOKX_DATA' ";
-        $result = $db->Execute($sql);
-
-        if ( $result->fields['configuration_value'] == 0 ) {
-
             $db->Execute( "DROP TABLE IF EXISTS " . $ep4bookx_db_table . " ");
             //include_once(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
             $messageStack->add(EP4BOOKX_MSG_INSTALL_REMOVED, 'warning');
-        }
+        
     }
 
     public function ep4BookxCheckInstall($table) {
-        global $db;
-
+        global $db,$current_page;
+      
         $sql = "SHOW TABLES LIKE '" . $table . "'";
         $result = $db->Execute($sql);
-
-        if ( $result->RecordCount() == 0 ) {
+        if ( $result->resource->num_rows == 0 ) {   
             $this->installed = false;
-            if ( !$current_page['login.php'] ) {
+            if ( $current_page !=='login.php' ) {
+              
                 $this->ep4BookxInstall();
+                 
             }
         } else {
             $this->installed = true;
         }
 
         // If EP4 is removed we go in solidarity 
-        if ( !is_null($_GET['epinstaller']) && $_GET['epinstaller'] == 'remove' || $this->installed == true ) {
+        if ( !is_null($_GET['epinstaller']) && $_GET['epinstaller'] == 'remove' && $this->installed == true ) {
             $this->ep4BookxRemove();
         }
     }
@@ -1243,9 +1247,8 @@ class ep4BookxVarsOverRide {
         $proj_prefix = $ep4bookx_project . '_';
 
         $ep4bookx_install_configuration = array( 
-            '0'=>array('name'=>'progress_bar','value' => 0,'text'=>EP4BOOKX_CONF_PROGRESS_BAR),
-            '1'=>array( 'name'=>'maintenance','value' => 0, 'text'=>EP4BOOKX_CONF_MAINTENANCE_MODE),
-            '2'=>array('name'=>'optimize_table','value' => 0, 'text'=>EP4BOOKX_CONF_OPTIMIZE_TABLES)
+            '0'=>array( 'name'=>'maintenance','value' => 0, 'text'=>EP4BOOKX_CONF_MAINTENANCE_MODE),
+            '1'=>array('name'=>'optimize_table','value' => 0, 'text'=>EP4BOOKX_CONF_OPTIMIZE_TABLES)
         );
 
         $proj_prefix = $ep4bookx_project . '_';
@@ -1305,6 +1308,9 @@ class ep4BookxVarsOverRide {
                 'enable_' . $proj_prefix . 'weight' => array(
                     'name' => EP4BOOKX_FIELD_WEIGHT,
                     'value' => true),
+                'enable_' . $proj_prefix . 'product_reward_points' => array(
+                    'name' => EP4BOOKX_FIELD_PRODUCT_REWARD_POINTS ,
+                    'value' => false),
             ),
             'ep4bookx_report_fields' => array(
                 'report_' . $proj_prefix . 'subtitle' => array(
