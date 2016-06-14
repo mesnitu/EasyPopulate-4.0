@@ -16,23 +16,30 @@ $ep4bookx_module_path = DIR_WS_MODULES . $ep4bookx_project . '/';
 $ep4bookx_tpl_path = $ep4bookx_module_path . 'tpl/';
 $ep4bookx_layout_path = $ep4bookx_module_path . 'layouts/';
 
-
-if ( $ep4bookx_enabled == 1 ) {
+if ( !$_SESSION['bookx_product_type'] ) {
 
     $sql = "SELECT * FROM {$const['TABLE_PRODUCT_TYPES']} WHERE type_handler = 'product_bookx' ";
     $result = $db->Execute($sql);
 
     if ( $result->RecordCount() !== 0 ) {
-		
         $bookx_product_type = $result->fields['type_id'];
-		
-		$ep4bookx_check_install = new ep4BookxVarsOverRide();
-		$ep4bookx_check_install->ep4BookxCheckInstall($ep4bookx_db_table);
-
-        include $ep4bookx_module_path . 'ep4bookx_pre_process.php';
-
+        $_SESSION['bookx_product_type'] = $bookx_product_type;
+       
         // Check table 
     } else {
-        $messageStack->add_session(EP4BOOKX_BOOKX_NOT_FOUND ,'error');
+        $messageStack->add_session(EP4BOOKX_BOOKX_NOT_FOUND, 'error');
     }
+} else {
+    $bookx_product_type = $_SESSION['bookx_product_type'];
+}
+
+if ($bookx_product_type!='') {
+    
+     $ep4bookx_check_install = new ep4BookxVarsOverRide();
+     $ep4bookx_check_install->ep4BookxCheckInstall($ep4bookx_db_table);
+     pr($ep4bookx_check_install);
+   
+        if ( $ep4bookx_enabled == 1 && $ep4bookx_check_install->installed == 1) {
+            include $ep4bookx_module_path . 'ep4bookx_pre_process.php';
+        }
 }
