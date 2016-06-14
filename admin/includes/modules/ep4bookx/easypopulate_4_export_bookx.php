@@ -101,7 +101,23 @@ foreach ($langcode as $key2 => $lang2) {
       $row['v_manufacturers_name'] = ''; // no manufacturer name
     }
   } //End if isset v_manufacturers_name
-         
+  
+   if (isset($filelayout['v_rewards_product_points']) ) {
+       
+       $sql = "SELECT point_ratio FROM ".TABLE_REWARD_MASTER." where scope = 2 AND scope_id = :v_products_id: limit 1";
+       $sql = $db->bindVars($sql, ':v_products_id:', $row['v_products_id'], 'integer');
+       $result_rewards = ep_4_query($sql);
+       
+       if ($row_rewards = ($ep_uses_mysqli ? mysqli_fetch_array($result_rewards) : mysql_fetch_array($result_rewards))) {
+                $row['v_rewards_product_points'] = $row_rewards['point_ratio'];
+               
+            } else {
+                $$row['v_rewards_product_points'] = '';
+            }
+  
+    }
+
+
         if (
                 ($row['v_bookx_isbn'] != '0') && ($row['v_bookx_isbn'] != '') || 
                 (isset($filelayout['v_bookx_size']) && $row['v_bookx_size'] != '0') && ($row['v_bookx_size'] != '') || 

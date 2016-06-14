@@ -31,6 +31,41 @@ $edit_link = "<div class=\"edit-link\"><a href=" . zen_href_link('product_bookx.
 
 if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout is present. He holds the bookx_extra table querys.
 
+    
+    if (isset($filelayout['v_rewards_product_points']) && $items[$filelayout['v_rewards_product_points']] !='') {
+       
+       // Reset products rewards points on 0 
+        if ( $items[$filelayout['v_rewards_product_points']] == '0') {
+               
+               $sql = "DELETE FROM ".TABLE_REWARD_MASTER." WHERE scope_id = :v_products_id: ";
+               $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
+               $result = $db->Execute($sql);
+           
+               
+        } else {
+            
+       $sql = "SELECT * FROM ".TABLE_REWARD_MASTER." where scope = 2 AND scope_id = :v_products_id: limit 1";
+       $sql = $db->bindVars($sql, ':v_products_id:', $v_products_id, 'integer');
+       $result = $db->Execute($sql);
+       
+       if ($result->RecordCount() > 0 ) {
+
+            $sql = "UPDATE " . TABLE_REWARD_MASTER . " SET point_ratio = :point_ratio:						
+						WHERE rewards_products_id = :rewards_products_id:  AND scope_id = :scope_id:";
+                $sql = $db->bindVars($sql, ':rewards_products_id:', $result->fields['rewards_products_id'], 'integer');
+                $sql = $db->bindVars($sql, ':scope_id:', $v_products_id, 'integer');
+                $sql = $db->bindVars($sql, ':point_ratio:', $items[$filelayout['v_rewards_product_points']], 'float');
+                $result = $db->Execute($sql);
+          
+       } else {
+          
+            UpdateRewardPointRecord(2, $v_products_id, $items[$filelayout['v_rewards_product_points']]);
+
+        }
+            
+        }      
+    }
+    
 //::: BOOKX GENRE
     if ( isset($filelayout['v_bookx_genre_name_' . $epdlanguage_id]) ) {
 
@@ -82,6 +117,10 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                         $query2 = $db->bindVars($query2, ':genre_description:', $genres_names_array[$l_id][$i], 'string');
                         $query2 = $db->bindVars($query2, ':genre_image:', null, 'string');
                         $result2 = $db->Execute($query2);
+                        
+                     if ( $result2 ) {
+                        zen_record_admin_activity('Inserted Genre '.$genres_names_array[$l_id][$i].' with id ' . (int) $v_genre_id . ' via EP4.', 'info');
+                    }
                     }
                 } else {
                     foreach ( $langcode as $lang ) {
@@ -115,6 +154,8 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                     $query = $db->bindVars($query, ':v_products_id:', $v_products_id, 'integer');
                     $inserted_id[] = $v_genre_id;
                     $result = $db->Execute($query);
+                    
+                    
                 }
             } // ends for 
             $temp_del = array_merge($updated_id, $inserted_id); // Merge all the id's in the loop
@@ -168,6 +209,11 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                 $sql = $db->bindVars($sql, ':CURRENT_TIMESTAMP:', CURRENT_TIMESTAMP, 'noquotestring');
                 $sql = $db->bindVars($sql, ':v_publisher_id:', $v_publisher_id, 'integer');
                 $result = $db->Execute($sql);
+                
+                  if ( $result ) {
+                        zen_record_admin_activity('Updated publisher '.$v_bookx_publisher_name.' with ID ' . (int)  $v_publisher_id . ' via EP4.', 'info');
+                    }
+                
             } else {
 
                 $sql = "INSERT INTO " . TABLE_PRODUCT_BOOKX_PUBLISHERS . " (publisher_name, publisher_image, publisher_sort_order, date_added, last_modified)
@@ -179,7 +225,11 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                 $result = $db->Execute($sql);
 
                 $v_publisher_id = $db->Insert_ID(); // id is auto_increment
-
+                
+                 if ( $result ) {
+                        zen_record_admin_activity('Inserted publisher '.$v_bookx_publisher_name.' with ID ' . (int)  $v_publisher_id . ' via EP4.', 'info');
+                    }
+                
                 if ( $result ) { // Publisher Description needs langueges ID
                     foreach ( $langcode as $lang ) {
                         $l_id = $lang['id'];
@@ -189,6 +239,9 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                         $sql2 = $db->bindVars($sql2, ':publisher_url:', null, 'string');
                         $sql2 = $db->bindVars($sql2, ':publisher_description:', null, 'string');
                         $result2 = $db->Execute($sql2);
+                        
+                       
+                        
                     }
                 }
             }
@@ -239,6 +292,11 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                     $query2 = $db->bindVars($query2, ':v_bookx_series_name:', $items[$filelayout['v_bookx_series_name_' . $l_id]], 'string');
                     $query2 = $db->bindVars($query2, ':series_description:', null, 'string');
                     $result2 = $db->Execute($query2);
+                    
+                     if ( $result2 ) {
+                        zen_record_admin_activity('Inserted Series '.$items[$filelayout['v_bookx_series_name_' . $l_id]].' with ID ' . (int)  $v_series_id . ' via EP4.', 'info');
+                    }
+                    
                 }
             } else {
                 foreach ( $langcode as $lang ) {
@@ -250,6 +308,11 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                     $query = $db->bindVars($query, ':series_description:', null, 'string');
                     $query = $db->bindVars($query, ':v_series_id:', $v_series_id, 'string');
                     $result = $db->Execute($query);
+                    
+                     if ( $result ) {
+                        zen_record_admin_activity('Updated Series '.$items[$filelayout['v_bookx_series_name_' . $l_id]].' with ID ' . (int)  $v_series_id . ' via EP4.', 'info');
+                    }
+                    
                 }
             }
         } else { // Empty series file fields 	
@@ -667,7 +730,12 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                     $query = $db->bindVars($query, ':v_author_default_type:', $v_author_default_type, 'integer');
                     $query = $db->bindVars($query, ':CURRENT_TIMESTAMP:', CURRENT_TIMESTAMP, 'noquotestring');
                     $query = $db->bindVars($query, ':v_author_id:', $v_author_id, 'integer');
-                    $result = $db->Execute($query);                   
+                    $result = $db->Execute($query);    
+                    
+                     if ( $result ) {
+                        zen_record_admin_activity('Updated Author '.$v_bookx_author_name.' with ID ' . (int)  $v_author_id . ' via EP4.', 'info');
+                    }
+                    
                     }
                   
                 } else { //insert
@@ -684,7 +752,11 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                     $result = $db->Execute($query);
                    
                     $v_author_id = $db->Insert_ID(); // id is auto_incremented
-
+                    
+                      if ( $result ) {
+                        zen_record_admin_activity('Inserted Author '.$v_bookx_author_name.' with ID ' . (int) $v_author_id . ' via EP4.', 'info');
+                    }
+                    
                     foreach ( $langcode as $lang ) {
                         $l_id = $lang['id'];
 
@@ -717,6 +789,10 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                   
                     $authors_inserted_id[] = $v_author_id; // Goes to array
                     
+                     if ( $result ) {
+                        zen_record_admin_activity('Inserted Author To Bookx ID '.$v_products_id.' with Author ID ' . (int) $v_author_id . ' via EP4.', 'info');
+                    }
+                    
                 } else {
                     
                     $v_author_id = $result_author_to_product->fields['bookx_author_id'];
@@ -732,7 +808,12 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
                     $query = $db->bindVars($query, ':v_author_type_id:', $v_author_type_id, 'integer');
                     $query = $db->bindVars($query, ':v_products_id:', $v_products_id, 'integer');
                     $query = $db->bindVars($query, ':primary_id:', $primary_id, 'integer');
-                    $result2 = $db->Execute($query);                  
+                    $result2 = $db->Execute($query);   
+                    
+                    if ( $result2 ) {
+                        zen_record_admin_activity('Inserted Author To Bookx ID '.$v_products_id.' with Author ID ' . (int) $v_author_id . ' via EP4.', 'info');
+                    }
+                    
                 }
             } // ends foreach
             
@@ -744,9 +825,14 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
             }
          
             if($q !='') {
-                $delete = "DELETE FROM " . TABLE_PRODUCT_BOOKX_AUTHORS_TO_PRODUCTS . " WHERE products_id='" . $v_products_id . "' " . $q . "";
+            $delete = "DELETE FROM " . TABLE_PRODUCT_BOOKX_AUTHORS_TO_PRODUCTS . " WHERE products_id='" . $v_products_id . "' " . $q . "";
             $delete = $db->bindVars($delete, ':v_products_id:', $v_products_id, 'integer');
-            $result = $db->Execute($delete);    
+            $result = $db->Execute($delete);
+            
+             if ( $result ) {
+                        zen_record_admin_activity('Deleted Author From Bookx ID '.(int)$v_products_id.' with Author ID ' . (int) $q . ' via EP4.', 'info');
+                    }
+            
             }
             
             unset($delete, $q, $temp_del, $updated_id, $inserted_id);
@@ -763,6 +849,7 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
 
 // now for PRODUCTS BOOKX EXTRA + BOOKX_EXTRA_DESCRIPTION
     if ( isset($v_bookx_isbn) ) { // it's isset 
+    
         // The querys are built on class observer
         $sql = "SELECT " . $ep4bookx_extra_sqlcol . " isbn FROM " . TABLE_PRODUCT_BOOKX_EXTRA . "  WHERE 
          products_id = :v_products_id: ";
@@ -786,7 +873,11 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
             $query = $db->bindVars($query, ':v_bookx_isbn:', $v_bookx_isbn, 'string');
             $query = $db->bindVars($query, ':v_products_id:', $v_products_id, 'integer');
             $result_query = $db->Execute($query);
-   
+            
+            if ( $result_query ) {
+                        zen_record_admin_activity('Updated ISBN '. $v_bookx_isbn .' on Bookx ID '.(int)$v_products_id.' via EP4.', 'info');
+                    }
+            
             // If the subtitle field is not set, a entry must go to TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION
             if ( ($result->RecordCount() > 0) && (!isset($filelayout['v_bookx_subtitle_' . $epdlanguage_id])) ) {
                 foreach ( $langcode as $lang ) {
@@ -816,7 +907,11 @@ if ( isset($filelayout['v_bookx_isbn']) ) { // Only proceed if ISBN filelayout i
             ($bind_size == 1 ? $query = $db->bindVars($query, ':v_bookx_size:', $v_bookx_size, 'string') : '');
             $query = $db->bindVars($query, ':v_bookx_isbn:', $v_bookx_isbn, 'string');
             $result_query = $db->Execute($query);
-
+            
+            if ( $result_query ) {
+                        zen_record_admin_activity('Inserted ISBN '. $v_bookx_isbn .' on Bookx ID '.(int)$v_products_id.' via EP4.', 'info');
+                    }
+            
             if ( ($result->RecordCount() > 0) && (!isset($filelayout['v_bookx_subtitle_' . $epdlanguage_id])) ) {
                  // If the subtitle field is not set, a entry must go to TABLE_PRODUCT_BOOKX_EXTRA_DESCRIPTION
                 foreach ( $langcode as $lang ) {

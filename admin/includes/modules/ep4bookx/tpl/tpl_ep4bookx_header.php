@@ -236,24 +236,5 @@ if ( $ep4bookx_fields_conf == true ) {  // Only loads if the config is enable ?>
     </script>
     <?php
 }
- if ( $progress_bar == 1 ) {   ?>
 
-    <script>
-   var options = {
-    bg: '#acf',
-    // leave target blank for global nanobar
-    target: document.getElementById('myDivId'),
-    // id for new nanobar
-    id: 'mynano'
-};
-
-var nanobar = new Nanobar( options );
-
-//move bar
-nanobar.go( 30 ); // size bar 30%
-
-// Finish progress bar
-nanobar.go(100);
-    </script>
-<?php }
 

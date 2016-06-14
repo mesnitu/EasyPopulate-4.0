@@ -92,8 +92,7 @@
             <?php
             $build_tpl_fields_enable = new ep4bookx();
             $build_tpl_fields_enable->ep4bookxBuild($ep4bookx_default_cnf, '', 'ep4bookx_fields');
-            //$build_tpl_fields_enable->ep4bookxBuild($ep4bookx_default_cnf, '', 'ep4bookx_fields');
-            //pr($build_tpl_fields_enable->tplForm, "TESTE");
+            //pr($build_tpl_fields_enable);
             foreach ( $build_tpl_fields_enable->tplForm as $field => $field_name ) {
                 ?>
 

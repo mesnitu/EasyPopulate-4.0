@@ -133,10 +133,7 @@ if ( isset($post_action['ep4bookx_action']) ) {
             
             foreach ( $post_action as $key => $values ) {
                 switch ( $key ) {
-                    case 'progress_bar':
-                        $text = "EP4BOOKX_CONF_PROGRESS_BAR";
-
-                        break;
+                    
                     case 'maintenance':
                         $text = "EP4BOOKX_CONF_MAINTENANCE_MODE";
 
@@ -169,7 +166,7 @@ if ( isset($post_action['ep4bookx_action']) ) {
     if ( isset($get_action) ) {
         switch ( $get_action['ep4bookx_action'] ) {
 
-            case 'ep4bookx_fen_cnf':
+            case 'ep4bookx_fen_cnf': //fen = field enable
                 
                 // Quick enable ep4Bookx fields config form
                 if ( $ep4bookx_fields_conf == 0 ) {
@@ -183,7 +180,7 @@ if ( isset($post_action['ep4bookx_action']) ) {
                 }
                 zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
                 break;
-            case 'ep4bookx_fdis_cnf':
+            case 'ep4bookx_fdis_cnf': // field disable
               
                 // Quick disable ep4Bookx fields config form
                 if ( $ep4bookx_fields_conf == 1 ) {

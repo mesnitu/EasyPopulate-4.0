@@ -27,8 +27,7 @@ function ep_4_remove_product_bookx($product_model) {
     $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
     $sql = "SELECT products_id FROM " . TABLE_PRODUCTS . " WHERE products_model = '" . zen_db_input($product_model) . "'";
     $products = $db->Execute($sql);
-    //$bookx_id = $products->fields['products_id'];
-    // Bye bye
+   
     bookx_delete_product($products->fields['products_id']);
 
     if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
@@ -48,21 +47,11 @@ function ep_4_remove_product_bookx($product_model) {
     return;
 }
 
-/*function pr($var, $title = null) {
-    echo '<pre style="background:#ccc;">';
-    if ($title):
-        echo '<b>' . $title . ':</b> ';
-    endif;
-    print_r($var);
-    echo '</pre>';
-}
-*/
-
 /**
  * 
  * @param type $obj
  * @return constant
- * @todo this is re assingned the constants. It should look or search for the constant and assing to it
+ * @todo this is re assingning the constants. It should look or search for the constant and assing to it
  */
 function _string($obj) {
     $temp = serialize($obj);

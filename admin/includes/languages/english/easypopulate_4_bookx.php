@@ -82,6 +82,7 @@ define ('EP4BOOKX_FIELD_CATEGORIES', 'Categories');
 define ('EP4BOOKX_FIELD_MANUFACTURERS', 'Manufacturers');
 define ('EP4BOOKX_FIELD_WEIGHT', 'Weight');
 define ('EP4BOOKX_FIELD_ISBN', 'ISBN');
+define ('EP4BOOKX_FIELD_PRODUCT_REWARD_POINTS', 'Product Reward Points');
 
 define ('EP4BOOKX_CONF_PROGRESS_BAR', 'Progress Bar');
 define ('EP4BOOKX_CONF_OPTIMIZE_TABLES', 'Optimize Table');
