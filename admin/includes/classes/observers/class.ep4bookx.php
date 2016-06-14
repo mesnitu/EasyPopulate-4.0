@@ -1187,7 +1187,7 @@ class ep4BookxVarsOverRide {
 
         $sql = "SELECT configuration_value, configuration_key FROM " . TABLE_CONFIGURATION . "  WHERE (configuration_key) LIKE 'EASYPOPULATE_4_CONFIG_BOOKX_DATA' ";
         $result = $db->Execute($sql);
-       // pr($result);
+
         if ( $result->fields['configuration_value'] == 1 ) {
 
             $db->Execute("DROP TABLE IF EXISTS " . $ep4bookx_db_table . " ");
