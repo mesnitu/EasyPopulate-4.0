@@ -37,8 +37,7 @@ if ($bookx_product_type!='') {
     
      $ep4bookx_check_install = new ep4BookxVarsOverRide();
      $ep4bookx_check_install->ep4BookxCheckInstall($ep4bookx_db_table);
-     pr($ep4bookx_check_install);
-   
+     
         if ( $ep4bookx_enabled == 1 && $ep4bookx_check_install->installed == 1) {
             include $ep4bookx_module_path . 'ep4bookx_pre_process.php';
         }
