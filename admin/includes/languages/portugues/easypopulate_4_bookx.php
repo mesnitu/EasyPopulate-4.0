@@ -46,14 +46,14 @@ define ('EP4BOOKX_ERROR_MISSING_FIELD_ISBN', 'Subtitle');
 define ('EP4BOOKX_SAVE_FILE', 'Save');
 define ('EP4BOOKX_SUBMIT_WAIT', 'Wait...');
 define ('EP4BOOKX_EXPORT_BUTTON', 'Export');
-define ('EP4BOOKX_EXPORT_CUSTOMIZE', 'Customize: ');
+define ('EP4BOOKX_EXPORT_CUSTOMIZE', 'Last Customize Layout: ');
 define ('EP4BOOKX_REQUIRED_FIELD', 'Required Field');
 define ('EP4BOOKX_INVALID_FIELD', 'Invalid Field. Exceeds max lenght');
 define ('EP4BOOKX_DEFAULT_FIELD_EMPTY', 'none');
 define ('EP4BOOKX_DEFAULT_FIELD_LAYOUT_NAME', 'Layout Name');
 define ('EP4BOOKX_REVIEW_FIELDS_ERROR', 'Review %s');
-define ('EP4BOOK_QUICK_EDIT_DISABLE', 'Quick Disable');
-define ('EP4BOOK_QUICK_EDIT_ENABLE', 'Quick Enable');
+define ('EP4BOOK_QUICK_EDIT_DISABLE', '(Quick Disable Fields)');
+define ('EP4BOOK_QUICK_EDIT_ENABLE', '(Quick Enable Fields)');
 define ('E4BOOKX_MSG_DISABLE_FIELDS_CONFIG', 'Ep4Bookx Fields Configuration are now Disable');
 define ('E4BOOKX_MSG_ENABLE_FIELDS_CONFIG', 'Ep4Bookx Fields Configuration are now Enable');
 define ('E4BOOKX_MSG_LAYOUT_SAVED', 'Data successfully save');
@@ -82,6 +82,8 @@ define ('EP4BOOKX_FIELD_CATEGORIES', 'Categories');
 define ('EP4BOOKX_FIELD_MANUFACTURERS', 'Manufacturers');
 define ('EP4BOOKX_FIELD_WEIGHT', 'Weight');
 define ('EP4BOOKX_FIELD_ISBN', 'ISBN');
+
+define('EP4BOOKX_FIELD_PRODUCT_REWARD_POINTS', 'Rewards Points');
 
 define ('EP4BOOKX_CONF_PROGRESS_BAR', 'Progress Bar');
 define ('EP4BOOKX_CONF_OPTIMIZE_TABLES', 'Optimize Table');

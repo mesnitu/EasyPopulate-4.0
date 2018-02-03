@@ -45,17 +45,38 @@ foreach ($langcode as $key2 => $lang2) {
     $thecategory_id = $row['v_categories_id']; // starting category_id
 
     if ( EASYPOPULATE_4_CONFIG_EXPORT_URI != '0') {
-      $sql_type = "SELECT type_handler FROM " . TABLE_PRODUCT_TYPES . " WHERE type_id = :type_id:";
-      $sql_type = $db->bindVars($sql_type, ':type_id:', zen_get_products_type($row['v_products_id']), 'integer');
-      $sql_typename = $db->Execute($sql_type);
-
-      $row['v_html_uri'] = zen_catalog_href_link($sql_typename->fields['type_handler'] . '_info', 'cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'], 'NONSSL');
+//      $sql_type = "SELECT type_handler FROM " . TABLE_PRODUCT_TYPES . " WHERE type_id = :type_id:";
+//      $sql_type = $db->bindVars($sql_type, ':type_id:', zen_get_products_type($row['v_products_id']), 'integer');
+//      $sql_typename = $db->Execute($sql_type);
+//
+//      $row['v_html_uri'] = zen_catalog_href_link($sql_typename->fields['type_handler'] . '_info', 'cPath=' . zen_get_generated_category_path_ids($row['v_master_categories_id']) . '&products_id=' . $row['v_products_id'], 'NONSSL');
+      /**
+       * A litle change to get the full products link with CEON
+       */
+      $sql_uri = "SELECT uri FROM ".TABLE_CEON_URI_MAPPINGS." WHERE main_page= :product_bookx_info: AND language_id=:language_id: AND current_uri=1 AND associated_db_id= :associated_db_id: ";
+      $sql_uri = $db->bindVars($sql_uri, ':product_bookx_info:', 'product_bookx_info', 'string');
+      $sql_uri = $db->bindVars($sql_uri, ':language_id:', $lid2, 'integer');
+      $sql_uri = $db->bindVars($sql_uri, ':associated_db_id:', $row['v_products_id'], 'integer');
+      $result_full_uri = ep_4_query($sql_uri);
+       
+       if ($row_full_uri = ($ep_uses_mysqli ? mysqli_fetch_array($result_full_uri) : mysql_fetch_array($result_full_uri))) {
+                $row['v_full_uri'] = HTTPS_SERVER.$row_full_uri['uri'];
+               
+            } else {
+                $row['v_full_uri'] = '';
+            }
 
     }
      //$zco_notifier->notify('EP4_EXPORT_FULL_OR_CAT_FULL_AFTER');
      //
- 
+    if ( isset($row['v_products_image'])){
+       $row['v_products_image'] = HTTP_SERVER . '/' . DIR_WS_IMAGES.$row['v_products_image'];
+    }
+     if ( isset($row['v_products_price'])){
+       $row['v_products_price'] = zen_round($row['v_products_price'], 2).' EUR';
+    }
     
+  
 // if parent_id is not null ('0'), then follow it up.  Perhaps this could be replaced by Zen's zen_not_null() function?
     while (!empty($thecategory_id)) {
       // mult-lingual categories start - for each language, get category description and name
@@ -101,8 +122,23 @@ foreach ($langcode as $key2 => $lang2) {
       $row['v_manufacturers_name'] = ''; // no manufacturer name
     }
   } //End if isset v_manufacturers_name
-         
-        if (
+  
+   if (isset($filelayout['v_rewards_product_points']) ) {
+       
+       $sql = "SELECT point_ratio FROM ".TABLE_REWARD_MASTER." where scope = 2 AND scope_id = :v_products_id: limit 1";
+       $sql = $db->bindVars($sql, ':v_products_id:', $row['v_products_id'], 'integer');
+       $result_rewards = ep_4_query($sql);
+       
+       if ($row_rewards = ($ep_uses_mysqli ? mysqli_fetch_array($result_rewards) : mysql_fetch_array($result_rewards))) {
+                $row['v_rewards_product_points'] = $row_rewards['point_ratio'];
+               
+            } else {
+                $row['v_rewards_product_points'] = '';
+            }
+  
+    }
+    
+     if (
                 ($row['v_bookx_isbn'] != '0') && ($row['v_bookx_isbn'] != '') || 
                 (isset($filelayout['v_bookx_size']) && $row['v_bookx_size'] != '0') && ($row['v_bookx_size'] != '') || 
                 (isset($filelayout['v_bookx_pages']) && $row['v_bookx_pages'] != '0') && ($row['v_bookx_pages'] != '') || 
@@ -324,9 +360,10 @@ foreach ($langcode as $key2 => $lang2) {
         }
     } // ends authors if
 
+       
     // Bookx Author Type. If the Authors is not selected for export, it wont do anything. No logic on that. 
     if (isset($filelayout['v_bookx_author_type_'.$epdlanguage_id]) && isset($filelayout['v_bookx_author_name'])) { // '0' is correct, but '' NULL is possible
-
+     
         $author_type_name_array = array();
         // If AuthorA as no type, and AuthorB is of Writer, in the file something must be written, otherwise, AuthorA becomes Writer, and authorB empty on import...This is not good. Don't see a simple way, but to use a default type to fill those empty types.
         foreach($author_typeID_array as $typeID) { // start looping
@@ -346,17 +383,38 @@ foreach ($langcode as $key2 => $lang2) {
                 foreach($langcode as $lang) {
                     $l_id = $lang['id'];
                     if (count(array_keys($author_typeID_array)) > 1) { // Only use the default type, if there's more than one author
-                        $author_type_name_array[$l_id][] = ($bookx_default_author_type != '' ? $bookx_default_author_type = $bookx_default_author_type : $bookx_default_author_type = 'NO TYPE'); // until better idea, if theres no default type, something visible is attached as a placeholder
+                        $author_type_name_array[$l_id][] = ($bookx_default_author_type != '' ? $bookx_default_author_type = $bookx_default_author_type : (!empty($build_vars->setFields['default_ep4bookx_author_type'])? $bookx_default_author_type = $build_vars->setFields['default_ep4bookx_author_type']:'NO TYPE')); // until better idea, if theres no default type, something visible is attached as a placeholder
                         $warning = true;
                     }
                 }
             }
         } //ends foreach author_typeID
+
         foreach($author_type_name_array as $lang => $value) {
             $row['v_bookx_author_type_'.$lang] = implode($category_delimiter, $value);
         }
+       
         if ($bookx_default_author_type == 'NO TYPE' && $warning == true) { // not visible enough
             $display_output .= '<strong>Warning:</strong> A default type was missing, and a author type was attached to prevent changing the types order on import <br />';
         }
     }
+
+     if ( isset($filelayout['v_familia_livros']) && EP4BOOKX_BOOK_UPDATE_TABLE_SEARCH == true) {
+            
+        $sql_fl = "SELECT familia_id FROM ".TABLE_FAMILIA_LIVROS." where products_id = :v_products_id: limit 1";
+        $sql_fl = $db->bindVars($sql_fl, ':v_products_id:', $row['v_products_id'], 'integer');
+        $result_fl = $db->Execute($sql_fl);
+
+        if ($result_fl->RecordCount() > 0) {
+                
+            $row['v_familia_livros'] = $result_fl->fields['familia_id'];
+               
+            } else {
+                
+             $row['$row_familia_livros'] = '';
+            }
+        
+    
+    }
+    
 // } //ends product bookx export

@@ -15,24 +15,27 @@ $post_action = filter_input_array(INPUT_POST);
 
 if ( isset($GLOBALS['current_page']) && 'easypopulate_4.php' == $GLOBALS['current_page'] ) {
     require(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
-    
+
     $sql = "SELECT default_fields FROM  " . TABLE_EP4BOOKX . "";
     $result = $db->Execute($sql);
     
     if ( $result ) {
 
         $ep4bookx_default_cnf = json_decode($result->fields['default_fields']);
-        
-        $build_vars = new ep4bookx();      
+
+        $build_vars = new ep4bookx();       
         /**
          * Build the the default config. 
          * From this config, the vars and the tpl fields can be built.
          */
         $build_vars->ep4bookxBuild($ep4bookx_default_cnf, true);
-       
-        // Fill the array with customize layouts   
+            
+        // Fill the array with customize layouts 
+      
+        $ep4bookx_layout_path = $ep4bookx_module_path. 'layouts/';
+
         $ep4bookx_customize_files = ep4bookx_list_layouts($ep4bookx_layout_path, '.json', false);
-    
+      
         if ( !empty($ep4bookx_customize_files) ) {
             // count the files ( will be use to refresh the page on delete the last one
             $numf = count($ep4bookx_customize_files);
@@ -42,7 +45,7 @@ if ( isset($GLOBALS['current_page']) && 'easypopulate_4.php' == $GLOBALS['curren
     
     $ep4bookx_configuration = new ep4BookxVarsOverRide();
     $ep4bookx_configuration->ep4BookxConfiguration(TABLE_EP4BOOKX);
-   
+       
 }   
 
 if ( isset($post_action['ep4bookx_action']) ) {
@@ -68,13 +71,13 @@ if ( isset($post_action['ep4bookx_action']) ) {
             }
 
             break;
-//        case 'maintanance':
-//          $sql2 = "UPDATE " .CONFIGURATION. " SET configuration_value = 'true' WHERE  configuration_key  LIKE 'DOWN_FOR_MAINTENANCE' ";
-//          $result2 = $db->Execute ($sql2);
-//          $jmsg = 1;
-//          echo $jmsg;
-//          exit();          
-//           break;
+        case 'maintanance':
+          $sql2 = "UPDATE " .CONFIGURATION. " SET configuration_value = 'true' WHERE  configuration_key  LIKE 'DOWN_FOR_MAINTENANCE' ";
+          $result2 = $db->Execute ($sql2);
+          $jmsg = 1;
+          echo $jmsg;
+          exit();          
+          break;
         case 'save_layout':
 
             $set_fields = array();
@@ -168,8 +171,16 @@ if ( isset($post_action['ep4bookx_action']) ) {
 
     if ( isset($get_action) ) {
         switch ( $get_action['ep4bookx_action'] ) {
+            
+            case 'ep4bookx_reloadConfig': //fen = field enable
+                
+                $remove = new ep4BookxVarsOverRide();
+                $remove->ep4BookxRemove();
+                zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
+                
+                break;
 
-            case 'ep4bookx_fen_cnf':
+            case 'ep4bookx_fen_cnf': //fen = field enable
                 
                 // Quick enable ep4Bookx fields config form
                 if ( $ep4bookx_fields_conf == 0 ) {
@@ -183,7 +194,7 @@ if ( isset($post_action['ep4bookx_action']) ) {
                 }
                 zen_redirect(zen_href_link(FILENAME_EASYPOPULATE_4));
                 break;
-            case 'ep4bookx_fdis_cnf':
+            case 'ep4bookx_fdis_cnf': // field disable
               
                 // Quick disable ep4Bookx fields config form
                 if ( $ep4bookx_fields_conf == 1 ) {
@@ -226,7 +237,7 @@ if ( isset($get_action['export']) && ('bookx' == $get_action['export']) || isset
     }
 }
 
-if ( (mb_substr($post_action['import'], 0, 5)) == 'BookX' ) {
+if ( (mb_substr($post_action['import'], 0, 8)) == 'BookX-EP' ) {
    
     $ep4bookx_flag_import = 1;
     
