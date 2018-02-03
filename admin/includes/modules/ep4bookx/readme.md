@@ -10,19 +10,18 @@ To import Bookx fields by CSV - tested with **Zencart 1.5.4** and **EP4 v4.0.33*
  * Special thanks to **@mc12345678** the EP4 maintainer, for his patient and valuable experience advises and for making the key class that gave independence not only for this module, but all other future features that might come along.
  
 
-[create an anchor](#supported-bookx-fields)
-[create an anchor](#installation)
-[create an anchor](#how-to-use)
-[create an anchor](#multiple-Authors-and-Genres)
-[create an anchor](#The-ISBN-Field)
-[create an anchor](#Reports)
-[create an anchor](#Defaults-Names)
-[create an anchor](#Multiple-Authors-and-Genres)
+[Supported Bookx Fields](#supported-bookx-fields)
+[Installation](#installation)
+[How To Use](#how-to-use)
+[Multiple Authors and Genres](#multiple-Authors-and-Genres)
+[The ISBN Field](#the-isbn-Field)
+[Reports](#reports)
+[Defaults Names](#defaults-names)
+[Multiple Authors / Genres](#multiple-authors-and-genres)
+[Manipulate Images](#manipulate-images)
 [create an anchor](#Should-Know)
-[create an anchor](#Manipulate-Images)
-[create an anchor](#Removing-Books-with-EP4Bookx)
-[create an anchor](#Reports)
-[create an anchor](#Reports)
+[Removing Books with EP4Bookx](#removing-books-with-ep4ookx)
+
 
 
 
@@ -134,9 +133,10 @@ For Genres that's it.
 Let's say we have a book with 3 Authors, two writers and one Illustrator.
 
 If **you use** the author type in a normal way, for each author, a author type must or should be set manually:
+
 | v_bookx_author_name | v_bookx_author_type |
 ----------------------|----------------------
-Author A^Author B^Author C | Writer^Illustrator^Writer
+|Author A^Author B^Author C | Writer^Illustrator^Writer
 
 Now, using a customized author type field name ( ie: Writer), all empty fields are populated, with that type.
 
@@ -149,14 +149,14 @@ Now, using a customized author type field name ( ie: Writer), all empty fields a
 Another example: If all 3 Authors were writers, with a customized author type field, all 3 would have "writer".
 | v_bookx_author_name | v_bookx_author_type |
 ----------------------|----------------------
-Author A^Author B^Author C |         
+|Author A^Author B^Author C |         
          
 But things can also go this way:
 Let's say you also have a customized author name (ie: Various ). Then both fields are populated:
 
 | v_bookx_author_name | v_bookx_author_type |
 ----------------------|----------------------
-                       |
+|                      |
 
 > Would populate has v_bookx_author_name = Various and v_bookx_author_type =  Writer
 
@@ -168,7 +168,7 @@ The same applies to all fields that can have a default name associated.
 The export does not report or use default names.
 
 The Import, does not rely on enable / disable configuration. Only in reports and defaults fields. 
-If that field is not on the file, EP4 doesn't processe it.  
+If that field is not on the file, EP4 does not process it. 
 
 > **Note** After your done, you may disable or should the configuration options, since all your customize layouts will be listed has normal download links. Disabling it, will also not load the jquery used for this configuration, so probably will also increase the import / export process. It really depends on your server.
 
@@ -183,8 +183,10 @@ In this files all starts with setting to true or false:
         define('EP4BOOKX_MANIPULATE_IMAGES', true); 
 ```
 
+Set the authors folder name, image prefix ( could be empty), image extension ( for now, only deals with one type), image width and height
+
 ``` 
-     define('EP4BOOKX_MANIPULATE_IMAGES', true);
+     
      //Temporary images folder to be resized / moved
      define('EP4BOOKX_IMAGES_SRC_TEMP_FOLDER', DIR_FS_CATALOG . DIR_WS_IMAGES . 'temp/');
      
@@ -249,8 +251,9 @@ You will find a /tpl folder, where all related style occurs, where you can chang
  - [X]  export /import assigned multiple genres.
  - [X]  Create a separated file to deal only with bookx fields.
  - [ ]  ~~Create a separated file to deal only with authors description.~~
- - [X]  Improve the querys for better performance.
+ - [X]  Improve the queries for better performance.
  - [ ]  ~~Map Fields~~
  - [ ]  Check for duplicated ISBN
  - [ ]  Improve the GD functionality 
- - [ ]  Use the proper $zco_notifiers to be able to export using EP4 Filters. 
+ - [ ]  Use the proper $zco_notifiers to be able to export using EP4 Filters.
+ - [ ]  When all set, simplify the readme file
