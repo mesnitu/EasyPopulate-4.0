@@ -8,7 +8,8 @@ To import Bookx fields by CSV - tested with **Zencart 1.5.5** and **EP4  v4.0.34
  * Contribution by: @mesnitu
  * Special thanks to **@joaosantacruz** for putting me in the right track when a foreach was a issue.
  * Special thanks to **@mc12345678** the EP4 maintainer, for his patient and valuable experience advises and for making the key class that gave independence not only for this module, but all other future features that might come along.
- 
+
+## Table of Contents
 
 - [Supported Bookx Fields](#supported-bookx-fields)
 - [Installation](#installation)
@@ -19,16 +20,15 @@ To import Bookx fields by CSV - tested with **Zencart 1.5.5** and **EP4  v4.0.34
 - [Defaults Names](#defaults-names)
 - [Multiple Authors / Genres](#multiple-authors-and-genres)
 - [Manipulate Images](#manipulate-images)
-- [create an anchor](#Should-Know)
+- [Should Know](#should-Know)
 - [Removing Books with EP4Bookx](#removing-books-with-ep4ookx)
 
 
-
-
 ## Quick review : 
+
 [Book X](https://sourceforge.net/p/zencartbookx) it's an impressive ZenCart mod made by @philou that introduces a new product type for books to the Zen Cart shop system. 
 
-**EP4Bookx** is a fork of Easy Populate 4.0 (v0.33) to support Bookx fields. It will not work under previous EP4 versions.
+**EP4Bookx** is a fork of Easy Populate 4.0 (v4.0.34a) to support Bookx fields. It will not work under previous EP4 versions.
 This is an attempt to give a book shop a quick start to get up and running, but also, to make changes when it comes to a large number of books.
 
 In sum, use the power of Easy Populate 4.0 with BookX product type.
