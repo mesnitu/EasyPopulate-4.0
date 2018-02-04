@@ -148,6 +148,7 @@ Now, using a customized author type field name ( ie: Writer), all empty fields a
 >**It Would assign Writer to Author C.** 
 
 Another example: If all 3 Authors were writers, with a customized author type field, all 3 would have "writer".
+
 | v_bookx_author_name   | v_bookx_author_type |
 ----------------------|----------------------
   Author A^Author B^Author C |                |
