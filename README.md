@@ -10,17 +10,17 @@ To import Bookx fields by CSV - tested with **Zencart 1.5.4** and **EP4 v4.0.33*
  * Special thanks to **@mc12345678** the EP4 maintainer, for his patient and valuable experience advises and for making the key class that gave independence not only for this module, but all other future features that might come along.
  
 
-[Supported Bookx Fields](#supported-bookx-fields)
-[Installation](#installation)
-[How To Use](#how-to-use)
-[Multiple Authors and Genres](#multiple-Authors-and-Genres)
-[The ISBN Field](#the-isbn-Field)
-[Reports](#reports)
-[Defaults Names](#defaults-names)
-[Multiple Authors / Genres](#multiple-authors-and-genres)
-[Manipulate Images](#manipulate-images)
-[create an anchor](#Should-Know)
-[Removing Books with EP4Bookx](#removing-books-with-ep4ookx)
+* [Supported Bookx Fields](#supported-bookx-fields)
+* [Installation](#installation)
+* [How To Use](#how-to-use)
+* [Multiple Authors and Genres](#multiple-Authors-and-Genres)
+* [The ISBN Field](#the-isbn-Field)
+* [Reports](#reports)
+* [Defaults Names](#defaults-names)
+* [Multiple Authors / Genres](#multiple-authors-and-genres)
+* [Manipulate Images](#manipulate-images)
+* [create an anchor](#Should-Know)
+* [Removing Books with EP4Bookx](#removing-books-with-ep4ookx)
 
 
 
@@ -60,6 +60,7 @@ For now, this are the supported fields (just the names).
 Besides this Bookx fields, the EP4Bookx export file has others fields available belonging to the normal product type, such as categories , weight, metatags, manufacturers, special price, date available. Except for categories ( mandatory for new products ), they are configurable whether to be present in the export or not.
 
 #### Note on 0.9.9rc2 
+
 Ep4Bookx is one of the most widely used scripts!...Well, at least for me :simple_smile:
 So I've also added the ability to manipulate products (book) images and author images, plus rewards points fields (individual products), in sum, some stuff that I use on a daily base.
 They are all optional. 
@@ -80,16 +81,16 @@ You can enable it there, but also in the **easypopulate_4 page**, where you'll f
 This will bring the fields configuration section, where you can make your changes.
 
 By default, **all fields names are enable, no reports, no default names are set**. 
-If no customized layout is created, this is the export configuration. 
+If no custom layout is created, this is the export configuration
 If this configuration suits your needs, you may disable this configuration table and simply use the Bookx default export link.
 
 If not, you can create customized export layouts, selecting bellow which fields you need for your csv file. 
 
-**Only the selected fields and default names** are going to be exported / imported, so it might reduce the amount of database query in the process improving the performance by removing unnecessary fields, besides it will present a more clean file only with fields that you've chosen.
+**Only the selected fields and default names** are going to be exported / imported, so it might reduce the amount of database queries in the process, improving the performance by removing unnecessary fields, besides it will present a more clean file only with fields that you've chosen.
 
 > ie: You can have a customized full fields export file for one reason, and some minimize customize fields for just consultation.
  
-There are no limit to the number of customized layouts, a layout name is required , It will save as *layout_your_name*.
+There are no limit to the number of customized layouts, a layout name is required, It will save as *layout_your_name*.
 You can delete the customized layouts.
 If you delete them all, the default configuration is reloaded again.
 
@@ -104,20 +105,20 @@ If for some reason it's not there, nothing ( related to Bookx fields, will be im
 ### Reports
  
 Reports are there if you want.  They will report (at **import**), if a book field was empty.
-In the end of import process, you'll see a table reporting all those missing fields, with a edit link to the admin products page.   
+In the end of import process, you will see a table reporting all those missing fields, with a edit link to the admin products page.   
 
 ### Defaults Names
 
-You can assign default names to some fields. If so, if a empty field as a default name assign, it will populate those fields with those names.
+You can assign default names to some fields. If so, if a empty field in your csv file, as a default name assign, it will populate those fields with those names.
 An example, it's the author type, or the binding. For me 98% are writers. So I just care with the 2% that are not.
 
-> The default names are not used on export, **only on import**. 
+> The default names are not (yet) used on export, **only on import**. 
 
 
-On **Import**, doesn't rely on the enable / disable configuration. Only on the reports and defaults fields. If the field is not in the file, EP4Bookx does not process it.  
-After your done, you may disable this configuration options, since all your customized layouts will be listed has normal download links. Disabling it, will also not load the jquery used for this configuration, so probably will also increase the import / export process. It really depends on your server.
+The **Import**, doesn't rely on the enable / disable configuration. Only on the reports and defaults fields. If the field is not in the file, EP4Bookx does not process it.  
+After your done creating a customized layout, you may disable this fields configuration options, since all your customized layouts will be listed has normal download links.
 
-I've done so, cause in my personal use, there are a lot of books that actually goes to a default values, so I don't have to write then down, but mainly, because if genre or author is empty, it wont be on BookX filter. 
+I've done so, cause in my personal use, there are a lot of books that actually goes to a default values, so I don't have to write then down, but mainly, because if genre or author is empty, it wont be on BookX filter.
 
 
 ### Multiple Authors and Genres 
@@ -136,27 +137,27 @@ If **you use** the author type in a normal way, for each author, a author type m
 
 | v_bookx_author_name | v_bookx_author_type |
 ----------------------|----------------------
-|Author A^Author B^Author C | Writer^Illustrator^Writer
+|Author A^Author B^Author C | Writer^Illustrator^Writer|
 
 Now, using a customized author type field name ( ie: Writer), all empty fields are populated, with that type.
 
 | v_bookx_author_name | v_bookx_author_type |
 ----------------------|----------------------
-| Author A^Author B^Author C | Writer^Illustrator
+| Author A^Author B^Author C | Writer^Illustrator|
 
 >**It Would assign Writer to Author C.** 
 
 Another example: If all 3 Authors were writers, with a customized author type field, all 3 would have "writer".
-| v_bookx_author_name | v_bookx_author_type |
+| v_bookx_author_name   | v_bookx_author_type |
 ----------------------|----------------------
-|Author A^Author B^Author C |         
+|Author A^Author B^Author C |                |
          
 But things can also go this way:
 Let's say you also have a customized author name (ie: Various ). Then both fields are populated:
 
 | v_bookx_author_name | v_bookx_author_type |
 ----------------------|----------------------
-|                      |
+|                      |                     |
 
 > Would populate has v_bookx_author_name = Various and v_bookx_author_type =  Writer
 
@@ -170,7 +171,6 @@ The export does not report or use default names.
 The Import, does not rely on enable / disable configuration. Only in reports and defaults fields. 
 If that field is not on the file, EP4 does not process it. 
 
-> **Note** After your done, you may disable or should the configuration options, since all your customize layouts will be listed has normal download links. Disabling it, will also not load the jquery used for this configuration, so probably will also increase the import / export process. It really depends on your server.
 
 ### Manipulating Images 
 
@@ -211,22 +211,23 @@ Set the authors folder name, image prefix ( could be empty), image extension ( f
 > Still in early testing but working
 
  * `Books Images` can be downloaded or placed at the `images/temporary folder` to be renamed, resized and moved to the destination folder.
- * `Author Images` for now can only be downloaded. 
+ * `Author Images` for now, can only be downloaded. 
 
 The temporary book images **must have the model number** ( maybe in another release this could be a option adding the use of ISBN). 
 In `v_products_image`, use number `9` as image name. If you leave this empty or use some other path, it will be process as EP4 default way.
  
 * Downloading 
     * Simple paste the image url. 
-* Use number 9 
+* Local : Use number 9 
     * It will look in your `temp` folder for the model, rename to  `yourPrefix_the_book_title_9789895623214.jpg`, resize and move to destination folder.
 
-The `Destination` folder will be the **Manufacturer/** name ( maybe in another release the use the Publisher name). It will capitalize the Manufacturer name, ex: images/BookSmile/the_book_title_9789895623214.jpg
+The `Destination` folder will be the capitalize **Manufacturer/** name ( maybe in another release the use the Publisher name). example: images/ThePublisher/the_book_title_9789895623214.jpg
 
-**Note** To clean the book title and Manufacturer, I'm using the Ceon URI class, since I'm using this module. You can change this function ot use some other way of cleaning the names. Look at extra functions.
+**Important Note** To clean the book title and Manufacturer, I'm using the Ceon URI class, since I'm using this module. You can change this function or to use some other way of cleaning the names. Look at extra functions in `easypopulate_4_bookx_functions` for.
+
 ```function cleanImageName($post_name, $type = null) {```
 
-The images process it's made after all data as been imported. 
+The images are processed after all data as been imported to the database. 
 >Caution: There are some downloaded images that are not processed. A report is generated. 
 
  
@@ -234,13 +235,13 @@ The images process it's made after all data as been imported.
 
 EP4Bookx uses status 10 (same procedure as status 9 in EP4), but changed to remove BookX associated fields.
 
-So you would place **v_status 10**, to remove books.
+So you would place **v_status** to `10`, to remove books.
 
 ### Know Issues 
 
 If you've never worked with this csv importers , be aware that "Author A" it's different than "Author  A ", or even more spaces of garbage, that sometimes are present in excel, calc, csv files.
 
-**NOTE** While EP4 shines for style simplicity, EP4Bookx comes with some colors and stylesheets and jquery.
+**NOTE** While EP4 shines for style simplicity, EP4Bookx comes with some stylesheets and jquery. Has of EP4Bookx 0.9.9rc2, it's using the already present zencart bootstrap
 
 You will find a /tpl folder, where all related style occurs, where you can change to your desire style. 
 
@@ -256,4 +257,4 @@ You will find a /tpl folder, where all related style occurs, where you can chang
  - [ ]  Check for duplicated ISBN
  - [ ]  Improve the GD functionality 
  - [ ]  Use the proper $zco_notifiers to be able to export using EP4 Filters.
- - [ ]  When all set, simplify the readme file
+ - [ ]  When all set, simplify the read me file
