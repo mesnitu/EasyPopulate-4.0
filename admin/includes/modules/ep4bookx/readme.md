@@ -1,7 +1,7 @@
 
 # EP4Bookx v0.9.9 -rc2 - A EasyPopulate 4.0 fork
  
-To import Bookx fields by CSV - tested with **Zencart 1.5.4** and **EP4 v4.0.33**
+To import Bookx fields by CSV - tested with **Zencart 1.5.5** and **EP4  v4.0.34a**
 
  * @version  0.9.9 rc2 - **Still in development, make your changes in a local environment**
  * @see Bookx module for ZenCart
@@ -10,17 +10,17 @@ To import Bookx fields by CSV - tested with **Zencart 1.5.4** and **EP4 v4.0.33*
  * Special thanks to **@mc12345678** the EP4 maintainer, for his patient and valuable experience advises and for making the key class that gave independence not only for this module, but all other future features that might come along.
  
 
-* [Supported Bookx Fields](#supported-bookx-fields)
-* [Installation](#installation)
-* [How To Use](#how-to-use)
-* [Multiple Authors and Genres](#multiple-Authors-and-Genres)
-* [The ISBN Field](#the-isbn-Field)
-* [Reports](#reports)
-* [Defaults Names](#defaults-names)
-* [Multiple Authors / Genres](#multiple-authors-and-genres)
-* [Manipulate Images](#manipulate-images)
-* [create an anchor](#Should-Know)
-* [Removing Books with EP4Bookx](#removing-books-with-ep4ookx)
+- [Supported Bookx Fields](#supported-bookx-fields)
+- [Installation](#installation)
+- [How To Use](#how-to-use)
+- [Multiple Authors and Genres](#multiple-Authors-and-Genres)
+- [The ISBN Field](#the-isbn-Field)
+- [Reports](#reports)
+- [Defaults Names](#defaults-names)
+- [Multiple Authors / Genres](#multiple-authors-and-genres)
+- [Manipulate Images](#manipulate-images)
+- [create an anchor](#Should-Know)
+- [Removing Books with EP4Bookx](#removing-books-with-ep4ookx)
 
 
 
@@ -126,7 +126,7 @@ I've done so, cause in my personal use, there are a lot of books that actually g
 Same as EP4 categories.
 > Note: Probably this delimiter will be on the admin panel in near EP4 versions
  
-So use the ** ^ ** as the delimiter.  
+So use the `^` as the delimiter.  
 For Genres that's it.
  
 #### For Authors 
@@ -137,20 +137,20 @@ If **you use** the author type in a normal way, for each author, a author type m
 
 | v_bookx_author_name | v_bookx_author_type |
 ----------------------|----------------------
-|Author A^Author B^Author C | Writer^Illustrator^Writer|
+Author A^Author B^Author C | Writer^Illustrator^Writer
 
 Now, using a customized author type field name ( ie: Writer), all empty fields are populated, with that type.
 
 | v_bookx_author_name | v_bookx_author_type |
 ----------------------|----------------------
-| Author A^Author B^Author C | Writer^Illustrator|
+ Author A^Author B^Author C | Writer^Illustrator
 
 >**It Would assign Writer to Author C.** 
 
 Another example: If all 3 Authors were writers, with a customized author type field, all 3 would have "writer".
 | v_bookx_author_name   | v_bookx_author_type |
 ----------------------|----------------------
-|Author A^Author B^Author C |                |
+  Author A^Author B^Author C |                |
          
 But things can also go this way:
 Let's say you also have a customized author name (ie: Various ). Then both fields are populated:
@@ -162,7 +162,7 @@ Let's say you also have a customized author name (ie: Various ). Then both field
 > Would populate has v_bookx_author_name = Various and v_bookx_author_type =  Writer
 
 The same applies to all fields that can have a default name associated.
-**Note** only works when default values are assign. 
+**Note** only works when default values are assign.
 
 ### Should Know
 
@@ -174,7 +174,8 @@ If that field is not on the file, EP4 does not process it.
 
 ### Manipulating Images 
 
-There's a new file in town at **/admin/includes/extra_configures/ep4book_extra_configures.php**, where some extra configurations can be made. 
+There's a new file in town at **/admin/includes/extra_configures/ep4book_extra_configures.php**, where some extra configurations can be made. The purpose is to reduce the amount of work and time, preparing books and authors images.
+ 
 > **Note** In some other release, I intend to move this configurations to the admin panel. 
 
 In this files all starts with setting to true or false:
@@ -211,7 +212,7 @@ Set the authors folder name, image prefix ( could be empty), image extension ( f
 > Still in early testing but working
 
  * `Books Images` can be downloaded or placed at the `images/temporary folder` to be renamed, resized and moved to the destination folder.
- * `Author Images` for now, can only be downloaded. 
+ * `Author Images` for now, can only be downloaded. For multiple authors use the `^` categorie delimiter. 
 
 The temporary book images **must have the model number** ( maybe in another release this could be a option adding the use of ISBN). 
 In `v_products_image`, use number `9` as image name. If you leave this empty or use some other path, it will be process as EP4 default way.
@@ -227,8 +228,9 @@ The `Destination` folder will be the capitalize **Manufacturer/** name ( maybe i
 
 ```function cleanImageName($post_name, $type = null) {```
 
-The images are processed after all data as been imported to the database. 
->Caution: There are some downloaded images that are not processed. A report is generated. 
+The images are processed after all data as been imported to the database.
+
+>Caution: There are some downloaded images that are not processed. A report is generated. I still didn't had the time to check why this occurs. Ideally in the future, would like to use Image Handler module to manipulate images, trying not to duplicate the same functionalitys in several files. Still, it's simple and much faster to ajust a few missing images, than to be downloading, resizing, renaming,and moving them online, etc...
 
  
 ### Removing Books with EP4Bookx
@@ -239,7 +241,7 @@ So you would place **v_status** to `10`, to remove books.
 
 ### Know Issues 
 
-If you've never worked with this csv importers , be aware that "Author A" it's different than "Author  A ", or even more spaces of garbage, that sometimes are present in excel, calc, csv files.
+If you've never worked with this csv importers, be aware that "Author A" it's different than "Author  A ", or even more spaces of garbage, that sometimes are present in excel, calc, csv files.
 
 **NOTE** While EP4 shines for style simplicity, EP4Bookx comes with some stylesheets and jquery. Has of EP4Bookx 0.9.9rc2, it's using the already present zencart bootstrap
 
@@ -256,5 +258,7 @@ You will find a /tpl folder, where all related style occurs, where you can chang
  - [ ]  ~~Map Fields~~
  - [ ]  Check for duplicated ISBN
  - [ ]  Improve the GD functionality 
+ - [ ]  Create a upload for images related to the new import process
+ - [ ]  Delete temp images
  - [ ]  Use the proper $zco_notifiers to be able to export using EP4 Filters.
  - [ ]  When all set, simplify the read me file
