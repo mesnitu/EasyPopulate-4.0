@@ -17,46 +17,50 @@ if (!defined('IS_ADMIN_FLAG')) {
  * Note: it's on product_bookx_functions
  */
 function ep_4_remove_product_bookx($product_model) {
-    
-   global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
-	$project = PROJECT_VERSION_MAJOR.'.'.PROJECT_VERSION_MINOR;
-	$ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
-	$sql = "SELECT products_id FROM ".TABLE_PRODUCTS;
-  switch (EP4_DB_FILTER_KEY) {
-    case 'products_model':
-      $sql .= " WHERE products_model = :products_model:";
-      $sql = $db->bindVars($sql, ':products_model:', $product_model, 'string');
-      break;
-    case 'blank_new':
-    case 'products_id':
-      $sql .= " WHERE products_id = :products_id:";
-      $sql = $db->bindVars($sql, ':products_id:', $product_model, 'string');
-      break;
-    default:
-      $sql .= " WHERE products_model = :products_model:";
-      $sql = $db->bindVars($sql, ':products_model:', $product_model, 'string');
-      break;
-  }
-	$products = $db->Execute($sql);
-	if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
-		$ep_stack_sql_error = true;
-		if ($ep_debug_logging == true) {
-			$string = "MySQL error ".($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno()).": ".($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error())."\nWhen executing:\n$sql\n";
-			write_debug_log($string);
-		}
-	} elseif ($ep_debug_logging_all == true) {
-		$string = "MySQL PASSED\nWhen executing:\n$sql\n";
-		write_debug_log($string);
-	}
-	while (!$products->EOF) {
-        
-        bookx_delete_product($products->fields['products_id']);
-        if ( function_exists( bookx_delete_table_search($products->fields['products_id'])) );
-		zen_remove_product($products->fields['products_id']);
-		$products->MoveNext();
-	}
-	return;
 
+    global $db, $ep_debug_logging, $ep_debug_logging_all, $ep_stack_sql_error;
+    $project = PROJECT_VERSION_MAJOR . '.' . PROJECT_VERSION_MINOR;
+    $ep_uses_mysqli = ((PROJECT_VERSION_MAJOR > '1' || PROJECT_VERSION_MINOR >= '5.3') ? true : false);
+    $sql = "SELECT products_id FROM " . TABLE_PRODUCTS;
+    switch (EP4_DB_FILTER_KEY) {
+        case 'products_model':
+            $sql .= " WHERE products_model = :products_model:";
+            $sql = $db->bindVars($sql, ':products_model:', $product_model, 'string');
+            break;
+        case 'blank_new':
+        case 'products_id':
+            $sql .= " WHERE products_id = :products_id:";
+            $sql = $db->bindVars($sql, ':products_id:', $product_model, 'integer');
+            break;
+        default:
+            $sql .= " WHERE products_model = :products_model:";
+            $sql = $db->bindVars($sql, ':products_model:', $product_model, 'string');
+            break;
+    }
+    $products = $db->Execute($sql);
+    if (($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno())) {
+        $ep_stack_sql_error = true;
+        if ($ep_debug_logging == true) {
+            $string = "MySQL error " . ($ep_uses_mysqli ? mysqli_errno($db->link) : mysql_errno()) . ": " . ($ep_uses_mysqli ? mysqli_error($db->link) : mysql_error()) . "\nWhen executing:\n$sql\n";
+            write_debug_log($string);
+        }
+    } elseif ($ep_debug_logging_all == true) {
+        $string = "MySQL PASSED\nWhen executing:\n$sql\n";
+        write_debug_log($string);
+    }
+    while (!$products->EOF) {
+
+        bookx_delete_product($products->fields['products_id']);
+        // this is for a extra table, not belonging to bookx module ( yet ), and probably will be remove, if I don't have time to review / update the bookx module itself
+        if (function_exists('bookx_delete_table_search')) {
+            bookx_delete_table_search($products->fields['products_id']);
+        }
+
+        zen_remove_product($products->fields['products_id']);
+        $products->MoveNext();
+    }
+
+    return;
 }
 
 /**

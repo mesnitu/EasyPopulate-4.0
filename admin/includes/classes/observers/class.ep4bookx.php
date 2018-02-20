@@ -679,14 +679,14 @@ class ep4bookx extends base {
 
     // EP4_IMPORT_FILE_EARLY_ROW_PROCESSING
     function updateEP4ImportFileEarlyRowProcessing(&$callingClass, $notifier, $paramsArray) {
-        global $items, $filelayout, $display_output, $continueNextRow;
+        global $items, $filelayout, $display_output, $continueNextRow, $chosen_key;
 
 
         if ($items[$filelayout['v_status']] == 10) {
             $display_output .= sprintf(EASYPOPULATE_4_DISPLAY_RESULT_BOOKX_DELETED, $items[$filelayout['v_products_model']], $items[$filelayout['v_bookx_isbn']]);
             // Using Bookx function to remove books.
-            // @todo Remove from bookx_extra_description 
-            ep_4_remove_product_bookx($items[$filelayout['v_products_model']]);
+          
+            ep_4_remove_product_bookx($items[$filelayout[$chosen_key]]);
             $continueNextRow = true;
         }
     }

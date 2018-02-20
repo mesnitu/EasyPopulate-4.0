@@ -12,9 +12,9 @@
 
 // this define paths is a temporary fix, it could be use as a constant at the observer ep4bookx. But for some reason my online server doesn't work with then
 // ------------------------------------------------------------------------
-define(EP4BOOKX_MODULE_PATH, DIR_WS_MODULES . 'ep4bookx/');
-define(EP4BOOKX_LAYOUTS_PATH, EP4BOOKX_MODULE_PATH . 'layouts/');
-define(EP4BOOKX_TPL_PATH, EP4BOOKX_MODULE_PATH . 'tpl/');
+define('EP4BOOKX_MODULE_PATH', DIR_WS_MODULES . 'ep4bookx/');
+define('EP4BOOKX_LAYOUTS_PATH', EP4BOOKX_MODULE_PATH . 'layouts/');
+define('EP4BOOKX_TPL_PATH', EP4BOOKX_MODULE_PATH . 'tpl/');
 
 define('EP4BOOKX_BOOK_UPDATE_TABLE_SEARCH', true);
 //---------------------------------------------------------------------------
