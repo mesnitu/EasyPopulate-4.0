@@ -1225,13 +1225,13 @@ class ep4BookxVarsOverRide {
 
             $db->Execute("DROP TABLE IF EXISTS " . $ep4bookx_db_table . " ");
 
-            $sql2 = " CREATE TABLE " . $ep4bookx_db_table . " ( configuration TEXT NOT NULL, default_fields TEXT NOT NULL, map_fields TEXT NOT NULL
+            $sql2 = " CREATE TABLE " . $ep4bookx_db_table . " ( configuration TEXT NOT NULL, default_fields TEXT NOT NULL, map_fields TEXT NULL DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
             $result2 = $db->Execute($sql2);
 
             if ($result2 == 1) {
 
-                $sql_insert = "INSERT INTO " . $ep4bookx_db_table . " (configuration, default_fields) VALUES ('" . $data . "', '" . $data2 . "')";
+                $sql_insert = "INSERT INTO " . $ep4bookx_db_table . " (configuration, default_fields) VALUES ('" . $data . "', '" . $data2 . "', DEFAULT)";
                 $result = $db->Execute($sql_insert);
 
                 //include_once(DIR_FS_ADMIN . DIR_WS_LANGUAGES . $_SESSION['language'] . '/easypopulate_4_bookx.php');
