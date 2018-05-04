@@ -1011,7 +1011,7 @@ if (isset($filelayout['v_bookx_isbn'])) {// Only proceed if ISBN filelayout is p
             ($this->bindStatus['bind_binding'] == 1 ? $query = $db->bindVars($query, ':v_binding_id:', $v_binding_id, 'integer') : '');
             ($this->bindStatus['bind_printing'] == 1 ? $query = $db->bindVars($query, ':v_printing_id:', $v_printing_id, 'integer') : '');
             ($this->bindStatus['bind_condition'] == 1 ? $query = $db->bindVars($query, ':v_condition_id:', $v_condition_id, 'integer') : '');
-            ($this->bindStatus['bind_publishing_date'] == 1 ? $query = $db->bindVars($query, ':v_bookx_publishing_date:', $v_bookx_publishing_date, 'date') : '');
+            ($this->bindStatus['bind_publishing_date'] == 1 && $v_bookx_publishing_date !='') ? $query = $db->bindVars($query, ':v_bookx_publishing_date:', $v_bookx_publishing_date, 'date') : $query = $db->bindVars($query, ':v_bookx_publishing_date:', 'DEFAULT', 'noquotestring');
             ($this->bindStatus['bind_pages'] == 1 ? $query = $db->bindVars($query, ':v_bookx_pages:', $v_bookx_pages, 'string') : '');
             ($this->bindStatus['bind_volume'] == 1 ? $query = $db->bindVars($query, ':v_bookx_volume:', $v_bookx_volume, 'string') : '' );
             ($this->bindStatus['bind_size'] == 1 ? $query = $db->bindVars($query, ':v_bookx_size:', $v_bookx_size, 'string') : '');
