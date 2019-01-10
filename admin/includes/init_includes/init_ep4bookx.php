@@ -13,6 +13,7 @@ if ( !defined('IS_ADMIN_FLAG') ) {
     die('Illegal Access');
 }
 
+define('EP4BOOKX_VERSION','0.9.9r2');
 
 $const = get_defined_constants();
 
